@@ -1,0 +1,10 @@
+{
+    "type": "module",
+    "scripts": {
+        "test": "spago test"
+    },
+    "prettier": {
+        "arrowParens": "avoid",
+        "trailingComma": "none"
+    }
+}
