@@ -9,6 +9,9 @@ import Aeson
   , caseAesonString
   , encodeAeson
   )
+import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
+import Cardano.FromData (class FromData)
+import Cardano.FromMetadata (class FromMetadata)
 import Cardano.Serialization.Lib
   ( fromBytes
   , scriptHash_fromBech32
@@ -16,24 +19,19 @@ import Cardano.Serialization.Lib
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Types.PlutusData (PlutusData(Bytes))
-import Cardano.FromData (class FromData)
-import Cardano.FromMetadata (class FromMetadata)
-import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.ToData (class ToData, toData)
+import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Bech32String (Bech32String)
+import Cardano.Types.PlutusData (PlutusData(Bytes))
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum(Bytes)) as Metadata
-import Data.ByteArray
-  ( byteArrayFromIntArrayUnsafe
-  , byteArrayToHex
-  , hexToByteArray
-  )
+import Data.ByteArray (byteArrayFromIntArrayUnsafe, hexToByteArray)
 import Data.Either (Either(Right, Left))
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing), fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
+import Data.Show.Generic (genericShow)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
@@ -42,6 +40,7 @@ import Test.QuickCheck.Gen (chooseInt, vectorOf)
 newtype ScriptHash = ScriptHash Csl.ScriptHash
 
 derive instance Newtype ScriptHash _
+derive instance Generic ScriptHash _
 
 instance Eq ScriptHash where
   eq = eq `on` encodeCbor
@@ -50,7 +49,7 @@ instance Ord ScriptHash where
   compare = compare `on` encodeCbor
 
 instance Show ScriptHash where
-  show edkh = "(ScriptHash " <> byteArrayToHex (unwrap $ encodeCbor edkh) <> ")"
+  show = genericShow
 
 instance Arbitrary ScriptHash where
   arbitrary =
