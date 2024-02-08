@@ -2,6 +2,7 @@ module Cardano.Types.MoveInstantaneousReward where
 
 import Prelude
 
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (moveInstantaneousReward_asToOtherPot, moveInstantaneousReward_asToStakeCreds, moveInstantaneousReward_newToOtherPot, moveInstantaneousReward_newToStakeCreds, moveInstantaneousReward_pot)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Teyps.MIRToStakeCredentials (MIRToStakeCredentials)
@@ -15,7 +16,7 @@ import Control.Alt ((<|>))
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe (fromJust)
-import Data.Newtype (unwrap)
+import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Partial.Unsafe (unsafePartial)
@@ -35,6 +36,10 @@ derive instance Generic MoveInstantaneousReward _
 
 instance Show MoveInstantaneousReward where
   show = genericShow
+
+instance AsCbor MoveInstantaneousReward where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl :: MoveInstantaneousReward -> Csl.MoveInstantaneousReward
 toCsl = case _ of

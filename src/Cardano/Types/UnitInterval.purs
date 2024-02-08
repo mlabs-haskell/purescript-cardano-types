@@ -7,6 +7,7 @@ import Cardano.Serialization.Lib
   , unitInterval_new
   , unitInterval_numerator
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
 import Data.Generic.Rep (class Generic)
@@ -34,3 +35,7 @@ fromCsl csl = UnitInterval
   { numerator: wrap $ unitInterval_numerator csl
   , denominator: wrap $ unitInterval_denominator csl
   }
+
+instance AsCbor UnitInterval where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl

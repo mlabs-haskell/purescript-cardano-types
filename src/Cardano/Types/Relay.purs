@@ -4,6 +4,7 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Aeson (class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( dnsRecordAorAAAA_new
   , dnsRecordAorAAAA_record
@@ -68,6 +69,10 @@ instance EncodeAeson Relay where
     SingleHostAddr r -> encodeTagged' "SingleHostAddr" r
     SingleHostName r -> encodeTagged' "SingleHostName" r
     MultiHostName r -> encodeTagged' "MultiHostName" r
+
+instance AsCbor Relay where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl :: Relay -> Csl.Relay
 toCsl = case _ of

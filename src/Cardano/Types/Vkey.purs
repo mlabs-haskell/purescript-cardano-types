@@ -3,9 +3,11 @@ module Cardano.Types.Vkey where
 import Prelude
 
 import Aeson (class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.PublicKey (PublicKey(PublicKey))
+import Cardano.Serialization.Lib as Csl
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, wrap,unwrap)
 import Data.Show.Generic (genericShow)
 
 newtype Vkey = Vkey PublicKey
@@ -18,3 +20,13 @@ derive newtype instance EncodeAeson Vkey
 
 instance Show Vkey where
   show = genericShow
+
+fromCsl :: Csl.Vkey -> Vkey
+fromCsl = Csl.vkey_publicKey >>> wrap >>> wrap
+
+toCsl :: Vkey -> Csl.Vkey
+toCsl = unwrap >>> unwrap >>> Csl.vkey_new
+
+instance AsCbor Vkey where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl

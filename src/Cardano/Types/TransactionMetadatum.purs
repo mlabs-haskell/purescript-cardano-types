@@ -4,6 +4,7 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Aeson (class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( packMapContainer
   , transactionMetadatum_asBytes
@@ -55,6 +56,10 @@ instance EncodeAeson TransactionMetadatum where
     Int n -> encodeTagged' "Int" n
     Bytes bytes -> encodeTagged' "Bytes" bytes
     Text string -> encodeTagged' "Text" string
+
+instance AsCbor TransactionMetadatum where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl
   :: TransactionMetadatum -> Csl.TransactionMetadatum

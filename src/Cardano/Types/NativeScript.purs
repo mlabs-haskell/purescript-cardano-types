@@ -10,7 +10,7 @@ import Aeson
   , getField
   , (.:)
   )
-import Cardano.AsCbor (decodeCbor, encodeCbor)
+import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
 import Cardano.Serialization.Lib
   ( nativeScript_asScriptAll
   , nativeScript_asScriptAny
@@ -129,6 +129,10 @@ instance EncodeAeson NativeScript where
       { n, nativeScripts }
     TimelockStart r -> encodeTagged' "TimelockStart" r
     TimelockExpiry r -> encodeTagged' "TimelockExpiry" r
+
+instance AsCbor NativeScript where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 pprintNativeScript :: NativeScript -> TagSet
 pprintNativeScript = case _ of

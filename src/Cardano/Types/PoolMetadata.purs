@@ -3,6 +3,7 @@ module Cardano.Types.PoolMetadata where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( poolMetadata_new
   , poolMetadata_poolMetadataHash
@@ -28,6 +29,10 @@ derive newtype instance DecodeAeson PoolMetadata
 
 instance Show PoolMetadata where
   show = genericShow
+
+instance AsCbor PoolMetadata where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 fromCsl :: Csl.PoolMetadata -> PoolMetadata
 fromCsl csl = PoolMetadata

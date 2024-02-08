@@ -3,7 +3,7 @@ module Cardano.Types.MultiAsset where
 import Prelude hiding (add)
 
 import Aeson (class DecodeAeson, class EncodeAeson, encodeAeson)
-import Cardano.AsCbor (encodeCbor)
+import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AssetName (AssetName, fromAssetName)
@@ -65,6 +65,10 @@ instance DecodeAeson MultiAsset where
   decodeAeson aeson = do
     mapAesons <- decodeMap aeson
     MultiAsset <$> for mapAesons decodeMap
+
+instance AsCbor MultiAsset where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 empty :: MultiAsset
 empty = MultiAsset Map.empty

@@ -8,6 +8,7 @@ module Cardano.Types.TransactionUnspentOutput
 import Prelude
 
 import Aeson (class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (transactionUnspentOutput_input, transactionUnspentOutput_new, transactionUnspentOutput_output)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.TransactionInput (TransactionInput)
@@ -17,7 +18,7 @@ import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.UtxoMap (UtxoMap)
 import Data.Generic.Rep (class Generic)
 import Data.Map as Map
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.Tuple (Tuple(Tuple))
 
@@ -33,6 +34,10 @@ derive newtype instance EncodeAeson TransactionUnspentOutput
 
 instance Show TransactionUnspentOutput where
   show = genericShow
+
+instance AsCbor TransactionUnspentOutput where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 transactionUnspentOutputsToUtxoMap :: Array TransactionUnspentOutput -> UtxoMap
 transactionUnspentOutputsToUtxoMap = Map.fromFoldable <<< map

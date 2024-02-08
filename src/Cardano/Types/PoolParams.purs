@@ -16,6 +16,7 @@ import Cardano.Serialization.Lib
   , poolParams_vrfKeyhash
   , unpackListContainer
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
@@ -57,6 +58,11 @@ derive instance Eq PoolParams
 
 instance Show PoolParams where
   show = genericShow
+
+instance AsCbor PoolParams where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
 
 toCsl :: PoolParams -> Csl.PoolParams
 toCsl

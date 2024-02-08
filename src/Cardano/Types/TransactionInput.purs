@@ -6,7 +6,10 @@ module Cardano.Types.TransactionInput
 
 import Prelude
 
+import Data.Newtype (unwrap, wrap)
+
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( transactionInput_index
   , transactionInput_new
@@ -66,6 +69,10 @@ instance ToData TransactionInput where
 instance Coarbitrary TransactionInput where
   coarbitrary (TransactionInput input) generator =
     coarbitrary (toInt input.index) $ coarbitrary input.transactionId generator
+
+instance AsCbor TransactionInput where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 fromCsl :: Csl.TransactionInput -> TransactionInput
 fromCsl input =
