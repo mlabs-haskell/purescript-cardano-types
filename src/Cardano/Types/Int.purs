@@ -26,6 +26,7 @@ import Cardano.Types.BigNum (fromBigInt, fromInt) as BigNum
 import Control.Alternative ((<|>))
 import Data.Either (note)
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import JS.BigInt as BigInt
@@ -36,6 +37,7 @@ import Prim as Prim
 -- | Signed 128-bit integer
 newtype Int = Int Csl.Int
 
+derive instance Generic Int _
 derive instance Newtype Int _
 
 instance Eq Int where

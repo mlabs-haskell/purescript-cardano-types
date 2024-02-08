@@ -29,6 +29,7 @@ import Cardano.Serialization.Lib as Csl
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Data.Either (note)
+import Data.Generic.Rep (class Generic)
 import Data.Int (fromString) as Int
 import Data.Maybe (Maybe, fromJust, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -42,6 +43,7 @@ import Safe.Coerce (coerce)
 
 newtype BigNum = BigNum Csl.BigNum
 
+derive instance Generic BigNum _
 derive instance Newtype BigNum _
 
 instance Eq BigNum where

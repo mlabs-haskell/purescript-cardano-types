@@ -17,6 +17,7 @@ import Cardano.Types.TransactionMetadatum (TransactionMetadatum(Bytes)) as Metad
 import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, byteArrayToHex, hexToByteArray)
 import Data.Either (Either(Left), hush, note)
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing), fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
@@ -28,6 +29,7 @@ import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
 newtype Ed25519KeyHash = Ed25519KeyHash Csl.Ed25519KeyHash
 
+derive instance Generic Ed25519KeyHash _
 derive instance Newtype Ed25519KeyHash _
 
 instance Eq Ed25519KeyHash where

@@ -10,10 +10,12 @@ import Cardano.FromData (class FromData, fromData)
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Cardano.ToData (class ToData, toData)
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Nullable (toMaybe)
 
 newtype PublicKey = PublicKey Csl.PublicKey
 
+derive instance Generic PublicKey _
 derive instance Newtype PublicKey _
 
 instance Eq PublicKey where

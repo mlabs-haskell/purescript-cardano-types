@@ -7,10 +7,12 @@ import Cardano.Serialization.Lib (ed25519Signature_toBech32, fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
 import Cardano.AsCbor (class AsCbor)
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 
 newtype Ed25519Signature = Ed25519Signature Csl.Ed25519Signature
 
+derive instance Generic Ed25519Signature _
 derive instance Newtype Ed25519Signature _
 
 instance Eq Ed25519Signature where

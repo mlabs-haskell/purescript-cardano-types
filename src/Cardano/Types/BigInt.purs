@@ -12,6 +12,7 @@ import Data.EuclideanRing (class CommutativeRing, class EuclideanRing, class Sem
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (bigInt_divCeil, bigInt_fromStr, bigInt_toStr)
 import Cardano.Serialization.Lib as Csl
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
@@ -30,6 +31,7 @@ derive newtype instance Ring CborBigInt
 derive newtype instance CommutativeRing CborBigInt
 derive newtype instance EuclideanRing CborBigInt
 
+derive instance Generic CborBigInt _
 derive instance Newtype CborBigInt _
 
 toCsl :: BigInt -> Csl.BigInt

@@ -21,6 +21,7 @@ import Cardano.Types.Internal.Helpers (decodeUtf8)
 import Data.ByteArray (ByteArray, byteArrayToHex, byteLength, hexToByteArray)
 import Data.Either (Either(Left, Right), either, note)
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.String as String
@@ -31,6 +32,7 @@ import Test.QuickCheck.Gen (resize)
 
 newtype AssetName = AssetName Csl.AssetName
 
+derive instance Generic AssetName _
 derive instance Newtype AssetName _
 
 instance Eq AssetName where

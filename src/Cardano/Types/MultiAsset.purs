@@ -15,6 +15,7 @@ import Control.Bind (bindFlipped)
 import Data.Array (filter, foldr)
 import Data.ByteArray (byteArrayToHex)
 import Data.Foldable (any, foldM)
+import Data.Generic.Rep (class Generic)
 import Data.Lattice (class JoinSemilattice, class MeetSemilattice)
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
@@ -33,6 +34,7 @@ import Test.QuickCheck.Gen (Gen, suchThat)
 
 newtype MultiAsset = MultiAsset (Map ScriptHash (Map AssetName BigNum))
 
+derive instance Generic MultiAsset _
 derive newtype instance Eq MultiAsset
 derive instance Newtype MultiAsset _
 
