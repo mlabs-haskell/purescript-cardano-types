@@ -24,6 +24,7 @@ newtype GeneralTransactionMetadata =
 derive instance Newtype GeneralTransactionMetadata _
 
 derive newtype instance Eq GeneralTransactionMetadata
+derive newtype instance Ord GeneralTransactionMetadata
 derive instance Generic GeneralTransactionMetadata _
 
 instance Show GeneralTransactionMetadata where

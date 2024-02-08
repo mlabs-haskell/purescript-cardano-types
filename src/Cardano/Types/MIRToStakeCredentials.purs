@@ -21,6 +21,7 @@ newtype MIRToStakeCredentials = MIRToStakeCredentials
   (Map StakeCredential Int.Int)
 
 derive instance Eq MIRToStakeCredentials
+derive instance Ord MIRToStakeCredentials
 derive instance Newtype MIRToStakeCredentials _
 derive instance Generic MIRToStakeCredentials _
 

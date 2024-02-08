@@ -6,6 +6,7 @@ import Aeson (class EncodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (value_coin, value_multiasset, value_newWithAssets)
 import Cardano.Serialization.Lib as Csl
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.Asset (Asset(Asset, AdaAsset))
 import Cardano.Types.AssetClass (AssetClass(AssetClass))
 import Cardano.Types.AssetName (AssetName)
@@ -38,6 +39,9 @@ data Value = Value Coin MultiAsset
 
 derive instance Generic Value _
 derive instance Eq Value
+
+instance Ord Value where
+  compare a b = if a `lt` b then LT else if a `gt` b then GT else EQ
 
 instance Arbitrary Value where
   arbitrary = Value <$> arbitrary <*> arbitrary

@@ -32,6 +32,7 @@ data MoveInstantaneousReward
       }
 
 derive instance Eq MoveInstantaneousReward
+derive instance Ord MoveInstantaneousReward
 derive instance Generic MoveInstantaneousReward _
 
 instance Show MoveInstantaneousReward where

@@ -36,6 +36,7 @@ newtype MultiAsset = MultiAsset (Map ScriptHash (Map AssetName BigNum))
 
 derive instance Generic MultiAsset _
 derive newtype instance Eq MultiAsset
+derive newtype instance Ord MultiAsset
 derive instance Newtype MultiAsset _
 
 instance Arbitrary MultiAsset where

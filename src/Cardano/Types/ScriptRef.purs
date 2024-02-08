@@ -24,6 +24,7 @@ data ScriptRef = NativeScriptRef NativeScript | PlutusScriptRef PlutusScript
 
 derive instance Eq ScriptRef
 derive instance Generic ScriptRef _
+derive instance Ord ScriptRef
 
 instance Show ScriptRef where
   show = genericShow

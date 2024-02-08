@@ -30,6 +30,7 @@ newtype TransactionUnspentOutput = TransactionUnspentOutput
 derive instance Generic TransactionUnspentOutput _
 derive instance Newtype TransactionUnspentOutput _
 derive newtype instance Eq TransactionUnspentOutput
+derive newtype instance Ord TransactionUnspentOutput
 derive newtype instance EncodeAeson TransactionUnspentOutput
 
 instance Show TransactionUnspentOutput where

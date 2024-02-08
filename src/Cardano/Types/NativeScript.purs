@@ -75,6 +75,7 @@ data NativeScript
 
 derive instance Eq NativeScript
 derive instance Generic NativeScript _
+derive instance Ord NativeScript
 
 instance Show NativeScript where
   show x = genericShow x

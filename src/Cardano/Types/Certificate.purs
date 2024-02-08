@@ -76,6 +76,7 @@ data Certificate
   | MoveInstantaneousRewardsCert MoveInstantaneousReward
 
 derive instance Eq Certificate
+derive instance Ord Certificate
 derive instance Generic Certificate _
 
 instance Show Certificate where

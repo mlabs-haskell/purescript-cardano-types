@@ -48,6 +48,7 @@ newtype TransactionOutput = TransactionOutput
 
 derive instance Generic TransactionOutput _
 derive instance Newtype TransactionOutput _
+derive newtype instance Ord TransactionOutput
 derive newtype instance Eq TransactionOutput
 derive newtype instance EncodeAeson TransactionOutput
 

@@ -34,6 +34,7 @@ import Effect.Unsafe (unsafePerformEffect)
 data OutputDatum = OutputDatumHash DataHash | OutputDatum PlutusData
 
 derive instance Generic OutputDatum _
+derive instance Ord OutputDatum
 derive instance Eq OutputDatum
 
 instance Show OutputDatum where

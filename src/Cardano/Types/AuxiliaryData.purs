@@ -31,6 +31,7 @@ newtype AuxiliaryData = AuxiliaryData
 derive instance Generic AuxiliaryData _
 derive instance Newtype AuxiliaryData _
 derive newtype instance Eq AuxiliaryData
+derive newtype instance Ord AuxiliaryData
 derive newtype instance EncodeAeson AuxiliaryData
 
 instance Show AuxiliaryData where

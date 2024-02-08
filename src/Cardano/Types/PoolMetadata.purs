@@ -23,6 +23,7 @@ newtype PoolMetadata = PoolMetadata
   }
 
 derive instance Eq PoolMetadata
+derive instance Ord PoolMetadata
 derive instance Generic PoolMetadata _
 derive newtype instance EncodeAeson PoolMetadata
 derive newtype instance DecodeAeson PoolMetadata
