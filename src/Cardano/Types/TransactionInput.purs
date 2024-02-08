@@ -6,8 +6,6 @@ module Cardano.Types.TransactionInput
 
 import Prelude
 
-import Data.Newtype (unwrap, wrap)
-
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
@@ -23,7 +21,7 @@ import Cardano.FromData (class FromData, fromData)
 import Cardano.ToData (class ToData, toData)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing))
-import Data.Newtype (class Newtype, unwrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.UInt (UInt, toInt)
 import Data.UInt as UInt
