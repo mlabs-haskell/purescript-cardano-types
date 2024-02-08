@@ -18,8 +18,9 @@ import Aeson
   , decodeAeson
   , encodeAeson
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (Int) as Csl
-import Cardano.Serialization.Lib (int_new, int_newNegative, int_toStr)
+import Cardano.Serialization.Lib (fromBytes, toBytes, int_new, int_newNegative, int_toStr)
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum (fromBigInt, fromInt) as BigNum
 import Control.Alternative ((<|>))
@@ -52,6 +53,10 @@ instance EncodeAeson Int where
 instance DecodeAeson Int where
   decodeAeson aeson =
     decodeAeson aeson >>= note (TypeMismatch "Int") <<< fromBigInt
+
+instance AsCbor Int where
+  encodeCbor = unwrap >>> toBytes >>> wrap
+  decodeCbor = unwrap >>> fromBytes >>> map wrap
 
 fromBigInt :: BigInt.BigInt -> Maybe Int
 fromBigInt bi =
