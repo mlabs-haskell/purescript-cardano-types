@@ -27,6 +27,10 @@ derive instance Generic UnitInterval _
 instance Show UnitInterval where
   show = genericShow
 
+instance AsCbor UnitInterval where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
 toCsl :: UnitInterval -> Csl.UnitInterval
 toCsl (UnitInterval { numerator, denominator }) = unitInterval_new (unwrap numerator) (unwrap denominator)
 
@@ -36,6 +40,3 @@ fromCsl csl = UnitInterval
   , denominator: wrap $ unitInterval_denominator csl
   }
 
-instance AsCbor UnitInterval where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl

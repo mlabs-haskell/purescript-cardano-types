@@ -1,4 +1,4 @@
-module Cardano.Teyps.MIRToStakeCredentials where
+module Cardano.Types.MIRToStakeCredentials where
 
 import Prelude
 
