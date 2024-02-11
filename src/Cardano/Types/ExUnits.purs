@@ -1,5 +1,7 @@
-module Cardano.Crypto.Csl.Types.ExUnits
+module Cardano.Types.ExUnits
   ( ExUnits(..)
+  , fromCsl
+  , toCsl
   ) where
 
 import Cardano.AsCbor (class AsCbor)
@@ -10,6 +12,7 @@ import Data.Eq (class Eq)
 import Data.Function ((>>>))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Ord (class Ord)
 import Data.Show (class Show)
 import Data.Show.Generic (genericShow)
 
@@ -17,6 +20,7 @@ newtype ExUnits = ExUnits { mem :: BigNum, steps :: BigNum }
 
 derive instance Newtype ExUnits _
 derive instance Eq ExUnits
+derive instance Ord ExUnits
 derive instance Generic ExUnits _
 
 instance Show ExUnits where
