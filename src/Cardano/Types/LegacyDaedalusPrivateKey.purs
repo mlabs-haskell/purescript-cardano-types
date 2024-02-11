@@ -1,0 +1,3 @@
+module LegacyDaedalusPrivateKey where
+
+-- TODO ?

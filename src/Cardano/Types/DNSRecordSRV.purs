@@ -1,5 +1,7 @@
 module Cardano.Types.DNSRecordSRV
   ( DNSRecordSRV(..)
+  , fromCsl
+  , toCsl
   ) where
 
 import Cardano.AsCbor (class AsCbor)
@@ -9,6 +11,7 @@ import Data.Eq (class Eq)
 import Data.Function ((>>>))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Ord (class Ord)
 import Data.Show (class Show)
 import Data.Show.Generic (genericShow)
 
@@ -17,6 +20,7 @@ newtype DNSRecordSRV = DNSRecordSRV { record :: String }
 derive instance Newtype DNSRecordSRV _
 derive instance Eq DNSRecordSRV
 derive instance Generic DNSRecordSRV _
+derive instance Ord DNSRecordSRV
 
 instance Show DNSRecordSRV where
     show = genericShow
