@@ -13,7 +13,6 @@ import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 import Safe.Coerce (coerce)
 
-
 newtype Ipv6 = Ipv6 Csl.Ipv6
 
 instance Eq Ipv6 where

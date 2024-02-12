@@ -9,14 +9,30 @@ module Cardano.Types.OutputDatum
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch, UnexpectedValue), caseAesonObject, fromString, toStringifiedNumbersJson, (.:))
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(TypeMismatch, UnexpectedValue)
+  , caseAesonObject
+  , fromString
+  , toStringifiedNumbersJson
+  , (.:)
+  )
 import Cardano.AsCbor (encodeCbor)
 import Cardano.Types.DataHash (DataHash)
 import Cardano.Types.PlutusData (PlutusData, pprintPlutusData)
 import Cardano.Types.PlutusData as PlutusData
 import Cardano.FromData (class FromData, genericFromData)
 import Cardano.Types.Internal.Helpers (encodeTagged')
-import Cardano.Plutus.DataSchema (class HasPlutusSchema, type (:+), type (:=), type (@@), PNil, S, Z)
+import Cardano.Plutus.DataSchema
+  ( class HasPlutusSchema
+  , type (:+)
+  , type (:=)
+  , type (@@)
+  , PNil
+  , S
+  , Z
+  )
 import Cardano.ToData (class ToData, genericToData)
 import Cardano.Serialization.Lib as Csl
 import Data.ByteArray (byteArrayToHex)
@@ -34,8 +50,8 @@ import Effect.Unsafe (unsafePerformEffect)
 data OutputDatum = OutputDatumHash DataHash | OutputDatum PlutusData
 
 derive instance Generic OutputDatum _
-derive instance Ord OutputDatum
 derive instance Eq OutputDatum
+derive instance Ord OutputDatum
 
 instance Show OutputDatum where
   show = genericShow
@@ -77,14 +93,12 @@ instance DecodeAeson OutputDatum where
           Left $ UnexpectedValue $ toStringifiedNumbersJson $ fromString
             tagValue
 
-
 fromCsl :: Csl.OutputDatum -> OutputDatum
 fromCsl cslOd = case toMaybe (Csl.outputDatum_dataHash cslOd) of
-   Just hash -> OutputDatumHash (wrap hash)
-   Nothing -> case toMaybe (Csl.outputDatum_data cslOd) of
-      Just dat -> OutputDatum (PlutusData.fromCsl dat)
-      Nothing -> unsafePerformEffect $ throw "Cardano.Types.OutputDatum.fromCsl: unknown kind"
-
+  Just hash -> OutputDatumHash (wrap hash)
+  Nothing -> case toMaybe (Csl.outputDatum_data cslOd) of
+    Just dat -> OutputDatum (PlutusData.fromCsl dat)
+    Nothing -> unsafePerformEffect $ throw "Cardano.Types.OutputDatum.fromCsl: unknown kind"
 
 toCsl :: OutputDatum -> Csl.OutputDatum
 toCsl = case _ of

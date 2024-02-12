@@ -1,69 +1,66 @@
 module Cardano.Types.RedeemerTag
-  ( RedeemerTag(..)
+  ( RedeemerTag
+      ( Spend
+      , Mint
+      , Cert
+      , Reward
+      )
   , fromCsl
   , toCsl
-  , redeemerTagFromNumber
-  , redeemerTagToNumber
-  )
-  where
+  , fromInt
+  , toInt
+  ) where
 
 import Prelude
 
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
-import Data.Int (floor)
+import Data.Int as Int
+import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Show.Generic (genericShow)
-import Effect.Exception (throw)
-import Effect.Unsafe (unsafePerformEffect)
+import Partial.Unsafe (unsafePartial)
 
 data RedeemerTag
-    = RedeemerTagNewSpend
-    | RedeemerTagNewMint
-    | RedeemerTagNewCert
-    | RedeemerTagNewReward
+  = Spend
+  | Mint
+  | Cert
+  | Reward
 
 derive instance Generic RedeemerTag _
 derive instance Eq RedeemerTag
 derive instance Ord RedeemerTag
 
-
 instance Show RedeemerTag where
   show = genericShow
-
 
 instance AsCbor RedeemerTag where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
-redeemerTagToNumber :: RedeemerTag -> Int
-redeemerTagToNumber = case _ of
-  RedeemerTagNewSpend -> 0
-  RedeemerTagNewMint -> 1
-  RedeemerTagNewCert -> 2
-  RedeemerTagNewReward -> 3
+toInt :: RedeemerTag -> Int
+toInt = case _ of
+  Spend -> 0
+  Mint -> 1
+  Cert -> 2
+  Reward -> 3
 
-redeemerTagFromNumber :: Int -> Maybe RedeemerTag
-redeemerTagFromNumber = case _ of
-  0 -> Just RedeemerTagNewSpend
-  1 -> Just RedeemerTagNewMint
-  2 -> Just RedeemerTagNewCert
-  3 -> Just RedeemerTagNewReward
+fromInt :: Int -> Maybe RedeemerTag
+fromInt = case _ of
+  0 -> Just Spend
+  1 -> Just Mint
+  2 -> Just Cert
+  3 -> Just Reward
   _ -> Nothing
 
 fromCsl :: Csl.RedeemerTag -> RedeemerTag
-fromCsl rt = case Csl.redeemerTag_kind rt # floor of
-  0 -> RedeemerTagNewSpend
-  1 -> RedeemerTagNewMint
-  2 -> RedeemerTagNewCert
-  3 -> RedeemerTagNewReward
-  _ -> unsafePerformEffect $ throw "Invalid redeemer tag"
+fromCsl rt =
+  unsafePartial $ fromJust $ fromInt $ fromJust $ Int.fromNumber $ Csl.redeemerTag_kind rt
 
 toCsl :: RedeemerTag -> Csl.RedeemerTag
 toCsl = case _ of
-  RedeemerTagNewSpend -> Csl.redeemerTag_newSpend
-  RedeemerTagNewMint -> Csl.redeemerTag_newMint
-  RedeemerTagNewCert -> Csl.redeemerTag_newCert
-  RedeemerTagNewReward -> Csl.redeemerTag_newReward
+  Spend -> Csl.redeemerTag_newSpend
+  Mint -> Csl.redeemerTag_newMint
+  Cert -> Csl.redeemerTag_newCert
+  Reward -> Csl.redeemerTag_newReward

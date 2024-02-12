@@ -54,8 +54,8 @@ newtype PoolParams = PoolParams
 
 derive instance Newtype PoolParams _
 derive instance Generic PoolParams _
-derive instance Ord PoolParams
 derive instance Eq PoolParams
+derive instance Ord PoolParams
 
 instance Show PoolParams where
   show = genericShow
@@ -63,7 +63,6 @@ instance Show PoolParams where
 instance AsCbor PoolParams where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
-
 
 toCsl :: PoolParams -> Csl.PoolParams
 toCsl

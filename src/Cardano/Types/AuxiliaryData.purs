@@ -1,9 +1,8 @@
 module Cardano.Types.AuxiliaryData
-  ( AuxiliaryData(..)
+  ( AuxiliaryData(AuxiliaryData)
   , fromCsl
   , toCsl
-  )
-  where
+  ) where
 
 import Prelude
 

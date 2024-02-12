@@ -16,8 +16,8 @@ import Data.Nullable (toMaybe)
 
 newtype ScriptDataHash = ScriptDataHash Csl.ScriptDataHash
 
-derive instance Generic ScriptDataHash _
 derive instance Newtype ScriptDataHash _
+derive instance Generic ScriptDataHash _
 
 instance Eq ScriptDataHash where
   eq = eqOrd
@@ -26,8 +26,8 @@ instance AsCbor ScriptDataHash where
   encodeCbor = unwrap >>> toBytes >>> wrap
   decodeCbor = unwrap >>> fromBytes >>> map wrap
 
-derive newtype instance EncodeAeson ScriptDataHash
 derive newtype instance DecodeAeson ScriptDataHash
+derive newtype instance EncodeAeson ScriptDataHash
 
 -- This is not newtyped derived because it will be used for ordering a
 -- `TransactionInput`, we want lexicographical ordering on the hexstring.

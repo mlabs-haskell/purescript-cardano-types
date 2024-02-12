@@ -1,9 +1,8 @@
 module Cardano.Types.StakeCredential
-  ( StakeCredential(..)
+  ( StakeCredential(StakeCredential)
   , fromCsl
   , toCsl
-  )
-  where
+  ) where
 
 import Prelude
 
@@ -57,10 +56,10 @@ instance EncodeAeson StakeCredential where
 
 fromCsl :: Csl.StakeCredential -> StakeCredential
 fromCsl cslc = case toMaybe (Csl.stakeCredential_toKeyhash cslc) of
-   Just hash -> StakeCredential $ PubKeyHashCredential (wrap hash)
-   Nothing -> case toMaybe (Csl.stakeCredential_toScripthash cslc) of
-      Just hash -> StakeCredential $ ScriptHashCredential (wrap hash)
-      Nothing -> unsafePerformEffect $ throw "Cardano.Types.StakeCredential.fromCsl: unknown kind"
+  Just hash -> StakeCredential $ PubKeyHashCredential (wrap hash)
+  Nothing -> case toMaybe (Csl.stakeCredential_toScripthash cslc) of
+    Just hash -> StakeCredential $ ScriptHashCredential (wrap hash)
+    Nothing -> unsafePerformEffect $ throw "Cardano.Types.StakeCredential.fromCsl: unknown kind"
 
 toCsl :: StakeCredential -> Csl.StakeCredential
 toCsl (StakeCredential (PubKeyHashCredential hash)) = Csl.stakeCredential_fromKeyhash (unwrap hash)

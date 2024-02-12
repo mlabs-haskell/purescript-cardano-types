@@ -39,6 +39,7 @@ data Value = Value Coin MultiAsset
 
 derive instance Generic Value _
 derive instance Eq Value
+-- no Ord instance to prevent confusion
 
 instance Ord Value where
   compare a b = if a `lt` b then LT else if a `gt` b then GT else EQ

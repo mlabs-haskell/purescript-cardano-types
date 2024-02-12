@@ -1,7 +1,6 @@
 module Cardano.Types.TransactionHash
   ( TransactionHash(TransactionHash)
-  )
-  where
+  ) where
 
 import Prelude
 

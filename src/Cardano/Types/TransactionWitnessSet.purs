@@ -1,5 +1,5 @@
 module Cardano.Types.TransactionWitnessSet
-  ( TransactionWitnessSet(..)
+  ( TransactionWitnessSet(TransactionWitnessSet)
   , fromCsl
   , toCsl
   ) where
@@ -18,7 +18,7 @@ import Data.Show.Generic (genericShow)
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
 
--- TODO better representation?
+-- TODO:
 newtype TransactionWitnessSet = TransactionWitnessSet Csl.TransactionWitnessSet
 
 derive instance Newtype TransactionWitnessSet _
@@ -31,7 +31,7 @@ instance Ord TransactionWitnessSet where
   compare = compareViaCslBytes `on` unwrap
 
 instance Show TransactionWitnessSet where
-    show = genericShow
+  show = genericShow
 
 instance AsCbor TransactionWitnessSet where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap

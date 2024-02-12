@@ -3,6 +3,7 @@ module Cardano.Types.TransactionOutput where
 import Prelude
 
 import Aeson (class EncodeAeson)
+import Cardano.AsCbor (encodeCbor)
 import Cardano.Serialization.Lib
   ( transactionOutput_address
   , transactionOutput_amount
@@ -18,6 +19,7 @@ import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Address (Address)
 import Cardano.Types.Address as Address
 import Cardano.AsCbor (class AsCbor, encodeCbor)
+import Cardano.Types.MultiAsset (MultiAsset(MultiAsset))
 import Cardano.Types.OutputDatum
   ( OutputDatum(OutputDatum, OutputDatumHash)
   , pprintOutputDatum
@@ -25,11 +27,12 @@ import Cardano.Types.OutputDatum
 import Cardano.Types.PlutusData as PlutusData
 import Cardano.Types.ScriptRef (ScriptRef)
 import Cardano.Types.ScriptRef as ScriptRef
-import Cardano.Types.Value (Value, pprintValue)
+import Cardano.Types.Value (Value(Value), pprintValue)
 import Cardano.Types.Value as Value
 import Control.Alt ((<|>))
 import Data.ByteArray (byteArrayToHex)
 import Data.Foldable (for_)
+import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
@@ -38,6 +41,7 @@ import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Effect.Unsafe (unsafePerformEffect)
+import Data.Tuple.Nested ((/\))
 
 newtype TransactionOutput = TransactionOutput
   { address :: Address
@@ -48,8 +52,21 @@ newtype TransactionOutput = TransactionOutput
 
 derive instance Generic TransactionOutput _
 derive instance Newtype TransactionOutput _
-derive newtype instance Ord TransactionOutput
 derive newtype instance Eq TransactionOutput
+
+-- We want to have an Ord instance for TransactionOutput, but we don't
+-- want to provide Ord instances for Value and MultiAsset to the users
+-- to prevent confusion.
+instance Ord TransactionOutput where
+  compare = compare `on` unTransactionOutput
+    where
+    unTransactionOutput (TransactionOutput rec) = rec
+      { amount =
+          unValue rec.amount
+      }
+    unValue (Value c ma) = c /\ unMultiAsset ma
+    unMultiAsset (MultiAsset ma) = ma
+
 derive newtype instance EncodeAeson TransactionOutput
 
 instance Show TransactionOutput where

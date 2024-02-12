@@ -2,12 +2,13 @@ module Cardano.Types.UnitInterval where
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( unitInterval_denominator
   , unitInterval_new
   , unitInterval_numerator
   )
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
 import Data.Generic.Rep (class Generic)
@@ -23,6 +24,8 @@ derive instance Newtype UnitInterval _
 derive instance Eq UnitInterval
 derive instance Ord UnitInterval
 derive instance Generic UnitInterval _
+derive newtype instance EncodeAeson UnitInterval
+derive newtype instance DecodeAeson UnitInterval
 
 instance Show UnitInterval where
   show = genericShow
@@ -39,4 +42,3 @@ fromCsl csl = UnitInterval
   { numerator: wrap $ unitInterval_numerator csl
   , denominator: wrap $ unitInterval_denominator csl
   }
-

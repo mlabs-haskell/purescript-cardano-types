@@ -2,34 +2,20 @@ module Cardano.Types.CostModel where
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
-import Data.Function (on)
+import Aeson (class EncodeAeson, class DecodeAeson)
+import Cardano.Types.Int as Int
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 
-newtype CostModel = CostModel Csl.CostModel
+newtype CostModel = CostModel (Array Int.Int)
 
-derive instance Generic CostModel _
 derive instance Newtype CostModel _
-
-instance Eq CostModel where
-  eq = eqOrd
-
-instance Show CostModel where
-  show = genericShow
-
-instance Ord CostModel where
-  compare = compareViaCslBytes `on` unwrap
-
-instance AsCbor CostModel where
-  encodeCbor = unwrap >>> toBytes >>> wrap
-  decodeCbor = unwrap >>> fromBytes >>> map wrap
-
+derive instance Generic CostModel _
+derive newtype instance Eq CostModel
+derive newtype instance Ord CostModel
 derive newtype instance EncodeAeson CostModel
 derive newtype instance DecodeAeson CostModel
 
+instance Show CostModel where
+  show = genericShow

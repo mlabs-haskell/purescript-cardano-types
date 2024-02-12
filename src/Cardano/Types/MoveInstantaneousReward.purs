@@ -2,18 +2,24 @@ module Cardano.Types.MoveInstantaneousReward where
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, finiteNumber)
+import Aeson (class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (moveInstantaneousReward_asToOtherPot, moveInstantaneousReward_asToStakeCreds, moveInstantaneousReward_newToOtherPot, moveInstantaneousReward_newToStakeCreds, moveInstantaneousReward_pot)
+import Cardano.Serialization.Lib
+  ( moveInstantaneousReward_asToOtherPot
+  , moveInstantaneousReward_asToStakeCreds
+  , moveInstantaneousReward_newToOtherPot
+  , moveInstantaneousReward_newToStakeCreds
+  , moveInstantaneousReward_pot
+  )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials)
-import Cardano.Types.MIRToStakeCredentials as MIRToStakeCredentials
-import Cardano.Types.BigNum (BigNum(..))
-import Cardano.Types.Coin (Coin(..))
+import Cardano.Types.BigNum (BigNum(BigNum))
+import Cardano.Types.Coin (Coin(Coin))
+import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.MIRPot (MIRPot)
 import Cardano.Types.MIRPot as MIRPot
 import Cardano.Types.MIRPot as Pot
-import Cardano.Types.Internal.Helpers (encodeMap, encodeTagged')
+import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials)
+import Cardano.Types.MIRToStakeCredentials as MIRToStakeCredentials
 import Control.Alt ((<|>))
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int

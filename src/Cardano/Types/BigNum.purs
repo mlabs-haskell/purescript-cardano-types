@@ -41,6 +41,7 @@ import JS.BigInt (fromString, toString) as BigInt
 import Partial.Unsafe (unsafePartial)
 import Safe.Coerce (coerce)
 
+-- | Unisigned 64-bit integer, 0..18446744073709551615
 newtype BigNum = BigNum Csl.BigNum
 
 derive instance Generic BigNum _
