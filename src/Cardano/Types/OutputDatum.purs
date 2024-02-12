@@ -7,13 +7,29 @@ module Cardano.Types.OutputDatum
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch, UnexpectedValue), caseAesonObject, fromString, toStringifiedNumbersJson, (.:))
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(TypeMismatch, UnexpectedValue)
+  , caseAesonObject
+  , fromString
+  , toStringifiedNumbersJson
+  , (.:)
+  )
 import Cardano.AsCbor (encodeCbor)
 import Cardano.Types.DataHash (DataHash)
 import Cardano.Types.PlutusData (PlutusData, pprintPlutusData)
 import Cardano.FromData (class FromData, genericFromData)
 import Cardano.Types.Internal.Helpers (encodeTagged')
-import Cardano.Plutus.DataSchema (class HasPlutusSchema, type (:+), type (:=), type (@@), PNil, S, Z)
+import Cardano.Plutus.DataSchema
+  ( class HasPlutusSchema
+  , type (:+)
+  , type (:=)
+  , type (@@)
+  , PNil
+  , S
+  , Z
+  )
 import Cardano.ToData (class ToData, genericToData)
 import Data.ByteArray (byteArrayToHex)
 import Data.Either (Either(Left))
@@ -28,6 +44,7 @@ data OutputDatum = OutputDatumHash DataHash | OutputDatum PlutusData
 
 derive instance Generic OutputDatum _
 derive instance Eq OutputDatum
+derive instance Ord OutputDatum
 
 instance Show OutputDatum where
   show = genericShow

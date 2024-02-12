@@ -19,7 +19,8 @@ import Data.Show.Generic (genericShow)
 newtype MIRToStakeCredentials = MIRToStakeCredentials
   (Map StakeCredential Int.Int)
 
-derive instance Eq MIRToStakeCredentials
+derive newtype instance Eq MIRToStakeCredentials
+derive newtype instance Ord MIRToStakeCredentials
 derive instance Newtype MIRToStakeCredentials _
 derive instance Generic MIRToStakeCredentials _
 

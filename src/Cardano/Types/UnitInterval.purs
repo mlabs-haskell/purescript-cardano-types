@@ -2,6 +2,7 @@ module Cardano.Types.UnitInterval where
 
 import Prelude
 
+import Aeson (class EncodeAeson)
 import Cardano.Serialization.Lib
   ( unitInterval_denominator
   , unitInterval_new
@@ -22,6 +23,7 @@ derive instance Newtype UnitInterval _
 derive instance Eq UnitInterval
 derive instance Ord UnitInterval
 derive instance Generic UnitInterval _
+derive newtype instance EncodeAeson UnitInterval
 
 instance Show UnitInterval where
   show = genericShow

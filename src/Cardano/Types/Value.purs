@@ -37,6 +37,7 @@ data Value = Value Coin MultiAsset
 
 derive instance Generic Value _
 derive instance Eq Value
+-- no Ord instance to prevent confusion
 
 instance Arbitrary Value where
   arbitrary = Value <$> arbitrary <*> arbitrary

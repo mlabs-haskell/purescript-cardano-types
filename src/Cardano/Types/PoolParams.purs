@@ -54,6 +54,7 @@ newtype PoolParams = PoolParams
 derive instance Newtype PoolParams _
 derive instance Generic PoolParams _
 derive instance Eq PoolParams
+derive instance Ord PoolParams
 
 instance Show PoolParams where
   show = genericShow

@@ -32,7 +32,7 @@ import Partial.Unsafe (unsafePartial)
 import Prim (String)
 import Prim as Prim
 
--- | Signed 128-bit integer
+-- | Signed 128-bit integer, -170141183460469231731687303715884105728..170141183460469231731687303715884105727
 newtype Int = Int Csl.Int
 
 derive instance Newtype Int _

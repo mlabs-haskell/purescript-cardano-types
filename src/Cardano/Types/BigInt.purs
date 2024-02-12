@@ -1,3 +1,4 @@
+-- We reuse JS.BigInt.BigInt here
 module Cardano.Types.BigInt
   ( module X
   , fromCsl

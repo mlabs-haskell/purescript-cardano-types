@@ -74,6 +74,7 @@ data NativeScript
   | TimelockExpiry Slot -- spend before
 
 derive instance Eq NativeScript
+derive instance Ord NativeScript
 derive instance Generic NativeScript _
 
 instance Show NativeScript where

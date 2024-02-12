@@ -33,8 +33,9 @@ import Test.QuickCheck.Gen (Gen, suchThat)
 
 newtype MultiAsset = MultiAsset (Map ScriptHash (Map AssetName BigNum))
 
-derive newtype instance Eq MultiAsset
 derive instance Newtype MultiAsset _
+derive newtype instance Eq MultiAsset
+-- no Ord instance to prevent confusion
 
 instance Arbitrary MultiAsset where
   arbitrary =

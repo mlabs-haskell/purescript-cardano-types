@@ -2,12 +2,18 @@ module Cardano.Types.MoveInstantaneousReward where
 
 import Prelude
 
-import Cardano.Serialization.Lib (moveInstantaneousReward_asToOtherPot, moveInstantaneousReward_asToStakeCreds, moveInstantaneousReward_newToOtherPot, moveInstantaneousReward_newToStakeCreds, moveInstantaneousReward_pot)
+import Cardano.Serialization.Lib
+  ( moveInstantaneousReward_asToOtherPot
+  , moveInstantaneousReward_asToStakeCreds
+  , moveInstantaneousReward_newToOtherPot
+  , moveInstantaneousReward_newToStakeCreds
+  , moveInstantaneousReward_pot
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Teyps.MIRToStakeCredentials (MIRToStakeCredentials)
 import Cardano.Teyps.MIRToStakeCredentials as MIRToStakeCredentials
-import Cardano.Types.BigNum (BigNum(..))
-import Cardano.Types.Coin (Coin(..))
+import Cardano.Types.BigNum (BigNum(BigNum))
+import Cardano.Types.Coin (Coin(Coin))
 import Cardano.Types.MIRPot (MIRPot)
 import Cardano.Types.MIRPot as MIRPot
 import Cardano.Types.MIRPot as Pot
@@ -31,6 +37,7 @@ data MoveInstantaneousReward
       }
 
 derive instance Eq MoveInstantaneousReward
+derive instance Ord MoveInstantaneousReward
 derive instance Generic MoveInstantaneousReward _
 
 instance Show MoveInstantaneousReward where

@@ -9,6 +9,7 @@ import Data.Show.Generic (genericShow)
 data MIRPot = Reserves | Treasury
 
 derive instance Eq MIRPot
+derive instance Ord MIRPot
 derive instance Generic MIRPot _
 
 instance Show MIRPot where
