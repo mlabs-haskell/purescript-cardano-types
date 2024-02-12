@@ -1,4 +1,9 @@
-module Cardano.Types.AuxiliaryData where
+module Cardano.Types.AuxiliaryData
+  ( AuxiliaryData(..)
+  , fromCsl
+  , toCsl
+  )
+  where
 
 import Prelude
 
