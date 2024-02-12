@@ -1,4 +1,4 @@
-module Cardano.Crypto.Csl.Types.ExUnitPrices
+module Cardano.Types.ExUnitPrices
   ( ExUnitPrices(..)
   ) where
 

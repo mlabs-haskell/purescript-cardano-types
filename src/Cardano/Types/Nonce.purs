@@ -11,6 +11,8 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Ord (class Ord)
+import Data.Show (class Show)
+import Data.Show.Generic (genericShow)
 
 
 data Nonce = NonceIdentity | NonceHash ByteArray
@@ -18,6 +20,9 @@ data Nonce = NonceIdentity | NonceHash ByteArray
 derive instance Generic Nonce _
 derive instance Eq Nonce
 derive instance Ord Nonce
+
+instance Show Nonce where
+    show = genericShow
 
 instance AsCbor Nonce where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
