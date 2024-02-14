@@ -1,5 +1,7 @@
-module Cardano.Crypto.Csl.Types.BootstrapWitness
+module Cardano.Types.BootstrapWitness
   ( BootstrapWitness(BootstrapWitness)
+  , fromCsl
+  , toCsl
   ) where
 
 import Cardano.AsCbor (class AsCbor)

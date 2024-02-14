@@ -2,10 +2,10 @@ module Cardano.Types.Vkey where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Types.PublicKey (PublicKey(PublicKey))
 import Cardano.Serialization.Lib as Csl
+import Cardano.Types.PublicKey (PublicKey(PublicKey))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, wrap, unwrap)
 import Data.Show.Generic (genericShow)
@@ -17,6 +17,7 @@ derive instance Newtype Vkey _
 derive newtype instance Eq Vkey
 derive newtype instance Ord Vkey
 derive newtype instance EncodeAeson Vkey
+derive newtype instance DecodeAeson Vkey
 
 instance Show Vkey where
   show = genericShow

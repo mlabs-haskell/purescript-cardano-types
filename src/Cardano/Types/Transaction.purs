@@ -1,6 +1,6 @@
 module Cardano.Types.Transaction
   ( Transaction(Transaction)
-  -- , toCsl
+  , toCsl
   -- , fromCsl
   ) where
 
@@ -51,5 +51,8 @@ instance Show Transaction where
 --   in
 --     Transaction { body, witnessSet, auxiliaryData }
 
--- toCsl :: Transaction -> Csl.Transaction
--- toCsl (Transaction { body, witnessSet, auxiliaryData }) = Csl.transaction_new (TransactionBody.toCsl body) (TransactionWitnessSet.toCsl witnessSet) (AuxiliaryData.toCsl auxiliaryData)
+toCsl :: Transaction -> Csl.Transaction
+toCsl (Transaction { body, witnessSet, auxiliaryData }) =
+  Csl.transaction_new (TransactionBody.toCsl body)
+    (TransactionWitnessSet.toCsl witnessSet)
+    (AuxiliaryData.toCsl auxiliaryData)

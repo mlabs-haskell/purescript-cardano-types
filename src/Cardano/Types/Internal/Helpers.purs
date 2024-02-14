@@ -8,6 +8,7 @@ module Cardano.Types.Internal.Helpers
   , encodeTagged'
   , encodeMap
   , decodeUtf8
+  , withNonEmptyArray
   ) where
 
 import Prelude
@@ -22,8 +23,8 @@ import Aeson
   , encodeAeson
   )
 import Aeson as Aeson
-import Cardano.Serialization.Lib (class IsBytes, toBytes)
-import Cardano.Serialization.Lib.Internal (class IsCsl)
+import Cardano.Serialization.Lib (class IsBytes, packListContainer, toBytes)
+import Cardano.Serialization.Lib.Internal (class IsCsl, class IsListContainer)
 import Control.Alt ((<|>))
 import Data.Bifunctor (bimap)
 import Data.Bitraversable (ltraverse)
@@ -34,6 +35,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Traversable (for, traverse)
 import Data.Tuple.Nested (type (/\), (/\))
+import Effect (Effect)
 import Effect.Exception (Error)
 import Foreign.Object (Object)
 import Foreign.Object as Obj
@@ -120,3 +122,13 @@ decodeUtf8 ba = _decodeUtf8 ba Left Right
 
 foreign import _decodeUtf8
   :: forall (r :: Type). ByteArray -> (Error -> r) -> (String -> r) -> r
+
+withNonEmptyArray
+  :: forall e c
+   . IsCsl c
+  => IsListContainer c e
+  => Array e
+  -> (c -> Effect Unit)
+  -> Effect Unit
+withNonEmptyArray [] _ = pure unit
+withNonEmptyArray els f = f $ packListContainer els

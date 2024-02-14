@@ -1,5 +1,7 @@
 module Cardano.Types.ExUnitPrices
   ( ExUnitPrices(ExUnitPrices)
+  , toCsl
+  , fromCsl
   ) where
 
 import Prelude
