@@ -9,7 +9,6 @@ import Cardano.Serialization.Lib (fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 import Safe.Coerce (coerce)
 

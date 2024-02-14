@@ -4,12 +4,10 @@ import Prelude
 
 import Cardano.AsCbor (class AsCbor)
 import Data.Newtype (class Newtype, unwrap, wrap)
-
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib (url_new, url_url, fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 
 newtype URL = URL String
