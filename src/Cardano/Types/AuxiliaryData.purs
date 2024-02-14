@@ -2,6 +2,7 @@ module Cardano.Types.AuxiliaryData
   ( AuxiliaryData(AuxiliaryData)
   , fromCsl
   , toCsl
+  , hashAuxiliaryData
   ) where
 
 import Prelude
@@ -20,6 +21,7 @@ import Cardano.Serialization.Lib
   , unpackListContainer
   )
 import Cardano.Serialization.Lib as Csl
+import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata)
 import Cardano.Types.GeneralTransactionMetadata as GeneralTransactionMetadatum
 import Cardano.Types.NativeScript (NativeScript)
@@ -70,6 +72,9 @@ instance Monoid AuxiliaryData where
 instance AsCbor AuxiliaryData where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+hashAuxiliaryData :: AuxiliaryData -> AuxiliaryDataHash
+hashAuxiliaryData = toCsl >>> Csl.hashAuxiliaryData >>> wrap
 
 toCsl :: AuxiliaryData -> Csl.AuxiliaryData
 toCsl

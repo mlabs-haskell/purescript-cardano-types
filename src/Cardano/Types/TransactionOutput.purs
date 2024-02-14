@@ -1,11 +1,18 @@
-module Cardano.Types.TransactionOutput where
+module Cardano.Types.TransactionOutput
+  ( TransactionOutput(TransactionOutput)
+  , pprintTransactionOutput
+  , fromCsl
+  , toCsl
+  , minAdaForOutput
+  ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib
-  ( transactionOutput_address
+  ( dataCost_newCoinsPerByte
+  , transactionOutput_address
   , transactionOutput_amount
   , transactionOutput_dataHash
   , transactionOutput_new
@@ -18,6 +25,8 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Address (Address)
 import Cardano.Types.Address as Address
+import Cardano.Types.BigNum (BigNum)
+import Cardano.Types.Coin (Coin)
 import Cardano.Types.MultiAsset (MultiAsset(MultiAsset))
 import Cardano.Types.OutputDatum
   ( OutputDatum(OutputDatum, OutputDatumHash)
@@ -88,6 +97,11 @@ pprintTransactionOutput
   referenceScriptTagSet = maybe []
     (pure <<< tag "referenceScript" <<< byteArrayToHex <<< unwrap <<< encodeCbor)
     scriptRef
+
+-- | Accepts a coins per byte parameter value
+minAdaForOutput :: TransactionOutput -> BigNum -> Coin
+minAdaForOutput output dataCost = wrap $ wrap $
+  Csl.minAdaForOutput (toCsl output) (dataCost_newCoinsPerByte $ unwrap dataCost)
 
 fromCsl :: Csl.TransactionOutput -> TransactionOutput
 fromCsl to =

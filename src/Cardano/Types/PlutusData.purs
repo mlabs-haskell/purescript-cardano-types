@@ -13,8 +13,32 @@ module Cardano.Types.PlutusData
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(UnexpectedValue), decodeAeson, encodeAeson, toStringifiedNumbersJson, (.:))
-import Cardano.Serialization.Lib (constrPlutusData_alternative, constrPlutusData_data, constrPlutusData_new, packMapContainer, plutusData_asBytes, plutusData_asConstrPlutusData, plutusData_asInteger, plutusData_asList, plutusData_asMap, plutusData_newBytes, plutusData_newConstrPlutusData, plutusData_newInteger, plutusData_newList, plutusData_newMap, unpackMapContainer)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(UnexpectedValue)
+  , decodeAeson
+  , encodeAeson
+  , toStringifiedNumbersJson
+  , (.:)
+  )
+import Cardano.Serialization.Lib
+  ( constrPlutusData_alternative
+  , constrPlutusData_data
+  , constrPlutusData_new
+  , packMapContainer
+  , plutusData_asBytes
+  , plutusData_asConstrPlutusData
+  , plutusData_asInteger
+  , plutusData_asList
+  , plutusData_asMap
+  , plutusData_newBytes
+  , plutusData_newConstrPlutusData
+  , plutusData_newInteger
+  , plutusData_newList
+  , plutusData_newMap
+  , unpackMapContainer
+  )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Serialization.Lib.Internal (packListContainer, unpackListContainer)

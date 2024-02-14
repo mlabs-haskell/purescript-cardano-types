@@ -1,16 +1,20 @@
-module Cardano.Types.DataHash where
+module Cardano.Types.DataHash
+  ( DataHash(DataHash)
+  , hashPlutusData
+  ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
+import Cardano.FromData (class FromData, fromData)
 import Cardano.Serialization.Lib (fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
-import Cardano.AsCbor (class AsCbor)
-import Cardano.Types.BigNum as BigNum
-import Cardano.Types.PlutusData (PlutusData(Constr))
-import Cardano.FromData (class FromData, fromData)
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromCbor)
 import Cardano.ToData (class ToData, toData)
+import Cardano.Types.BigNum as BigNum
+import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromCbor)
+import Cardano.Types.PlutusData (PlutusData(Constr))
+import Cardano.Types.PlutusData as PlutusData
 import Data.ByteArray (byteArrayFromIntArrayUnsafe)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
@@ -62,3 +66,6 @@ instance Arbitrary DataHash where
 instance Coarbitrary DataHash where
   coarbitrary (DataHash th) generator = coarbitrary (toBytes th)
     generator
+
+hashPlutusData :: PlutusData -> DataHash
+hashPlutusData = PlutusData.toCsl >>> Csl.hashPlutusData >>> wrap

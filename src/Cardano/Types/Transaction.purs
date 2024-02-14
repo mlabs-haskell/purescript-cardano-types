@@ -2,6 +2,7 @@ module Cardano.Types.Transaction
   ( Transaction(Transaction)
   , toCsl
   , fromCsl
+  , hashTransaction
   ) where
 
 import Cardano.AsCbor (class AsCbor)
@@ -10,6 +11,7 @@ import Cardano.Types.AuxiliaryData (AuxiliaryData)
 import Cardano.Types.AuxiliaryData as AuxiliaryData
 import Cardano.Types.TransactionBody (TransactionBody)
 import Cardano.Types.TransactionBody as TransactionBody
+import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet)
 import Cardano.Types.TransactionWitnessSet as TransactionWitnessSet
 import Control.Apply (map)
@@ -41,6 +43,13 @@ instance Show Transaction where
 instance AsCbor Transaction where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+hashTransaction :: Transaction -> TransactionHash
+hashTransaction = unwrap
+  >>> _.body
+  >>> TransactionBody.toCsl
+  >>> Csl.hashTransaction
+  >>> wrap
 
 fromCsl :: Csl.Transaction -> Transaction
 fromCsl tx =
