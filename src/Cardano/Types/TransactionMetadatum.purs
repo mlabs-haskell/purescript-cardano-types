@@ -2,8 +2,15 @@ module Cardano.Types.TransactionMetadatum where
 
 import Prelude
 
-import Control.Alt ((<|>))
-import Aeson (class EncodeAeson)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , Aeson
+  , JsonDecodeError(UnexpectedValue, AtKey, Named)
+  , decodeAeson
+  , fromString
+  , toStringifiedNumbersJson
+  )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( packMapContainer
@@ -23,8 +30,10 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.Serialization.Lib.Internal (packListContainer)
 import Cardano.Types.Int (Int) as Int
-import Cardano.Types.Internal.Helpers (encodeMap, encodeTagged')
+import Cardano.Types.Internal.Helpers (decodeMap, encodeMap, encodeTagged')
+import Control.Alt ((<|>))
 import Data.ByteArray (ByteArray)
+import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map (toUnfoldable) as Map
@@ -56,6 +65,21 @@ instance EncodeAeson TransactionMetadatum where
     Int n -> encodeTagged' "Int" n
     Bytes bytes -> encodeTagged' "Bytes" bytes
     Text string -> encodeTagged' "Text" string
+
+instance DecodeAeson TransactionMetadatum where
+  decodeAeson aeson = do
+    { tag, contents } <-
+      ( decodeAeson aeson :: Either _ { tag :: String, contents :: Aeson }
+      )
+    case tag of
+      "Map" -> Map <$> decodeMap contents
+      "List" -> List <$> decodeAeson contents
+      "Int" -> Int <$> decodeAeson contents
+      "Bytes" -> Bytes <$> decodeAeson contents
+      "Text" -> Text <$> decodeAeson contents
+      tagValue -> Left $ Named "TransactionMetadatum" $ AtKey "tag" $ UnexpectedValue
+        $ toStringifiedNumbersJson
+        $ fromString tagValue
 
 instance AsCbor TransactionMetadatum where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap

@@ -6,9 +6,19 @@ module Cardano.Types.AuxiliaryData
 
 import Prelude
 
-import Aeson (class EncodeAeson)
-import Cardano.Serialization.Lib (auxiliaryData_metadata, auxiliaryData_nativeScripts, auxiliaryData_new, auxiliaryData_plutusScripts, auxiliaryData_setMetadata, auxiliaryData_setNativeScripts, auxiliaryData_setPlutusScripts, packListContainer, unpackListContainer)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
+import Cardano.Serialization.Lib
+  ( auxiliaryData_metadata
+  , auxiliaryData_nativeScripts
+  , auxiliaryData_new
+  , auxiliaryData_plutusScripts
+  , auxiliaryData_setMetadata
+  , auxiliaryData_setNativeScripts
+  , auxiliaryData_setPlutusScripts
+  , packListContainer
+  , unpackListContainer
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata)
 import Cardano.Types.GeneralTransactionMetadata as GeneralTransactionMetadatum
@@ -37,6 +47,7 @@ derive instance Newtype AuxiliaryData _
 derive newtype instance Eq AuxiliaryData
 derive newtype instance Ord AuxiliaryData
 derive newtype instance EncodeAeson AuxiliaryData
+derive newtype instance DecodeAeson AuxiliaryData
 
 instance Show AuxiliaryData where
   show = genericShow

@@ -9,6 +9,7 @@ import Aeson
   , decodeAeson
   , encodeAeson
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.FromData (class FromData)
 import Cardano.ToData (class ToData)
 import Cardano.Types.Ed25519KeyHash
@@ -29,6 +30,7 @@ derive instance Ord PoolPubKeyHash
 derive instance Generic PoolPubKeyHash _
 derive newtype instance ToData PoolPubKeyHash
 derive newtype instance FromData PoolPubKeyHash
+derive newtype instance AsCbor PoolPubKeyHash
 
 instance EncodeAeson PoolPubKeyHash where
   encodeAeson (PoolPubKeyHash kh) =

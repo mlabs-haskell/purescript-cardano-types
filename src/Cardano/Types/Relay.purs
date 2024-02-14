@@ -2,8 +2,15 @@ module Cardano.Types.Relay where
 
 import Prelude
 
-import Control.Alt ((<|>))
-import Aeson (class EncodeAeson)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(UnexpectedValue, AtKey, Named)
+  , decodeAeson
+  , fromString
+  , toStringifiedNumbersJson
+  , (.:)
+  )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( dnsRecordAorAAAA_new
@@ -30,6 +37,8 @@ import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.Ipv4 (Ipv4)
 import Cardano.Types.Ipv6 (Ipv6)
+import Control.Alt ((<|>))
+import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe (Maybe, fromJust, fromMaybe)
@@ -69,6 +78,19 @@ instance EncodeAeson Relay where
     SingleHostAddr r -> encodeTagged' "SingleHostAddr" r
     SingleHostName r -> encodeTagged' "SingleHostName" r
     MultiHostName r -> encodeTagged' "MultiHostName" r
+
+instance DecodeAeson Relay where
+  decodeAeson aeson = do
+    obj <- decodeAeson aeson
+    tag <- obj .: "tag"
+    contents <- obj .: "contents"
+    case tag of
+      "SingleHostAddr" -> SingleHostAddr <$> decodeAeson contents
+      "SingleHostName" -> SingleHostName <$> decodeAeson contents
+      "MultiHostName" -> MultiHostName <$> decodeAeson contents
+      tagValue -> Left $ Named "Relay" $ AtKey "tag" $ UnexpectedValue
+        $ toStringifiedNumbersJson
+        $ fromString tagValue
 
 instance AsCbor Relay where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap

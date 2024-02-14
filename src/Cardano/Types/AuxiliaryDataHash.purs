@@ -2,7 +2,7 @@ module Cardano.Types.AuxiliaryDataHash where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib (fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
@@ -30,3 +30,4 @@ instance AsCbor AuxiliaryDataHash where
   decodeCbor = unwrap >>> fromBytes >>> map wrap
 
 derive newtype instance EncodeAeson AuxiliaryDataHash
+derive newtype instance DecodeAeson AuxiliaryDataHash

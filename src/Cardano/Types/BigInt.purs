@@ -8,12 +8,9 @@ module Cardano.Types.BigInt
 
 import Prelude
 
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (bigInt_divCeil, bigInt_fromStr, bigInt_toStr)
 import Cardano.Serialization.Lib as Csl
-import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromJust)
-import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import JS.BigInt (BigInt)
 import JS.BigInt as BigInt

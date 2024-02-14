@@ -11,7 +11,7 @@ import Data.Show.Generic (genericShow)
 import Test.QuickCheck (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (oneOf)
 
--- Inspired by cardano-wallet:
+-- Not from CSL. Inspired by cardano-wallet:
 -- https://github.com/input-output-hk/cardano-wallet/blob/791541da69b9b3f434bb9ead43de406cc18b0373/lib/primitive/lib/Cardano/Wallet/Primitive/Types/UTxOIndex/Internal.hs#L485
 data Asset = Asset ScriptHash AssetName | AdaAsset
 

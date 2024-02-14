@@ -1,11 +1,36 @@
-module Cardano.Types.ProtocolParamUpdate where
+module Cardano.Types.ProtocolParamUpdate
+  ( ProtocolParamUpdate(ProtocolParamUpdate)
+  , fromCsl
+  , toCsl
+  ) where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib
   ( packMapContainer
+  , protocolParamUpdate_adaPerUtxoByte
+  , protocolParamUpdate_collateralPercentage
+  , protocolParamUpdate_costModels
+  , protocolParamUpdate_executionCosts
+  , protocolParamUpdate_expansionRate
+  , protocolParamUpdate_keyDeposit
+  , protocolParamUpdate_maxBlockBodySize
+  , protocolParamUpdate_maxBlockExUnits
+  , protocolParamUpdate_maxBlockHeaderSize
+  , protocolParamUpdate_maxCollateralInputs
+  , protocolParamUpdate_maxEpoch
+  , protocolParamUpdate_maxTxExUnits
+  , protocolParamUpdate_maxTxSize
+  , protocolParamUpdate_maxValueSize
+  , protocolParamUpdate_minPoolCost
+  , protocolParamUpdate_minfeeA
+  , protocolParamUpdate_minfeeB
+  , protocolParamUpdate_nOpt
   , protocolParamUpdate_new
+  , protocolParamUpdate_poolDeposit
+  , protocolParamUpdate_poolPledgeInfluence
+  , protocolParamUpdate_protocolVersion
   , protocolParamUpdate_setAdaPerUtxoByte
   , protocolParamUpdate_setCollateralPercentage
   , protocolParamUpdate_setCostModels
@@ -28,12 +53,14 @@ import Cardano.Serialization.Lib
   , protocolParamUpdate_setPoolPledgeInfluence
   , protocolParamUpdate_setProtocolVersion
   , protocolParamUpdate_setTreasuryGrowthRate
+  , protocolParamUpdate_treasuryGrowthRate
+  , unpackMapContainerToMapWith
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Type.Epoch (Epoch)
-import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.CostModel (CostModel)
+import Cardano.Types.CostModel as CostModel
 import Cardano.Types.CostModel as CostModels
 import Cardano.Types.ExUnitPrices (ExUnitPrices)
 import Cardano.Types.ExUnitPrices as ExUnitPrices
@@ -49,7 +76,8 @@ import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe)
-import Data.Newtype (class Newtype, unwrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Nullable (Nullable, toMaybe)
 import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for_)
@@ -72,8 +100,8 @@ newtype ProtocolParamUpdate = ProtocolParamUpdate
   , expansionRate :: Maybe UnitInterval
   , treasuryGrowthRate :: Maybe UnitInterval
   , protocolVersion :: Maybe ProtocolVersion
-  , minPoolCost :: Maybe BigNum
-  , adaPerUtxoByte :: Maybe BigNum
+  , minPoolCost :: Maybe Coin
+  , adaPerUtxoByte :: Maybe Coin
   , costModels :: Maybe (Map Language CostModel)
   , executionCosts :: Maybe ExUnitPrices
   , maxTxExUnits :: Maybe ExUnits
@@ -88,6 +116,7 @@ derive instance Newtype ProtocolParamUpdate _
 derive newtype instance Eq ProtocolParamUpdate
 derive newtype instance Ord ProtocolParamUpdate
 derive newtype instance EncodeAeson ProtocolParamUpdate
+derive newtype instance DecodeAeson ProtocolParamUpdate
 
 derive instance Generic ProtocolParamUpdate _
 
@@ -135,8 +164,8 @@ toCsl
   for_ expansionRate $ protocolParamUpdate_setExpansionRate pp <<< UnitInterval.toCsl
   for_ treasuryGrowthRate $ protocolParamUpdate_setTreasuryGrowthRate pp <<< UnitInterval.toCsl
   for_ protocolVersion $ protocolParamUpdate_setProtocolVersion pp <<< ProtocolVersion.toCsl
-  for_ minPoolCost $ protocolParamUpdate_setMinPoolCost pp <<< unwrap
-  for_ adaPerUtxoByte $ protocolParamUpdate_setAdaPerUtxoByte pp <<< unwrap
+  for_ minPoolCost $ protocolParamUpdate_setMinPoolCost pp <<< unwrap <<< unwrap
+  for_ adaPerUtxoByte $ protocolParamUpdate_setAdaPerUtxoByte pp <<< unwrap <<< unwrap
   for_ costModels $ protocolParamUpdate_setCostModels pp
     <<< packMapContainer
     <<< map (Language.toCsl *** CostModels.toCsl)
@@ -148,3 +177,59 @@ toCsl
   for_ collateralPercentage $ protocolParamUpdate_setCollateralPercentage pp <<< UInt.toNumber
   for_ maxCollateralInputs $ protocolParamUpdate_setMaxCollateralInputs pp <<< UInt.toNumber
   pure pp
+
+fromCsl :: Csl.ProtocolParamUpdate -> ProtocolParamUpdate
+fromCsl pp =
+  ProtocolParamUpdate
+    { minfeeA
+    , minfeeB
+    , maxBlockBodySize
+    , maxTxSize
+    , maxBlockHeaderSize
+    , keyDeposit
+    , poolDeposit
+    , maxEpoch
+    , nOpt
+    , poolPledgeInfluence
+    , expansionRate
+    , treasuryGrowthRate
+    , protocolVersion
+    , minPoolCost
+    , adaPerUtxoByte
+    , costModels
+    , executionCosts
+    , maxTxExUnits
+    , maxBlockExUnits
+    , maxValueSize
+    , collateralPercentage
+    , maxCollateralInputs
+    }
+  where
+  use :: forall b. (Csl.ProtocolParamUpdate -> Nullable b) -> Maybe b
+  use f = toMaybe (f pp)
+  minfeeA = wrap <<< wrap <$> use protocolParamUpdate_minfeeA
+  minfeeB = wrap <<< wrap <$> use protocolParamUpdate_minfeeB
+  maxBlockBodySize = UInt.fromNumber <$>
+    use protocolParamUpdate_maxBlockBodySize
+  maxTxSize = UInt.fromNumber <$>
+    use protocolParamUpdate_maxTxSize
+  maxBlockHeaderSize = UInt.fromNumber <$>
+    use protocolParamUpdate_maxBlockHeaderSize
+  keyDeposit = wrap <<< wrap <$> use protocolParamUpdate_keyDeposit
+  poolDeposit = wrap <<< wrap <$> use protocolParamUpdate_poolDeposit
+  maxEpoch = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_maxEpoch
+  nOpt = UInt.fromNumber <$> use protocolParamUpdate_nOpt
+  poolPledgeInfluence = UnitInterval.fromCsl <$> use protocolParamUpdate_poolPledgeInfluence
+  expansionRate = UnitInterval.fromCsl <$> use protocolParamUpdate_expansionRate
+  treasuryGrowthRate = UnitInterval.fromCsl <$> use protocolParamUpdate_treasuryGrowthRate
+  protocolVersion = ProtocolVersion.fromCsl <$> use protocolParamUpdate_protocolVersion
+  minPoolCost = wrap <<< wrap <$> use protocolParamUpdate_minPoolCost
+  adaPerUtxoByte = wrap <<< wrap <$> use protocolParamUpdate_adaPerUtxoByte
+  costModels = costModelsFromCsl <$> use protocolParamUpdate_costModels
+  costModelsFromCsl = unpackMapContainerToMapWith Language.fromCsl CostModel.fromCsl
+  executionCosts = ExUnitPrices.fromCsl <$> use protocolParamUpdate_executionCosts
+  maxTxExUnits = ExUnits.fromCsl <$> use protocolParamUpdate_maxTxExUnits
+  maxBlockExUnits = ExUnits.fromCsl <$> use protocolParamUpdate_maxBlockExUnits
+  maxValueSize = UInt.fromNumber <$> use protocolParamUpdate_maxValueSize
+  collateralPercentage = UInt.fromNumber <$> use protocolParamUpdate_collateralPercentage
+  maxCollateralInputs = UInt.fromNumber <$> use protocolParamUpdate_maxCollateralInputs

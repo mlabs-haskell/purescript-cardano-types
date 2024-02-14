@@ -1,7 +1,7 @@
 module Cardano.Types.Transaction
   ( Transaction(Transaction)
   , toCsl
-  -- , fromCsl
+  , fromCsl
   ) where
 
 import Cardano.AsCbor (class AsCbor)
@@ -38,18 +38,18 @@ derive instance Ord Transaction
 instance Show Transaction where
   show = genericShow
 
--- instance AsCbor Transaction where
---   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
---   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+instance AsCbor Transaction where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
--- fromCsl :: Csl.Transaction -> Transaction
--- fromCsl tx =
---   let
---     body = TransactionBody.fromCsl $ Csl.transaction_body tx
---     witnessSet = TransactionWitnessSet.fromCsl $ Csl.transaction_witnessSet tx
---     auxiliaryData = fromMaybe mempty $ map AuxiliaryData.fromCsl $ toMaybe $ Csl.transaction_auxiliaryData tx
---   in
---     Transaction { body, witnessSet, auxiliaryData }
+fromCsl :: Csl.Transaction -> Transaction
+fromCsl tx =
+  let
+    body = TransactionBody.fromCsl $ Csl.transaction_body tx
+    witnessSet = TransactionWitnessSet.fromCsl $ Csl.transaction_witnessSet tx
+    auxiliaryData = fromMaybe mempty $ map AuxiliaryData.fromCsl $ toMaybe $ Csl.transaction_auxiliaryData tx
+  in
+    Transaction { body, witnessSet, auxiliaryData }
 
 toCsl :: Transaction -> Csl.Transaction
 toCsl (Transaction { body, witnessSet, auxiliaryData }) =

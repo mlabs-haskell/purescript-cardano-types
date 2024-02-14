@@ -2,8 +2,8 @@ module Cardano.Types.TransactionOutput where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
-import Cardano.AsCbor (encodeCbor)
+import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib
   ( transactionOutput_address
   , transactionOutput_amount
@@ -18,7 +18,6 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Address (Address)
 import Cardano.Types.Address as Address
-import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Types.MultiAsset (MultiAsset(MultiAsset))
 import Cardano.Types.OutputDatum
   ( OutputDatum(OutputDatum, OutputDatumHash)
@@ -40,8 +39,8 @@ import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
-import Effect.Unsafe (unsafePerformEffect)
 import Data.Tuple.Nested ((/\))
+import Effect.Unsafe (unsafePerformEffect)
 
 newtype TransactionOutput = TransactionOutput
   { address :: Address
@@ -68,6 +67,7 @@ instance Ord TransactionOutput where
     unMultiAsset (MultiAsset ma) = ma
 
 derive newtype instance EncodeAeson TransactionOutput
+derive newtype instance DecodeAeson TransactionOutput
 
 instance Show TransactionOutput where
   show = genericShow

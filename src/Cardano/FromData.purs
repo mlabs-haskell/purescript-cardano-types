@@ -227,7 +227,6 @@ instance
       , tail: pdArgs''
       }
 
--- TODO: Unhush the errors in FromData
 genericFromData
   :: forall (t :: Type) (rep :: Type)
    . G.Generic t rep

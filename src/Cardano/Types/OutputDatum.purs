@@ -12,18 +12,14 @@ import Prelude
 import Aeson
   ( class DecodeAeson
   , class EncodeAeson
-  , JsonDecodeError(TypeMismatch, UnexpectedValue)
+  , JsonDecodeError(AtKey, Named, TypeMismatch, UnexpectedValue)
   , caseAesonObject
   , fromString
   , toStringifiedNumbersJson
   , (.:)
   )
 import Cardano.AsCbor (encodeCbor)
-import Cardano.Types.DataHash (DataHash)
-import Cardano.Types.PlutusData (PlutusData, pprintPlutusData)
-import Cardano.Types.PlutusData as PlutusData
 import Cardano.FromData (class FromData, genericFromData)
-import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Plutus.DataSchema
   ( class HasPlutusSchema
   , type (:+)
@@ -33,8 +29,12 @@ import Cardano.Plutus.DataSchema
   , S
   , Z
   )
-import Cardano.ToData (class ToData, genericToData)
 import Cardano.Serialization.Lib as Csl
+import Cardano.ToData (class ToData, genericToData)
+import Cardano.Types.DataHash (DataHash)
+import Cardano.Types.Internal.Helpers (encodeTagged')
+import Cardano.Types.PlutusData (PlutusData, pprintPlutusData)
+import Cardano.Types.PlutusData as PlutusData
 import Data.ByteArray (byteArrayToHex)
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
@@ -90,8 +90,11 @@ instance DecodeAeson OutputDatum where
           datum <- obj .: "contents"
           pure $ OutputDatum datum
         tagValue -> do
-          Left $ UnexpectedValue $ toStringifiedNumbersJson $ fromString
-            tagValue
+          Left $ Named "OutputDatum"
+            $ AtKey "tag"
+            $ UnexpectedValue
+            $ toStringifiedNumbersJson
+            $ fromString tagValue
 
 fromCsl :: Csl.OutputDatum -> OutputDatum
 fromCsl cslOd = case toMaybe (Csl.outputDatum_dataHash cslOd) of

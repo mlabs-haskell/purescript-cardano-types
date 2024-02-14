@@ -2,13 +2,13 @@ module Cardano.Types.MIRToStakeCredentials where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Credential as Credential
 import Cardano.Types.Int as Int
-import Cardano.Types.Internal.Helpers (encodeMap)
+import Cardano.Types.Internal.Helpers (decodeMap, encodeMap)
 import Cardano.Types.StakeCredential (StakeCredential)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
@@ -30,6 +30,9 @@ instance Show MIRToStakeCredentials where
 
 instance EncodeAeson MIRToStakeCredentials where
   encodeAeson (MIRToStakeCredentials r) = encodeMap r
+
+instance DecodeAeson MIRToStakeCredentials where
+  decodeAeson r = MIRToStakeCredentials <$> decodeMap r
 
 instance AsCbor MIRToStakeCredentials where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap

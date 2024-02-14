@@ -8,10 +8,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 import Test.QuickCheck (class Arbitrary, arbitrary)
 
---------------------------------------------------------------------------------
--- AssetClass
---------------------------------------------------------------------------------
-
+-- This type is not present in CSL, but exists in cardano-api.
 data AssetClass = AssetClass ScriptHash AssetName
 
 derive instance Generic AssetClass _

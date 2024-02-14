@@ -4,19 +4,18 @@ module Cardano.Types.BootstrapWitness
   , toCsl
   ) where
 
+import Prelude
+
+import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (bootstrapWitness_attributes, bootstrapWitness_chainCode, bootstrapWitness_new, bootstrapWitness_signature, bootstrapWitness_vkey)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Vkey (Vkey)
 import Cardano.Types.Vkey as Vkey
-import Control.Apply (map)
 import Data.ByteArray (ByteArray)
-import Data.Eq (class Eq)
-import Data.Function (($), (>>>))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
-import Data.Show (class Show)
 import Data.Show.Generic (genericShow)
 
 newtype BootstrapWitness = BootstrapWitness
@@ -36,6 +35,12 @@ instance Show BootstrapWitness where
 instance AsCbor BootstrapWitness where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+instance EncodeAeson BootstrapWitness where
+  encodeAeson = toCsl >>> encodeAeson
+
+instance DecodeAeson BootstrapWitness where
+  decodeAeson = map fromCsl <<< decodeAeson
 
 fromCsl :: Csl.BootstrapWitness -> BootstrapWitness
 fromCsl bw =

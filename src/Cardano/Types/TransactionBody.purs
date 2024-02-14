@@ -2,10 +2,28 @@ module Cardano.Types.TransactionBody where
 
 import Prelude
 
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , decodeAeson
+  , encodeAeson
+  )
 import Cardano.Serialization.Lib
   ( packListContainer
   , packMapContainer
+  , transactionBody_auxiliaryDataHash
+  , transactionBody_certs
+  , transactionBody_collateral
+  , transactionBody_collateralReturn
+  , transactionBody_fee
+  , transactionBody_inputs
+  , transactionBody_mint
+  , transactionBody_networkId
   , transactionBody_newTxBody
+  , transactionBody_outputs
+  , transactionBody_referenceInputs
+  , transactionBody_requiredSigners
+  , transactionBody_scriptDataHash
   , transactionBody_setAuxiliaryDataHash
   , transactionBody_setCerts
   , transactionBody_setCollateral
@@ -20,6 +38,13 @@ import Cardano.Serialization.Lib
   , transactionBody_setUpdate
   , transactionBody_setValidityStartIntervalBignum
   , transactionBody_setWithdrawals
+  , transactionBody_totalCollateral
+  , transactionBody_ttlBignum
+  , transactionBody_update
+  , transactionBody_validityStartIntervalBignum
+  , transactionBody_withdrawals
+  , unpackListContainer
+  , unpackMapContainerToMapWith
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
@@ -46,8 +71,9 @@ import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe)
-import Data.Newtype (class Newtype, unwrap)
+import Data.Maybe (Maybe, fromMaybe)
+import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Nullable (toMaybe)
 import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for_)
@@ -85,6 +111,12 @@ instance Ord TransactionBody where
 
 instance Show TransactionBody where
   show = genericShow
+
+instance EncodeAeson TransactionBody where
+  encodeAeson = toCsl >>> encodeAeson
+
+instance DecodeAeson TransactionBody where
+  decodeAeson = map fromCsl <<< decodeAeson
 
 toCsl :: TransactionBody -> Csl.TransactionBody
 toCsl
@@ -141,3 +173,60 @@ toCsl
   withNonEmptyArray (TransactionInput.toCsl <$> referenceInputs) $
     transactionBody_setReferenceInputs tb
   pure tb
+
+fromCsl :: Csl.TransactionBody -> TransactionBody
+fromCsl tb =
+  TransactionBody
+    { inputs
+    , outputs
+    , fee
+    , ttl
+    , certs
+    , withdrawals
+    , update
+    , auxiliaryDataHash
+    , validityStartInterval
+    , mint
+    , scriptDataHash
+    , collateral
+    , requiredSigners
+    , networkId
+    , collateralReturn
+    , totalCollateral
+    , referenceInputs
+    }
+  where
+  inputs = map TransactionInput.fromCsl $ unpackListContainer $
+    transactionBody_inputs tb
+  outputs = map TransactionOutput.fromCsl $ unpackListContainer $
+    transactionBody_outputs tb
+  fee = wrap $ wrap $ transactionBody_fee tb
+  ttl = wrap <<< wrap <$>
+    toMaybe (transactionBody_ttlBignum tb)
+  certs = Certificate.fromCsl <$> fromMaybe []
+    (map unpackListContainer $ toMaybe $ transactionBody_certs tb)
+  withdrawals = fromMaybe Map.empty
+    $ map (unpackMapContainerToMapWith RewardAddress.fromCsl (wrap <<< wrap))
+    $ toMaybe
+    $ transactionBody_withdrawals tb
+  update = Update.fromCsl <$>
+    toMaybe (transactionBody_update tb)
+  auxiliaryDataHash = wrap <$>
+    toMaybe (transactionBody_auxiliaryDataHash tb)
+  validityStartInterval = wrap <<< wrap <$>
+    toMaybe (transactionBody_validityStartIntervalBignum tb)
+  mint = Mint.fromCsl <$> toMaybe (transactionBody_mint tb)
+  scriptDataHash = wrap <$> toMaybe (transactionBody_scriptDataHash tb)
+  collateral = map TransactionInput.fromCsl $ fromMaybe []
+    $ map unpackListContainer
+    $ toMaybe (transactionBody_collateral tb)
+  requiredSigners = map wrap $ fromMaybe [] $ unpackListContainer <$>
+    toMaybe (transactionBody_requiredSigners tb)
+  networkId = NetworkId.fromCsl <$>
+    toMaybe (transactionBody_networkId tb)
+  collateralReturn = TransactionOutput.fromCsl <$>
+    toMaybe (transactionBody_collateralReturn tb)
+  totalCollateral = wrap <<< wrap <$>
+    toMaybe (transactionBody_totalCollateral tb)
+  referenceInputs = map TransactionInput.fromCsl $ fromMaybe [] $ unpackListContainer <$>
+    toMaybe (transactionBody_referenceInputs tb)

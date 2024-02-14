@@ -7,7 +7,7 @@ module Cardano.Types.TransactionUnspentOutput
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (transactionUnspentOutput_input, transactionUnspentOutput_new, transactionUnspentOutput_output)
 import Cardano.Serialization.Lib as Csl
@@ -32,6 +32,7 @@ derive instance Newtype TransactionUnspentOutput _
 derive newtype instance Eq TransactionUnspentOutput
 derive newtype instance Ord TransactionUnspentOutput
 derive newtype instance EncodeAeson TransactionUnspentOutput
+derive newtype instance DecodeAeson TransactionUnspentOutput
 
 instance Show TransactionUnspentOutput where
   show = genericShow

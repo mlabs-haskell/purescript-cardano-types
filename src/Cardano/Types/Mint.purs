@@ -2,7 +2,8 @@ module Cardano.Types.Mint where
 
 import Prelude
 
-import Cardano.Serialization.Lib (packMapContainer)
+import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
+import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
@@ -10,7 +11,7 @@ import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Newtype (class Newtype, unwrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.Tuple.Nested ((/\))
 
@@ -24,9 +25,19 @@ derive instance Newtype Mint _
 instance Show Mint where
   show = genericShow
 
+instance EncodeAeson Mint where
+  encodeAeson = toCsl >>> encodeAeson
+
+instance DecodeAeson Mint where
+  decodeAeson = map fromCsl <<< decodeAeson
+
 toCsl :: Mint -> Csl.Mint
 toCsl (Mint mp) = packMapContainer $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
   unwrap scriptHash /\
     packMapContainer do
       Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
         unwrap assetName /\ unwrap quantity
+
+fromCsl :: Csl.Mint -> Mint
+fromCsl = wrap <<< unpackMapContainerToMapWith wrap
+  (unpackMapContainerToMapWith wrap wrap)

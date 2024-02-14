@@ -6,18 +6,27 @@ module Cardano.Types.TransactionWitnessSet
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
-  ( transactionWitnessSet_new
+  ( transactionWitnessSet_bootstraps
+  , transactionWitnessSet_nativeScripts
+  , transactionWitnessSet_new
+  , transactionWitnessSet_plutusData
+  , transactionWitnessSet_plutusScripts
+  , transactionWitnessSet_redeemers
   , transactionWitnessSet_setBootstraps
   , transactionWitnessSet_setNativeScripts
   , transactionWitnessSet_setPlutusData
   , transactionWitnessSet_setPlutusScripts
   , transactionWitnessSet_setRedeemers
   , transactionWitnessSet_setVkeys
+  , transactionWitnessSet_vkeys
+  , unpackListContainer
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BootstrapWitness (BootstrapWitness)
+import Cardano.Types.BootstrapWitness as BoostrapWitness
 import Cardano.Types.BootstrapWitness as BootstrapWitness
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, withNonEmptyArray)
 import Cardano.Types.NativeScript (NativeScript)
@@ -32,9 +41,10 @@ import Cardano.Types.Vkeywitness (Vkeywitness)
 import Cardano.Types.Vkeywitness as Vkeywitness
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Nullable (Nullable, toMaybe)
 import Data.Show.Generic (genericShow)
-import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
 
 newtype TransactionWitnessSet = TransactionWitnessSet
@@ -48,6 +58,8 @@ newtype TransactionWitnessSet = TransactionWitnessSet
 
 derive instance Newtype TransactionWitnessSet _
 derive instance Generic TransactionWitnessSet _
+derive newtype instance EncodeAeson TransactionWitnessSet
+derive newtype instance DecodeAeson TransactionWitnessSet
 
 instance Eq TransactionWitnessSet where
   eq = eqOrd
@@ -63,8 +75,30 @@ instance AsCbor TransactionWitnessSet where
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 fromCsl :: Csl.TransactionWitnessSet -> TransactionWitnessSet
-fromCsl =
-  unsafePerformEffect $ throw "TransactionWitnessSet.fromCsl: not implemented"
+fromCsl ws =
+  TransactionWitnessSet
+    { vkeys
+    , nativeScripts
+    , bootstraps
+    , plutusScripts
+    , plutusData
+    , redeemers
+    }
+  where
+  use :: forall a. (Csl.TransactionWitnessSet -> Nullable a) -> Maybe a
+  use f = toMaybe (f ws)
+  vkeys = map Vkeywitness.fromCsl $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_vkeys
+  nativeScripts = map NativeScript.fromCsl $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_nativeScripts
+  bootstraps = map BoostrapWitness.fromCsl $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_bootstraps
+  plutusScripts = map PlutusScript.fromCsl $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_plutusScripts
+  plutusData = map PlutusData.fromCsl $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_plutusData
+  redeemers = map Redeemer.fromCsl $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_redeemers
 
 toCsl :: TransactionWitnessSet -> Csl.TransactionWitnessSet
 toCsl

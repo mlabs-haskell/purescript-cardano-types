@@ -2,6 +2,7 @@ module Cardano.Types.Redeemer where
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
@@ -26,6 +27,12 @@ derive instance Newtype Redeemer _
 derive instance Generic Redeemer _
 derive instance Eq Redeemer
 derive instance Ord Redeemer
+
+instance EncodeAeson Redeemer where
+  encodeAeson = toCsl >>> encodeAeson
+
+instance DecodeAeson Redeemer where
+  decodeAeson = map fromCsl <<< decodeAeson
 
 instance Show Redeemer where
   show = genericShow

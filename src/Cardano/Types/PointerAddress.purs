@@ -2,8 +2,19 @@ module Cardano.Types.PointerAddress where
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson)
-import Cardano.Serialization.Lib (fromBytes, pointerAddress_fromAddress, pointerAddress_toAddress, toBytes)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(TypeMismatch)
+  , decodeAeson
+  , encodeAeson
+  )
+import Cardano.Serialization.Lib
+  ( fromBytes
+  , pointerAddress_fromAddress
+  , pointerAddress_toAddress
+  , toBytes
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
 import Data.ByteArray (byteArrayToHex)

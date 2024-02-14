@@ -2,12 +2,12 @@ module Cardano.Types.GeneralTransactionMetadata where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
-import Cardano.Types.Internal.Helpers (encodeMap)
+import Cardano.Types.Internal.Helpers (decodeMap, encodeMap)
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum)
 import Cardano.Types.TransactionMetadatum as TransactionMetadatum
 import Data.Generic.Rep (class Generic)
@@ -32,6 +32,9 @@ instance Show GeneralTransactionMetadata where
 
 instance EncodeAeson GeneralTransactionMetadata where
   encodeAeson (GeneralTransactionMetadata m) = encodeMap m
+
+instance DecodeAeson GeneralTransactionMetadata where
+  decodeAeson = map wrap <<< decodeMap
 
 -- This Semigroup instance simply takes the Last value for duplicate keys
 -- to avoid a Semigroup instance for TransactionMetadatum.

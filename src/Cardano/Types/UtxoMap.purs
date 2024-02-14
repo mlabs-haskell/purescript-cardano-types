@@ -22,6 +22,7 @@ import Data.Newtype (unwrap)
 import Data.Tuple.Nested ((/\))
 import Data.UInt as UInt
 
+-- Not a CSL type!
 type UtxoMap = Map TransactionInput TransactionOutput
 
 pprintUtxoMap :: UtxoMap -> TagSet

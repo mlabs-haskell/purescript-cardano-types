@@ -2,6 +2,8 @@ module Cardano.Types.PoolParams where
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( packListContainer
   , poolParams_cost
@@ -16,7 +18,6 @@ import Cardano.Serialization.Lib
   , poolParams_vrfKeyhash
   , unpackListContainer
   )
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
@@ -56,6 +57,8 @@ derive instance Newtype PoolParams _
 derive instance Generic PoolParams _
 derive instance Eq PoolParams
 derive instance Ord PoolParams
+derive newtype instance EncodeAeson PoolParams
+derive newtype instance DecodeAeson PoolParams
 
 instance Show PoolParams where
   show = genericShow

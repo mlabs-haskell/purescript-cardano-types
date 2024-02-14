@@ -13,6 +13,7 @@ module Cardano.Types.RedeemerTag
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Data.Generic.Rep (class Generic)
@@ -34,6 +35,12 @@ derive instance Ord RedeemerTag
 
 instance Show RedeemerTag where
   show = genericShow
+
+instance EncodeAeson RedeemerTag where
+  encodeAeson = toCsl >>> encodeAeson
+
+instance DecodeAeson RedeemerTag where
+  decodeAeson = map fromCsl <<< decodeAeson
 
 instance AsCbor RedeemerTag where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
