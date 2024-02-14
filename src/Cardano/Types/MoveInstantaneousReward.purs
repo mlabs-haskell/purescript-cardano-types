@@ -2,6 +2,8 @@ module Cardano.Types.MoveInstantaneousReward where
 
 import Prelude
 
+import Aeson (class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( moveInstantaneousReward_asToOtherPot
   , moveInstantaneousReward_asToStakeCreds
@@ -10,18 +12,19 @@ import Cardano.Serialization.Lib
   , moveInstantaneousReward_pot
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Teyps.MIRToStakeCredentials (MIRToStakeCredentials)
-import Cardano.Teyps.MIRToStakeCredentials as MIRToStakeCredentials
 import Cardano.Types.BigNum (BigNum(BigNum))
 import Cardano.Types.Coin (Coin(Coin))
+import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.MIRPot (MIRPot)
 import Cardano.Types.MIRPot as MIRPot
 import Cardano.Types.MIRPot as Pot
+import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials)
+import Cardano.Types.MIRToStakeCredentials as MIRToStakeCredentials
 import Control.Alt ((<|>))
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe (fromJust)
-import Data.Newtype (unwrap)
+import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Partial.Unsafe (unsafePartial)
@@ -42,6 +45,22 @@ derive instance Generic MoveInstantaneousReward _
 
 instance Show MoveInstantaneousReward where
   show = genericShow
+
+instance EncodeAeson MoveInstantaneousReward where
+  encodeAeson = case _ of
+    ToOtherPot r -> encodeTagged' "ToOtherPot" r
+      -- We assume the numbers are finite
+      { pot = MIRPot.toInt r.pot }
+    ToStakeCreds r -> encodeTagged' "ToStakeCreds" r
+      -- We assume the numbers are finite
+      { pot = MIRPot.toInt r.pot }
+
+--  TODO
+-- instance DecodeAeson MoveInstantaneousReward where
+
+instance AsCbor MoveInstantaneousReward where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl :: MoveInstantaneousReward -> Csl.MoveInstantaneousReward
 toCsl = case _ of

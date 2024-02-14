@@ -3,7 +3,7 @@ module Cardano.Types.MultiAsset where
 import Prelude hiding (add)
 
 import Aeson (class DecodeAeson, class EncodeAeson, encodeAeson)
-import Cardano.AsCbor (encodeCbor)
+import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AssetName (AssetName, fromAssetName)
@@ -15,6 +15,7 @@ import Control.Bind (bindFlipped)
 import Data.Array (filter, foldr)
 import Data.ByteArray (byteArrayToHex)
 import Data.Foldable (any, foldM)
+import Data.Generic.Rep (class Generic)
 import Data.Lattice (class JoinSemilattice, class MeetSemilattice)
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
@@ -33,8 +34,9 @@ import Test.QuickCheck.Gen (Gen, suchThat)
 
 newtype MultiAsset = MultiAsset (Map ScriptHash (Map AssetName BigNum))
 
-derive instance Newtype MultiAsset _
+derive instance Generic MultiAsset _
 derive newtype instance Eq MultiAsset
+derive instance Newtype MultiAsset _
 -- no Ord instance to prevent confusion
 
 instance Arbitrary MultiAsset where
@@ -66,6 +68,10 @@ instance DecodeAeson MultiAsset where
   decodeAeson aeson = do
     mapAesons <- decodeMap aeson
     MultiAsset <$> for mapAesons decodeMap
+
+instance AsCbor MultiAsset where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 empty :: MultiAsset
 empty = MultiAsset Map.empty

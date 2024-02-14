@@ -5,14 +5,14 @@ module Cardano.Types.TransactionHash
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
+import Cardano.FromData (class FromData, fromData)
 import Cardano.Serialization.Lib (fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
-import Cardano.AsCbor (class AsCbor)
-import Cardano.Types.BigNum (zero) as BigNum
-import Cardano.Types.PlutusData (PlutusData(Constr))
-import Cardano.FromData (class FromData, fromData)
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromBytes)
 import Cardano.ToData (class ToData, toData)
+import Cardano.Types.BigNum (zero) as BigNum
+import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromBytes)
+import Cardano.Types.PlutusData (PlutusData(Constr))
 import Data.ByteArray (byteArrayFromIntArrayUnsafe)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)

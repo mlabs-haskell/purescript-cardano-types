@@ -18,6 +18,7 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Address (Address)
 import Cardano.Types.Address as Address
+import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Types.MultiAsset (MultiAsset(MultiAsset))
 import Cardano.Types.OutputDatum
   ( OutputDatum(OutputDatum, OutputDatumHash)
@@ -70,6 +71,10 @@ derive newtype instance EncodeAeson TransactionOutput
 
 instance Show TransactionOutput where
   show = genericShow
+
+instance AsCbor TransactionOutput where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 pprintTransactionOutput :: TransactionOutput -> TagSet
 pprintTransactionOutput

@@ -37,6 +37,7 @@ import Cardano.Serialization.Lib
   , stakeRegistration_new
   , stakeRegistration_stakeCredential
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Type.Epoch (Epoch)
 import Cardano.Types.Credential as Credential
@@ -87,6 +88,10 @@ instance DecodeAeson Certificate where
 
 instance Show Certificate where
   show = genericShow
+
+instance AsCbor Certificate where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl :: Certificate -> Csl.Certificate
 toCsl = case _ of

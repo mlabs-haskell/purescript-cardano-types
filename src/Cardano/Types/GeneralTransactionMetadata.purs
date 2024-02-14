@@ -3,6 +3,7 @@ module Cardano.Types.GeneralTransactionMetadata where
 import Prelude
 
 import Aeson (class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
@@ -23,6 +24,7 @@ newtype GeneralTransactionMetadata =
 derive instance Newtype GeneralTransactionMetadata _
 
 derive newtype instance Eq GeneralTransactionMetadata
+derive newtype instance Ord GeneralTransactionMetadata
 derive instance Generic GeneralTransactionMetadata _
 
 instance Show GeneralTransactionMetadata where
@@ -42,6 +44,10 @@ instance Semigroup GeneralTransactionMetadata where
 
 instance Monoid GeneralTransactionMetadata where
   mempty = GeneralTransactionMetadata Map.empty
+
+instance AsCbor GeneralTransactionMetadata where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl :: GeneralTransactionMetadata -> Csl.GeneralTransactionMetadata
 toCsl = unwrap >>> Map.toUnfoldable >>> map (unwrap *** TransactionMetadatum.toCsl) >>> packMapContainer

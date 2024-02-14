@@ -2,7 +2,8 @@ module Cardano.Types.UnitInterval where
 
 import Prelude
 
-import Aeson (class EncodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( unitInterval_denominator
   , unitInterval_new
@@ -24,9 +25,14 @@ derive instance Eq UnitInterval
 derive instance Ord UnitInterval
 derive instance Generic UnitInterval _
 derive newtype instance EncodeAeson UnitInterval
+derive newtype instance DecodeAeson UnitInterval
 
 instance Show UnitInterval where
   show = genericShow
+
+instance AsCbor UnitInterval where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 toCsl :: UnitInterval -> Csl.UnitInterval
 toCsl (UnitInterval { numerator, denominator }) = unitInterval_new (unwrap numerator) (unwrap denominator)

@@ -3,6 +3,7 @@ module Cardano.Types.Language where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(UnexpectedValue), decodeAeson, encodeAeson, fromString, toStringifiedNumbersJson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( language_kind
   , language_newPlutusV1
@@ -11,6 +12,7 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
+import Data.Newtype (unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
@@ -38,6 +40,10 @@ instance EncodeAeson Language where
 
 instance Show Language where
   show = genericShow
+
+instance AsCbor Language where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 fromCsl :: Csl.Language -> Language
 fromCsl lang =

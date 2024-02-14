@@ -3,8 +3,10 @@ module Cardano.Types.Value where
 import Prelude hiding (join)
 
 import Aeson (class EncodeAeson, encodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (value_coin, value_multiasset, value_newWithAssets)
 import Cardano.Serialization.Lib as Csl
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.Asset (Asset(Asset, AdaAsset))
 import Cardano.Types.AssetClass (AssetClass(AssetClass))
 import Cardano.Types.AssetName (AssetName)
@@ -39,6 +41,9 @@ derive instance Generic Value _
 derive instance Eq Value
 -- no Ord instance to prevent confusion
 
+instance Ord Value where
+  compare a b = if a `lt` b then LT else if a `gt` b then GT else EQ
+
 instance Arbitrary Value where
   arbitrary = Value <$> arbitrary <*> arbitrary
 
@@ -56,6 +61,10 @@ instance EncodeAeson Value where
     { coin
     , nonAdaAsset
     }
+
+instance AsCbor Value where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 zero :: Value
 zero = Value Coin.zero MultiAsset.empty

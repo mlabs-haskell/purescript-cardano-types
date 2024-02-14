@@ -3,6 +3,8 @@ module Cardano.Types.OutputDatum
   , outputDatumDataHash
   , outputDatumDatum
   , pprintOutputDatum
+  , fromCsl
+  , toCsl
   ) where
 
 import Prelude
@@ -19,6 +21,7 @@ import Aeson
 import Cardano.AsCbor (encodeCbor)
 import Cardano.Types.DataHash (DataHash)
 import Cardano.Types.PlutusData (PlutusData, pprintPlutusData)
+import Cardano.Types.PlutusData as PlutusData
 import Cardano.FromData (class FromData, genericFromData)
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Plutus.DataSchema
@@ -31,14 +34,18 @@ import Cardano.Plutus.DataSchema
   , Z
   )
 import Cardano.ToData (class ToData, genericToData)
+import Cardano.Serialization.Lib as Csl
 import Data.ByteArray (byteArrayToHex)
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Newtype (unwrap)
+import Data.Newtype (unwrap, wrap)
+import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
+import Effect.Exception (throw)
+import Effect.Unsafe (unsafePerformEffect)
 
 data OutputDatum = OutputDatumHash DataHash | OutputDatum PlutusData
 
@@ -85,6 +92,18 @@ instance DecodeAeson OutputDatum where
         tagValue -> do
           Left $ UnexpectedValue $ toStringifiedNumbersJson $ fromString
             tagValue
+
+fromCsl :: Csl.OutputDatum -> OutputDatum
+fromCsl cslOd = case toMaybe (Csl.outputDatum_dataHash cslOd) of
+  Just hash -> OutputDatumHash (wrap hash)
+  Nothing -> case toMaybe (Csl.outputDatum_data cslOd) of
+    Just dat -> OutputDatum (PlutusData.fromCsl dat)
+    Nothing -> unsafePerformEffect $ throw "Cardano.Types.OutputDatum.fromCsl: unknown kind"
+
+toCsl :: OutputDatum -> Csl.OutputDatum
+toCsl = case _ of
+  OutputDatumHash hash -> Csl.outputDatum_newDataHash (unwrap hash)
+  OutputDatum datum -> Csl.outputDatum_newData (PlutusData.toCsl datum)
 
 pprintOutputDatum :: OutputDatum -> TagSet
 pprintOutputDatum = TagSet.fromArray <<< case _ of

@@ -18,13 +18,15 @@ import Aeson
   , decodeAeson
   , encodeAeson
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (Int) as Csl
-import Cardano.Serialization.Lib (int_new, int_newNegative, int_toStr)
+import Cardano.Serialization.Lib (fromBytes, toBytes, int_new, int_newNegative, int_toStr)
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum (fromBigInt, fromInt) as BigNum
 import Control.Alternative ((<|>))
 import Data.Either (note)
 import Data.Function (on)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import JS.BigInt as BigInt
@@ -35,6 +37,7 @@ import Prim as Prim
 -- | Signed 128-bit integer, -170141183460469231731687303715884105728..170141183460469231731687303715884105727
 newtype Int = Int Csl.Int
 
+derive instance Generic Int _
 derive instance Newtype Int _
 
 instance Eq Int where
@@ -52,6 +55,10 @@ instance EncodeAeson Int where
 instance DecodeAeson Int where
   decodeAeson aeson =
     decodeAeson aeson >>= note (TypeMismatch "Int") <<< fromBigInt
+
+instance AsCbor Int where
+  encodeCbor = unwrap >>> toBytes >>> wrap
+  decodeCbor = unwrap >>> fromBytes >>> map wrap
 
 fromBigInt :: BigInt.BigInt -> Maybe Int
 fromBigInt bi =

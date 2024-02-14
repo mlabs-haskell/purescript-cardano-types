@@ -2,12 +2,17 @@ module Cardano.Types.ProposedProtocolParameterUpdates where
 
 import Prelude
 
-import Data.Map (Map)
 import Aeson (class EncodeAeson)
+import Cardano.Serialization.Lib (packMapContainer)
+import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GenesisHash (GenesisHash)
 import Cardano.Types.ProtocolParamUpdate (ProtocolParamUpdate)
+import Cardano.Types.ProtocolParamUpdate as ProtocolParamUpdate
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype)
+import Data.Map (Map)
+import Data.Map as Map
+import Data.Newtype (class Newtype, unwrap)
+import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 
 newtype ProposedProtocolParameterUpdates =
@@ -24,3 +29,6 @@ instance Show ProposedProtocolParameterUpdates where
   show = genericShow
 
 derive newtype instance EncodeAeson ProposedProtocolParameterUpdates
+
+toCsl :: ProposedProtocolParameterUpdates -> Csl.ProposedProtocolParameterUpdates
+toCsl = packMapContainer <<< map (unwrap *** ProtocolParamUpdate.toCsl) <<< Map.toUnfoldable <<< unwrap

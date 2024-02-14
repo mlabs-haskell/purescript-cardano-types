@@ -2,7 +2,10 @@ module Cardano.Types.Ipv6 where
 
 import Prelude
 
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
+import Cardano.Serialization.Lib (fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
 import Data.Generic.Rep (class Generic)
@@ -17,6 +20,10 @@ instance Eq Ipv6 where
 
 instance Ord Ipv6 where
   compare = coerce (compareViaCslBytes :: Csl.Ipv6 -> Csl.Ipv6 -> Ordering)
+
+instance AsCbor Ipv6 where
+  encodeCbor = unwrap >>> toBytes >>> wrap
+  decodeCbor = unwrap >>> fromBytes >>> map wrap
 
 derive instance Generic Ipv6 _
 derive instance Newtype Ipv6 _
