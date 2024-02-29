@@ -19,6 +19,7 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.Internal.Helpers (eqOrd)
+import Cardano.Types.RawBytes (RawBytes)
 import Data.Either (note)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
@@ -54,3 +55,6 @@ instance FromData PublicKey where
 
 instance Show PublicKey where
   show pk = "(PublicKey " <> (publicKey_toBech32 <<< unwrap $ pk) <> ")"
+
+toRawBytes :: PublicKey -> RawBytes
+toRawBytes = unwrap >>> publicKey_asBytes >>> wrap
