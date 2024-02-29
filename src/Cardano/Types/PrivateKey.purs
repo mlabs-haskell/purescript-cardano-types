@@ -5,6 +5,7 @@ import Prelude
 import Aeson (class EncodeAeson, encodeAeson)
 import Cardano.Serialization.Lib
   ( privateKey_asBytes
+  , privateKey_fromBech32
   , privateKey_sign
   , privateKey_toBech32
   , privateKey_toPublic
@@ -18,7 +19,9 @@ import Cardano.Types.RawBytes (RawBytes)
 import Data.ByteArray (ByteArray)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Nullable (toMaybe)
 
 newtype PrivateKey = PrivateKey Csl.PrivateKey
 
@@ -39,6 +42,9 @@ instance Show PrivateKey where
 
 toBech32 :: PrivateKey -> Bech32String
 toBech32 = unwrap >>> privateKey_toBech32
+
+fromBech32 :: Bech32String -> Maybe PrivateKey
+fromBech32 = privateKey_fromBech32 >>> toMaybe >>> map wrap
 
 toPublicKey :: PrivateKey -> PublicKey
 toPublicKey = unwrap >>> privateKey_toPublic >>> wrap
