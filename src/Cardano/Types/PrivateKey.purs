@@ -5,14 +5,17 @@ import Prelude
 import Aeson (class EncodeAeson, encodeAeson)
 import Cardano.Serialization.Lib
   ( privateKey_asBytes
+  , privateKey_sign
   , privateKey_toBech32
   , privateKey_toPublic
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Bech32String (Bech32String)
+import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Cardano.Types.PublicKey (PublicKey)
 import Cardano.Types.RawBytes (RawBytes)
+import Data.ByteArray (ByteArray)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -42,3 +45,6 @@ toPublicKey = unwrap >>> privateKey_toPublic >>> wrap
 
 toRawBytes :: PrivateKey -> RawBytes
 toRawBytes = unwrap >>> privateKey_asBytes >>> wrap
+
+sign :: PrivateKey -> ByteArray -> Ed25519Signature
+sign pk bytes = wrap $ privateKey_sign (unwrap pk) bytes
