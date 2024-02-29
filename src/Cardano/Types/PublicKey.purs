@@ -14,10 +14,14 @@ import Cardano.Serialization.Lib
   ( publicKey_asBytes
   , publicKey_fromBech32
   , publicKey_fromBytes
+  , publicKey_hash
   , publicKey_toBech32
+  , publicKey_verify
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.ToData (class ToData, toData)
+import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
+import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Cardano.Types.RawBytes (RawBytes)
 import Data.Either (note)
@@ -58,3 +62,10 @@ instance Show PublicKey where
 
 toRawBytes :: PublicKey -> RawBytes
 toRawBytes = unwrap >>> publicKey_asBytes >>> wrap
+
+hash :: PublicKey -> Ed25519KeyHash
+hash = unwrap >>> publicKey_hash >>> wrap
+
+-- | The corresponding `signData` function is located in https://github.com/mlabs-haskell/purescript-cardano-message-signing
+verify :: PublicKey -> RawBytes -> Ed25519Signature -> Boolean
+verify pk bytes sig = publicKey_verify (unwrap pk) (unwrap bytes) (unwrap sig)
