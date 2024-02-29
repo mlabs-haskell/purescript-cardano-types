@@ -12,6 +12,7 @@ import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Cardano.Types.PublicKey (PublicKey)
+import Cardano.Types.RawBytes (RawBytes)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -38,3 +39,6 @@ toBech32 = unwrap >>> privateKey_toBech32
 
 toPublicKey :: PrivateKey -> PublicKey
 toPublicKey = unwrap >>> privateKey_toPublic >>> wrap
+
+toRawBytes :: PrivateKey -> RawBytes
+toRawBytes = unwrap >>> privateKey_asBytes >>> wrap
