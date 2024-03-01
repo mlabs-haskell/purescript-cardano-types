@@ -16,6 +16,9 @@ import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Cardano.Types.PublicKey (PublicKey)
 import Cardano.Types.RawBytes (RawBytes)
+import Cardano.Types.TransactionHash (TransactionHash)
+import Cardano.Types.Vkeywitness (Vkeywitness)
+import Cardano.Types.Vkeywitness as Vkeywitness
 import Data.ByteArray (ByteArray)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
@@ -54,3 +57,8 @@ toRawBytes = unwrap >>> privateKey_asBytes >>> wrap
 
 sign :: PrivateKey -> ByteArray -> Ed25519Signature
 sign pk bytes = wrap $ privateKey_sign (unwrap pk) bytes
+
+-- | Sign a transaction body hash
+makeVkeyWitness :: TransactionHash -> PrivateKey -> Vkeywitness
+makeVkeyWitness th pk =
+  Vkeywitness.fromCsl $ Csl.makeVkeyWitness (unwrap th) (unwrap pk)
