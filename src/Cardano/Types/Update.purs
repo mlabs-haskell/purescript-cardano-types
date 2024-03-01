@@ -14,8 +14,10 @@ import Cardano.Serialization.Lib
   , update_proposedProtocolParameterUpdates
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Type.Epoch (Epoch)
-import Cardano.Types.ProposedProtocolParameterUpdates (ProposedProtocolParameterUpdates)
+import Cardano.Types.Epoch (Epoch)
+import Cardano.Types.ProposedProtocolParameterUpdates
+  ( ProposedProtocolParameterUpdates
+  )
 import Cardano.Types.ProposedProtocolParameterUpdates as ProposedProtocolParameterUpdates
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)

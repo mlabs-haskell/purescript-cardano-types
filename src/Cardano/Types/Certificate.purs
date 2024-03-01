@@ -39,7 +39,7 @@ import Cardano.Serialization.Lib
   )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
-import Cardano.Type.Epoch (Epoch)
+import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.Credential as Credential
 import Cardano.Types.GenesisDelegateHash (GenesisDelegateHash)
 import Cardano.Types.GenesisHash (GenesisHash)

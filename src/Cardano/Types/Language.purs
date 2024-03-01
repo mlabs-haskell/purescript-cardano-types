@@ -2,7 +2,15 @@ module Cardano.Types.Language where
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(UnexpectedValue), decodeAeson, encodeAeson, fromString, toStringifiedNumbersJson)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(UnexpectedValue)
+  , decodeAeson
+  , encodeAeson
+  , fromString
+  , toStringifiedNumbersJson
+  )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( language_kind

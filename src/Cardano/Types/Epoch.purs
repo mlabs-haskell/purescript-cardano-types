@@ -1,4 +1,4 @@
-module Cardano.Type.Epoch where
+module Cardano.Types.Epoch where
 
 import Prelude
 
