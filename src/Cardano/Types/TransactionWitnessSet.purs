@@ -61,6 +61,7 @@ derive instance Generic TransactionWitnessSet _
 derive newtype instance EncodeAeson TransactionWitnessSet
 derive newtype instance DecodeAeson TransactionWitnessSet
 derive newtype instance Semigroup TransactionWitnessSet
+derive newtype instance Monoid TransactionWitnessSet
 
 instance Eq TransactionWitnessSet where
   eq = eqOrd
