@@ -1,10 +1,20 @@
 module Cardano.Types.Value where
 
-import Prelude hiding (join)
+import Prelude hiding (join, zero, one, add)
 
-import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson, (.:))
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , decodeAeson
+  , encodeAeson
+  , (.:)
+  )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (value_coin, value_multiasset, value_newWithAssets)
+import Cardano.Serialization.Lib
+  ( value_coin
+  , value_multiasset
+  , value_newWithAssets
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Asset (Asset(Asset, AdaAsset))
 import Cardano.Types.AssetClass (AssetClass(AssetClass))
@@ -13,11 +23,22 @@ import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Cardano.Types.Coin (Coin(Coin))
 import Cardano.Types.Coin as Coin
-import Cardano.Types.MultiAsset (MultiAsset(MultiAsset), pprintMultiAsset, unionNonAda, unionWithNonAda)
+import Cardano.Types.MultiAsset
+  ( MultiAsset(MultiAsset)
+  , pprintMultiAsset
+  , unionNonAda
+  , unionWithNonAda
+  )
 import Cardano.Types.MultiAsset as MultiAsset
+import Data.Array (foldr)
 import Data.Foldable (all)
 import Data.Generic.Rep (class Generic)
-import Data.Lattice (class JoinSemilattice, class MeetSemilattice, join, meet)
+import Data.Lattice
+  ( class JoinSemilattice
+  , class MeetSemilattice
+  , join
+  , meet
+  )
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
 import Data.Map (Map)
@@ -77,6 +98,9 @@ zero = Value Coin.zero MultiAsset.empty
 
 add :: Value -> Value -> Maybe Value
 add = unionWith BigNum.add
+
+sum :: Array Value -> Maybe Value
+sum = foldr (\v acc -> acc >>= add v) (pure zero)
 
 -- for compatibility with older CTL
 mkValue :: Coin -> MultiAsset -> Value
