@@ -10,12 +10,15 @@ import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Internal.Helpers (decodeMap, encodeMap)
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum)
 import Cardano.Types.TransactionMetadatum as TransactionMetadatum
+import Data.Array (foldr)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
+import Data.Tuple.Nested ((/\))
 
 newtype GeneralTransactionMetadata =
   GeneralTransactionMetadata
@@ -51,6 +54,22 @@ instance Monoid GeneralTransactionMetadata where
 instance AsCbor GeneralTransactionMetadata where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+empty :: GeneralTransactionMetadata
+empty = wrap Map.empty
+
+-- |  Join together an array of metadata maps without overriding the keys
+fold :: Array GeneralTransactionMetadata -> Maybe GeneralTransactionMetadata
+fold metas =
+  map wrap
+    $ foldr consume (Just Map.empty)
+    $ join
+    $ map (Map.toUnfoldable <<< unwrap) metas
+  where
+  consume (k /\ v) acc
+    | Just oldMap <- acc
+    , Nothing <- Map.lookup k oldMap = pure $ Map.insert k v oldMap
+    | otherwise = Nothing
 
 toCsl :: GeneralTransactionMetadata -> Csl.GeneralTransactionMetadata
 toCsl = unwrap >>> Map.toUnfoldable >>> map (unwrap *** TransactionMetadatum.toCsl) >>> packMapContainer
