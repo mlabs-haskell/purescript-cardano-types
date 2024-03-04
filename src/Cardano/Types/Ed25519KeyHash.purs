@@ -57,7 +57,7 @@ instance Ord Ed25519KeyHash where
 instance Show Ed25519KeyHash where
   show edkh =
     "(Ed25519KeyHash $ unsafePartial $ fromJust $ ed25519KeyHashFromBech32 "
-      <> show (ed25519KeyHashToBech32 "pool" edkh)
+      <> show (toBech32 "pool" edkh)
       <> ")"
 
 instance AsCbor Ed25519KeyHash where
@@ -109,8 +109,8 @@ fromBech32 = map wrap <<< toMaybe <<< ed25519KeyHash_fromBech32
 -- | Convert ed25519KeyHash to Bech32 representation with given prefix.
 -- | Will return Nothing if prefix is invalid (length, mixed-case, etc)
 -- | More on prefixes: https://cips.cardano.org/cips/cip5
-ed25519KeyHashToBech32 :: String -> Ed25519KeyHash -> Maybe Bech32String
-ed25519KeyHashToBech32 prefix kh =
+toBech32 :: String -> Ed25519KeyHash -> Maybe Bech32String
+toBech32 prefix kh =
   hush $ unsafePerformEffect $ try $ unsafePartial
     $ pure
     $ toBech32Unsafe prefix kh

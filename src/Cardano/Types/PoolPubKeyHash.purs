@@ -12,12 +12,17 @@ import Aeson
 import Cardano.AsCbor (class AsCbor)
 import Cardano.FromData (class FromData)
 import Cardano.ToData (class ToData)
-import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash, ed25519KeyHashToBech32)
-import Cardano.Types.Ed25519KeyHash (fromBech32) as Ed25519KeyHash
+import Cardano.Types.Bech32String (Bech32String)
+import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
+import Cardano.Types.Ed25519KeyHash
+  ( fromBech32
+  , toBech32Unsafe
+  ) as Ed25519KeyHash
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap)
 import Data.Show.Generic (genericShow)
+import Partial.Unsafe (unsafePartial)
 
 newtype PoolPubKeyHash = PoolPubKeyHash Ed25519KeyHash
 
@@ -30,8 +35,7 @@ derive newtype instance FromData PoolPubKeyHash
 derive newtype instance AsCbor PoolPubKeyHash
 
 instance EncodeAeson PoolPubKeyHash where
-  encodeAeson (PoolPubKeyHash kh) =
-    encodeAeson (ed25519KeyHashToBech32 "pool" kh)
+  encodeAeson = encodeAeson <<< toBech32
 
 instance DecodeAeson PoolPubKeyHash where
   decodeAeson aeson = do
@@ -41,3 +45,6 @@ instance DecodeAeson PoolPubKeyHash where
 
 instance Show PoolPubKeyHash where
   show = genericShow
+
+toBech32 :: PoolPubKeyHash -> Bech32String
+toBech32 = unsafePartial $ unwrap >>> Ed25519KeyHash.toBech32Unsafe "pool"
