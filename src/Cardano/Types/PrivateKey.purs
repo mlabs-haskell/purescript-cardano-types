@@ -6,6 +6,7 @@ import Aeson (class EncodeAeson, encodeAeson)
 import Cardano.Serialization.Lib
   ( privateKey_asBytes
   , privateKey_fromBech32
+  , privateKey_fromNormalBytes
   , privateKey_sign
   , privateKey_toBech32
   , privateKey_toPublic
@@ -54,6 +55,9 @@ toPublicKey = unwrap >>> privateKey_toPublic >>> wrap
 
 toRawBytes :: PrivateKey -> RawBytes
 toRawBytes = unwrap >>> privateKey_asBytes >>> wrap
+
+fromRawBytes :: RawBytes -> Maybe PrivateKey
+fromRawBytes = unwrap >>> privateKey_fromNormalBytes >>> toMaybe >>> map wrap
 
 sign :: PrivateKey -> ByteArray -> Ed25519Signature
 sign pk bytes = wrap $ privateKey_sign (unwrap pk) bytes

@@ -48,7 +48,8 @@ import Cardano.Types.ExUnits (ExUnits(ExUnits)) as X
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata(GeneralTransactionMetadata)) as X
 import Cardano.Types.GenesisDelegateHash (GenesisDelegateHash(GenesisDelegateHash)) as X
 import Cardano.Types.GenesisHash (GenesisHash(GenesisHash)) as X
-import Cardano.Types.Int (Int(Int)) as X
+-- Commented out, because it conflicts with Prim.Int
+-- import Cardano.Types.Int (Int(Int)) as X
 import Cardano.Types.Ipv4 (Ipv4(Ipv4)) as X
 import Cardano.Types.Ipv6 (Ipv6(Ipv6)) as X
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2)) as X
