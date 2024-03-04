@@ -12,11 +12,8 @@ import Aeson
 import Cardano.AsCbor (class AsCbor)
 import Cardano.FromData (class FromData)
 import Cardano.ToData (class ToData)
-import Cardano.Types.Ed25519KeyHash
-  ( Ed25519KeyHash(Ed25519KeyHash)
-  , ed25519KeyHashFromBech32
-  , ed25519KeyHashToBech32
-  )
+import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash, ed25519KeyHashToBech32)
+import Cardano.Types.Ed25519KeyHash (fromBech32) as Ed25519KeyHash
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype)
@@ -40,7 +37,7 @@ instance DecodeAeson PoolPubKeyHash where
   decodeAeson aeson = do
     str <- decodeAeson aeson
     PoolPubKeyHash <$> note (TypeMismatch "PoolPubKeyHash")
-      (ed25519KeyHashFromBech32 str)
+      (Ed25519KeyHash.fromBech32 str)
 
 instance Show PoolPubKeyHash where
   show = genericShow
