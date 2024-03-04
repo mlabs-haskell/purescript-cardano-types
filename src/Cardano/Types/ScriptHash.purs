@@ -86,11 +86,11 @@ instance EncodeAeson ScriptHash where
   encodeAeson sh = encodeAeson $ encodeCbor sh
 
 -- | Decodes a script hash from its Bech32 representation
-scriptHashFromBech32 :: Bech32String -> Maybe ScriptHash
-scriptHashFromBech32 = map wrap <<< toMaybe <<< scriptHash_fromBech32
+fromBech32 :: Bech32String -> Maybe ScriptHash
+fromBech32 = map wrap <<< toMaybe <<< scriptHash_fromBech32
 
 -- | Convert scriptHash to Bech32 representation with given prefix.
 -- | Will return `Nothing` if prefix is invalid (length, mixed-case, etc)
 -- | More on prefixes: https://cips.cardano.org/cips/cip5
-scriptHashToBech32Unsafe :: Partial => String -> ScriptHash -> Bech32String
-scriptHashToBech32Unsafe prefix = unwrap >>> flip scriptHash_toBech32 prefix
+toBech32Unsafe :: Partial => String -> ScriptHash -> Bech32String
+toBech32Unsafe prefix = unwrap >>> flip scriptHash_toBech32 prefix
