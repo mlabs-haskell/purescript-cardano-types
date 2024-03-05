@@ -2,9 +2,22 @@ module Cardano.Types.Credential where
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, (.:))
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(TypeMismatch)
+  , decodeAeson
+  , (.:)
+  )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (fromBytes, stakeCredential_fromKeyhash, stakeCredential_fromScripthash, stakeCredential_toKeyhash, stakeCredential_toScripthash, toBytes)
+import Cardano.Serialization.Lib
+  ( fromBytes
+  , stakeCredential_fromKeyhash
+  , stakeCredential_fromScripthash
+  , stakeCredential_toKeyhash
+  , stakeCredential_toScripthash
+  , toBytes
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
@@ -12,7 +25,7 @@ import Cardano.Types.ScriptHash (ScriptHash)
 import Control.Alt ((<|>))
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (fromJust)
+import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
@@ -20,6 +33,14 @@ import Partial.Unsafe (unsafePartial)
 
 -- In CSL, this type is called StakeCredential. They reuse it for Payment Credentials as well.
 data Credential = PubKeyHashCredential Ed25519KeyHash | ScriptHashCredential ScriptHash
+
+asPubKeyHash :: Credential -> Maybe Ed25519KeyHash
+asPubKeyHash (PubKeyHashCredential pk) = Just pk
+asPubKeyHash _ = Nothing
+
+asScriptHash :: Credential -> Maybe ScriptHash
+asScriptHash (ScriptHashCredential sh) = Just sh
+asScriptHash _ = Nothing
 
 derive instance Generic Credential _
 derive instance Eq Credential
