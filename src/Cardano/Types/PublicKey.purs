@@ -20,6 +20,7 @@ import Cardano.Serialization.Lib
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.ToData (class ToData, toData)
+import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Internal.Helpers (eqOrd)
@@ -27,6 +28,7 @@ import Cardano.Types.RawBytes (RawBytes)
 import Data.Either (note)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 
@@ -62,6 +64,15 @@ instance Show PublicKey where
 
 toRawBytes :: PublicKey -> RawBytes
 toRawBytes = unwrap >>> publicKey_asBytes >>> wrap
+
+fromRawBytes :: RawBytes -> Maybe PublicKey
+fromRawBytes = unwrap >>> publicKey_fromBytes >>> toMaybe >>> map wrap
+
+fromBech32 :: Bech32String -> Maybe PublicKey
+fromBech32 = publicKey_fromBech32 >>> toMaybe >>> map wrap
+
+toBech32 :: PublicKey -> Bech32String
+toBech32 = unwrap >>> publicKey_toBech32
 
 hash :: PublicKey -> Ed25519KeyHash
 hash = unwrap >>> publicKey_hash >>> wrap
