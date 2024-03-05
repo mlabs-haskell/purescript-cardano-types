@@ -5,7 +5,9 @@ module Cardano.Types.Transaction
   , hashTransaction
   ) where
 
+import Prelude
 import Cardano.AsCbor (class AsCbor)
+import Cardano.Serialization.Lib (transaction_setIsValid)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AuxiliaryData (AuxiliaryData)
 import Cardano.Types.AuxiliaryData as AuxiliaryData
@@ -14,22 +16,18 @@ import Cardano.Types.TransactionBody as TransactionBody
 import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet)
 import Cardano.Types.TransactionWitnessSet as TransactionWitnessSet
-import Control.Apply (map)
-import Data.Eq (class Eq)
-import Data.Function (($), (>>>))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromMaybe)
-import Data.Monoid (mempty)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
-import Data.Ord (class Ord)
-import Data.Show (class Show)
 import Data.Show.Generic (genericShow)
+import Effect.Unsafe (unsafePerformEffect)
 
 newtype Transaction = Transaction
   { body :: TransactionBody
   , witnessSet :: TransactionWitnessSet
   , auxiliaryData :: AuxiliaryData
+  , isValid :: Boolean
   }
 
 derive instance Newtype Transaction _
@@ -57,11 +55,16 @@ fromCsl tx =
     body = TransactionBody.fromCsl $ Csl.transaction_body tx
     witnessSet = TransactionWitnessSet.fromCsl $ Csl.transaction_witnessSet tx
     auxiliaryData = fromMaybe mempty $ map AuxiliaryData.fromCsl $ toMaybe $ Csl.transaction_auxiliaryData tx
+    isValid = Csl.transaction_isValid tx
   in
-    Transaction { body, witnessSet, auxiliaryData }
+    Transaction { body, witnessSet, auxiliaryData, isValid }
 
 toCsl :: Transaction -> Csl.Transaction
-toCsl (Transaction { body, witnessSet, auxiliaryData }) =
-  Csl.transaction_new (TransactionBody.toCsl body)
-    (TransactionWitnessSet.toCsl witnessSet)
-    (AuxiliaryData.toCsl auxiliaryData)
+toCsl (Transaction { body, witnessSet, auxiliaryData, isValid }) = do
+  unsafePerformEffect do
+    let
+      tx = Csl.transaction_new (TransactionBody.toCsl body)
+        (TransactionWitnessSet.toCsl witnessSet)
+        (AuxiliaryData.toCsl auxiliaryData)
+    transaction_setIsValid tx isValid
+    pure tx
