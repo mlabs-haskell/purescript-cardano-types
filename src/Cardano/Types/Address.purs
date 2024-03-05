@@ -9,6 +9,7 @@ import Aeson
   , decodeAeson
   , encodeAeson
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( address_fromBech32
   , address_networkId
@@ -27,20 +28,21 @@ import Cardano.Serialization.Lib
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.BaseAddress (BaseAddress, fromCsl, toCsl) as BA
+import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.ByronAddress (ByronAddress) as BA
 import Cardano.Types.EnterpriseAddress as EA
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId
+import Cardano.Types.PaymentCredential (PaymentCredential)
 import Cardano.Types.PointerAddress (PointerAddress) as PA
 import Cardano.Types.RewardAddress as RA
+import Cardano.Types.StakeCredential (StakeCredential)
 import Control.Alt ((<|>))
-import Cardano.Types.Bech32String (Bech32String)
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
-import Data.Maybe (Maybe, fromJust)
+import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
@@ -75,6 +77,22 @@ instance AsCbor Address where
 addressNetworkId :: Address -> NetworkId
 addressNetworkId = unsafePartial $
   toCsl >>> address_networkId >>> Int.fromNumber >>> fromJust >>> NetworkId.fromInt >>> fromJust
+
+getPaymentCredential :: Address -> Maybe PaymentCredential
+getPaymentCredential = case _ of
+  BaseAddress { paymentCredential } -> Just paymentCredential
+  ByronAddress _ -> Nothing
+  EnterpriseAddress { paymentCredential } -> Just paymentCredential
+  RewardAddress _ -> Nothing
+  PointerAddress _ -> Nothing
+
+getStakeCredential :: Address -> Maybe StakeCredential
+getStakeCredential = case _ of
+  BaseAddress { stakeCredential } -> Just stakeCredential
+  ByronAddress _ -> Nothing
+  EnterpriseAddress _ -> Nothing
+  RewardAddress { stakeCredential } -> Just stakeCredential
+  PointerAddress _ -> Nothing
 
 toBech32 :: Address -> Bech32String
 toBech32 = toCsl >>> flip address_toBech32 (unsafeCoerce undefined)
