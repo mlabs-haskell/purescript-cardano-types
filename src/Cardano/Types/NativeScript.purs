@@ -18,6 +18,7 @@ import Cardano.Serialization.Lib
   , nativeScript_asScriptPubkey
   , nativeScript_asTimelockExpiry
   , nativeScript_asTimelockStart
+  , nativeScript_hash
   , nativeScript_newScriptAll
   , nativeScript_newScriptAny
   , nativeScript_newScriptNOfK
@@ -39,14 +40,12 @@ import Cardano.Serialization.Lib
   , timelockStart_slotBignum
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal
-  ( packListContainer
-  , unpackListContainer
-  )
+import Cardano.Serialization.Lib.Internal (packListContainer, unpackListContainer)
 import Cardano.Types.BigNum (fromString)
 import Cardano.Types.BigNum as BigNum
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
+import Cardano.Types.ScriptHash (ScriptHash)
 import Cardano.Types.Slot (Slot(Slot))
 import Control.Alt ((<|>))
 import Data.Array.NonEmpty (fromFoldable)
@@ -135,6 +134,9 @@ instance AsCbor NativeScript where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
+hash :: NativeScript -> ScriptHash
+hash = toCsl >>> nativeScript_hash >>> wrap
+
 pprintNativeScript :: NativeScript -> TagSet
 pprintNativeScript = case _ of
   ScriptPubkey kh -> TagSet.fromArray
@@ -187,8 +189,8 @@ toCsl = case _ of
   TimelockExpiry slot -> convertTimelockExpiry slot
   where
   convertScriptPubkey :: Ed25519KeyHash -> Csl.NativeScript
-  convertScriptPubkey hash = do
-    nativeScript_newScriptPubkey $ scriptPubkey_new (unwrap hash)
+  convertScriptPubkey kh = do
+    nativeScript_newScriptPubkey $ scriptPubkey_new (unwrap kh)
 
   convertScriptAll :: Array NativeScript -> Csl.NativeScript
   convertScriptAll nss =

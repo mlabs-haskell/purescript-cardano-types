@@ -3,16 +3,24 @@ module Cardano.Types.PlutusScript where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Data.Newtype (class Newtype, unwrap, wrap)
-import Data.Tuple.Nested (type (/\), (/\))
-import Cardano.Serialization.Lib (fromBytes, plutusScript_bytes, plutusScript_languageVersion, plutusScript_newWithVersion, toBytes)
-import Cardano.Serialization.Lib as Csl
 import Cardano.AsCbor (class AsCbor)
+import Cardano.Serialization.Lib
+  ( fromBytes
+  , plutusScript_bytes
+  , plutusScript_hash
+  , plutusScript_languageVersion
+  , plutusScript_newWithVersion
+  , toBytes
+  )
+import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2))
 import Cardano.Types.Language as Language
+import Cardano.Types.ScriptHash (ScriptHash)
 import Data.ByteArray (ByteArray)
 import Data.Generic.Rep (class Generic)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
+import Data.Tuple.Nested (type (/\), (/\))
 
 -- | Corresponds to "Script" in Plutus
 newtype PlutusScript = PlutusScript (ByteArray /\ Language)
@@ -36,6 +44,9 @@ plutusV2Script ba = PlutusScript (ba /\ PlutusV2)
 instance AsCbor PlutusScript where
   encodeCbor = toCsl >>> toBytes >>> wrap
   decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+
+hash :: PlutusScript -> ScriptHash
+hash = toCsl >>> plutusScript_hash >>> wrap
 
 toCsl :: PlutusScript -> Csl.PlutusScript
 toCsl (PlutusScript (bytes /\ lang)) = plutusScript_newWithVersion bytes $ Language.toCsl lang
