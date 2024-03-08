@@ -1,4 +1,5 @@
--- We reuse JS.BigInt.BigInt here
+-- We reuse JS.BigInt.BigInt here. Csl.BigInt is not used at runtime at
+-- all, except for divCeil
 module Cardano.Types.BigInt
   ( module X
   , fromCsl

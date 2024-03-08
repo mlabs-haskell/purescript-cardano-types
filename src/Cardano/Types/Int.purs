@@ -7,6 +7,11 @@ module Cardano.Types.Int
   , fromInt
   , toInt
   , fromString
+  , add
+  , mul
+  , sub
+  , max
+  , zero
   ) where
 
 import Prelude
@@ -20,7 +25,13 @@ import Aeson
   )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (Int) as Csl
-import Cardano.Serialization.Lib (fromBytes, toBytes, int_new, int_newNegative, int_toStr)
+import Cardano.Serialization.Lib
+  ( fromBytes
+  , toBytes
+  , int_new
+  , int_newNegative
+  , int_toStr
+  )
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum (fromBigInt, fromInt) as BigNum
 import Control.Alternative ((<|>))
@@ -29,8 +40,10 @@ import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import JS.BigInt (BigInt)
 import JS.BigInt as BigInt
 import Partial.Unsafe (unsafePartial)
+import Prelude as Prelude
 import Prim (String)
 import Prim as Prim
 
@@ -69,6 +82,24 @@ toBigInt :: Int -> BigInt.BigInt
 toBigInt int =
   -- Assuming every Int can be represented as BigInt
   unsafePartial $ fromJust $ BigInt.fromString $ int_toStr $ unwrap int
+
+zero :: Int
+zero = fromInt 0
+
+add :: Int -> Int -> Maybe Int
+add = binaryViaBigInt Prelude.add
+
+mul :: Int -> Int -> Maybe Int
+mul = binaryViaBigInt Prelude.mul
+
+sub :: Int -> Int -> Maybe Int
+sub = binaryViaBigInt Prelude.sub
+
+max :: Int -> Int -> Int
+max a b = unsafePartial $ fromJust $ binaryViaBigInt Prelude.max a b
+
+binaryViaBigInt :: (BigInt -> BigInt -> BigInt) -> (Int -> Int -> Maybe Int)
+binaryViaBigInt f x y = fromBigInt $ f (toBigInt x) (toBigInt y)
 
 fromInt :: Prim.Int -> Int
 fromInt n
