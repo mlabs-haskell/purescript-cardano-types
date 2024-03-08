@@ -31,6 +31,9 @@ instance EncodeAeson Mint where
 instance DecodeAeson Mint where
   decodeAeson = map fromCsl <<< decodeAeson
 
+singleton :: ScriptHash -> AssetName -> Int.Int -> Mint
+singleton sh an n = Mint (Map.singleton sh (Map.singleton an n))
+
 toCsl :: Mint -> Csl.Mint
 toCsl (Mint mp) = packMapContainer $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
   unwrap scriptHash /\
