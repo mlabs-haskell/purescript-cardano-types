@@ -3,6 +3,7 @@ module Cardano.Types.Mint
   , empty
   , flatten
   , unflatten
+  , singleton
   , toCsl
   , fromCsl
   ) where
