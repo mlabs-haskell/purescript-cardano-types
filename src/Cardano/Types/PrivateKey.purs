@@ -7,6 +7,7 @@ import Cardano.Serialization.Lib
   ( privateKey_asBytes
   , privateKey_fromBech32
   , privateKey_fromNormalBytes
+  , privateKey_generateEd25519
   , privateKey_sign
   , privateKey_toBech32
   , privateKey_toPublic
@@ -26,6 +27,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
+import Effect (Effect)
 
 newtype PrivateKey = PrivateKey Csl.PrivateKey
 
@@ -58,6 +60,9 @@ toRawBytes = unwrap >>> privateKey_asBytes >>> wrap
 
 fromRawBytes :: RawBytes -> Maybe PrivateKey
 fromRawBytes = unwrap >>> privateKey_fromNormalBytes >>> toMaybe >>> map wrap
+
+generate :: Effect PrivateKey
+generate = wrap <$> privateKey_generateEd25519
 
 sign :: PrivateKey -> ByteArray -> Ed25519Signature
 sign pk bytes = wrap $ privateKey_sign (unwrap pk) bytes
