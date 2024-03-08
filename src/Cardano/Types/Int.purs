@@ -12,9 +12,10 @@ module Cardano.Types.Int
   , sub
   , max
   , zero
+  , negate
   ) where
 
-import Prelude
+import Prelude hiding (zero, sub)
 
 import Aeson
   ( class DecodeAeson
@@ -76,7 +77,7 @@ instance AsCbor Int where
 fromBigInt :: BigInt.BigInt -> Maybe Int
 fromBigInt bi =
   (newPositive <$> BigNum.fromBigInt bi) <|>
-    (newNegative <$> BigNum.fromBigInt (negate bi))
+    (newNegative <$> BigNum.fromBigInt (Prelude.negate bi))
 
 toBigInt :: Int -> BigInt.BigInt
 toBigInt int =
@@ -97,6 +98,9 @@ sub = binaryViaBigInt Prelude.sub
 
 max :: Int -> Int -> Int
 max a b = unsafePartial $ fromJust $ binaryViaBigInt Prelude.max a b
+
+negate :: Int -> Int
+negate x = unsafePartial $ fromJust $ sub zero x
 
 binaryViaBigInt :: (BigInt -> BigInt -> BigInt) -> (Int -> Int -> Maybe Int)
 binaryViaBigInt f x y = fromBigInt $ f (toBigInt x) (toBigInt y)
