@@ -13,6 +13,8 @@ module Cardano.Types.Int
   , max
   , zero
   , negate
+  , asPositive
+  , asNegative
   ) where
 
 import Prelude hiding (zero, sub)
@@ -28,10 +30,12 @@ import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (Int) as Csl
 import Cardano.Serialization.Lib
   ( fromBytes
-  , toBytes
+  , int_asNegative
+  , int_asPositive
   , int_new
   , int_newNegative
   , int_toStr
+  , toBytes
   )
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum (fromBigInt, fromInt) as BigNum
@@ -41,6 +45,7 @@ import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Nullable (toMaybe)
 import JS.BigInt (BigInt)
 import JS.BigInt as BigInt
 import Partial.Unsafe (unsafePartial)
@@ -124,3 +129,9 @@ newPositive = unwrap >>> int_new >>> wrap
 
 newNegative :: BigNum -> Int
 newNegative = unwrap >>> int_newNegative >>> wrap
+
+asPositive :: Int -> Maybe BigNum
+asPositive = unwrap >>> int_asPositive >>> toMaybe >>> map wrap
+
+asNegative :: Int -> Maybe BigNum
+asNegative = unwrap >>> int_asNegative >>> toMaybe >>> map wrap
