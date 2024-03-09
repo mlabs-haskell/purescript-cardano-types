@@ -6,6 +6,7 @@ module Cardano.Types.Mint
   , singleton
   , toCsl
   , fromCsl
+  , union
   ) where
 
 import Prelude
@@ -21,12 +22,14 @@ import Data.Array (foldM)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.These (These(Both, That, This))
 import Data.Traversable (traverse)
 import Data.Tuple.Nested ((/\), type (/\))
+import Effect.Exception (throw)
+import Effect.Unsafe (unsafePerformEffect)
 
 newtype Mint = Mint (Map ScriptHash (Map AssetName Int.Int))
 
@@ -44,6 +47,14 @@ instance EncodeAeson Mint where
 instance DecodeAeson Mint where
   decodeAeson = map fromCsl <<< decodeAeson
 
+instance Semigroup Mint where
+  append x y =
+    unsafePerformEffect $ maybe (throw "Mint.append: numeric overflow") pure $
+      unionWithNonAda Int.add x y
+
+instance Monoid Mint where
+  mempty = empty
+
 empty :: Mint
 empty = Mint Map.empty
 
@@ -60,7 +71,10 @@ unflatten =
   foldM accumulate empty
   where
   uncurry2 f (a /\ b /\ c) = f a b c
-  accumulate ma = unionWithNonAda Int.add ma <<< uncurry2 singleton
+  accumulate ma = union ma <<< uncurry2 singleton
+
+union :: Mint -> Mint -> Maybe Mint
+union = unionWithNonAda Int.add
 
 unionWithNonAda
   :: (Int.Int -> Int.Int -> Maybe Int.Int)

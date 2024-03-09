@@ -43,13 +43,15 @@ import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe, fromMaybe)
+import Data.Maybe (Maybe, fromMaybe, maybe)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Data.These (These(Both, That, This))
 import Data.Tuple (fst)
 import Data.Tuple.Nested (type (/\), (/\))
+import Effect.Exception (throw)
+import Effect.Unsafe (unsafePerformEffect)
 import Test.QuickCheck (class Arbitrary, arbitrary)
 
 -- | In Plutus, Ada is is stored inside the map (with currency symbol and token
@@ -60,6 +62,14 @@ data Value = Value Coin MultiAsset
 derive instance Generic Value _
 derive instance Eq Value
 -- no Ord instance to prevent confusion
+
+instance Semigroup Value where
+  append x y =
+    unsafePerformEffect $ maybe (throw "Value.append: numeric overflow") pure $
+      unionWithNonAda BigNum.add x y
+
+instance Monoid Value where
+  mempty = empty
 
 instance Ord Value where
   compare a b = if a `lt` b then LT else if a `gt` b then GT else EQ
@@ -93,8 +103,8 @@ instance AsCbor Value where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
-zero :: Value
-zero = Value Coin.zero MultiAsset.empty
+empty :: Value
+empty = Value Coin.zero MultiAsset.empty
 
 add :: Value -> Value -> Maybe Value
 add = unionWith BigNum.add
