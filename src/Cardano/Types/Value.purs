@@ -66,7 +66,7 @@ derive instance Eq Value
 instance Semigroup Value where
   append x y =
     unsafePerformEffect $ maybe (throw "Value.append: numeric overflow") pure $
-      unionWithNonAda BigNum.add x y
+      unionWith BigNum.add x y
 
 instance Monoid Value where
   mempty = empty
@@ -110,7 +110,7 @@ add :: Value -> Value -> Maybe Value
 add = unionWith BigNum.add
 
 sum :: Array Value -> Maybe Value
-sum = foldr (\v acc -> acc >>= add v) (pure zero)
+sum = foldr (\v acc -> acc >>= add v) (pure empty)
 
 -- for compatibility with older CTL
 mkValue :: Coin -> MultiAsset -> Value
