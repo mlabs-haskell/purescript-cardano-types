@@ -1,6 +1,7 @@
 module Cardano.Types.TransactionUnspentOutput
   ( TransactionUnspentOutput(TransactionUnspentOutput)
-  , transactionUnspentOutputsToUtxoMap
+  , toUtxoMap
+  , fromUtxoMap
   , fromCsl
   , toCsl
   ) where
@@ -41,9 +42,15 @@ instance AsCbor TransactionUnspentOutput where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
-transactionUnspentOutputsToUtxoMap :: Array TransactionUnspentOutput -> UtxoMap
-transactionUnspentOutputsToUtxoMap = Map.fromFoldable <<< map
+toUtxoMap :: Array TransactionUnspentOutput -> UtxoMap
+toUtxoMap = Map.fromFoldable <<< map
   \(TransactionUnspentOutput { input, output }) -> Tuple input output
+
+fromUtxoMap :: UtxoMap -> Array TransactionUnspentOutput
+fromUtxoMap =
+  Map.toUnfoldable >>>
+    map \(Tuple input output) ->
+      TransactionUnspentOutput { input, output }
 
 fromCsl
   :: Csl.TransactionUnspentOutput -> TransactionUnspentOutput
