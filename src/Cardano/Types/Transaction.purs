@@ -1,5 +1,6 @@
 module Cardano.Types.Transaction
   ( Transaction(Transaction)
+  , empty
   , toCsl
   , fromCsl
   , hashTransaction
@@ -41,6 +42,14 @@ instance Show Transaction where
 instance AsCbor Transaction where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+empty :: Transaction
+empty = Transaction
+  { body: TransactionBody.empty
+  , witnessSet: mempty
+  , auxiliaryData: mempty
+  , isValid: true
+  }
 
 hashTransaction :: Transaction -> TransactionHash
 hashTransaction = unwrap
