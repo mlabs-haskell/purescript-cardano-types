@@ -51,6 +51,7 @@ import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.Certificate (Certificate)
 import Cardano.Types.Certificate as Certificate
 import Cardano.Types.Coin (Coin)
+import Cardano.Types.Coin as Coin
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (withNonEmptyArray)
 import Cardano.Types.Mint (Mint)
@@ -71,7 +72,7 @@ import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe, fromMaybe)
+import Data.Maybe (Maybe(Nothing), fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Profunctor.Strong ((***))
@@ -102,6 +103,27 @@ newtype TransactionBody = TransactionBody
 derive instance Newtype TransactionBody _
 derive instance Generic TransactionBody _
 derive newtype instance Eq TransactionBody
+
+empty :: TransactionBody
+empty = TransactionBody
+  { inputs: []
+  , outputs: []
+  , fee: Coin.zero
+  , ttl: Nothing
+  , certs: []
+  , withdrawals: Map.empty
+  , update: Nothing
+  , auxiliaryDataHash: Nothing
+  , validityStartInterval: Nothing
+  , mint: Nothing
+  , scriptDataHash: Nothing
+  , collateral: []
+  , requiredSigners: []
+  , networkId: Nothing
+  , collateralReturn: Nothing
+  , totalCollateral: Nothing
+  , referenceInputs: []
+  }
 
 instance Ord TransactionBody where
   compare = compare `on` repack
