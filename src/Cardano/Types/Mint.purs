@@ -34,7 +34,10 @@ import Effect.Unsafe (unsafePerformEffect)
 newtype Mint = Mint (Map ScriptHash (Map AssetName Int.Int))
 
 derive instance Generic Mint _
-derive newtype instance Eq Mint
+
+instance Eq Mint where
+  eq a b = eq (unwrap $ normalizeMint a) (unwrap $ normalizeMint b)
+
 derive instance Newtype Mint _
 -- no Ord instance to prevent confusion
 
@@ -59,7 +62,7 @@ empty :: Mint
 empty = Mint Map.empty
 
 singleton :: ScriptHash -> AssetName -> Int.Int -> Mint
-singleton sh an n = Mint (Map.singleton sh (Map.singleton an n))
+singleton sh an n = normalizeMint $ Mint (Map.singleton sh (Map.singleton an n))
 
 flatten :: Mint -> Array (ScriptHash /\ AssetName /\ Int.Int)
 flatten (Mint mp) =
@@ -67,8 +70,7 @@ flatten (Mint mp) =
     Map.toUnfoldable mp' >>= \(tn /\ amount) -> pure (sh /\ tn /\ amount)
 
 unflatten :: Array (ScriptHash /\ AssetName /\ Int.Int) -> Maybe Mint
-unflatten =
-  foldM accumulate empty
+unflatten = map normalizeMint <<< foldM accumulate empty
   where
   uncurry2 f (a /\ b /\ c) = f a b c
   accumulate ma = union ma <<< uncurry2 singleton
@@ -123,11 +125,12 @@ unionNonAda (Mint l) (Mint r) =
     unBoth <$> combined
 
 toCsl :: Mint -> Csl.Mint
-toCsl (Mint mp) = packMapContainer $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
-  unwrap scriptHash /\
-    packMapContainer do
-      Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
-        unwrap assetName /\ unwrap quantity
+toCsl mint | Mint mp <- normalizeMint mint =
+  packMapContainer $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
+    unwrap scriptHash /\
+      packMapContainer do
+        Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
+          unwrap assetName /\ unwrap quantity
 
 fromCsl :: Csl.Mint -> Mint
 fromCsl = wrap <<< unpackMapContainerToMapWith wrap

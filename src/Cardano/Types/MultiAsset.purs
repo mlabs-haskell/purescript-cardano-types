@@ -35,7 +35,10 @@ import Test.QuickCheck.Gen (Gen, suchThat)
 newtype MultiAsset = MultiAsset (Map ScriptHash (Map AssetName BigNum))
 
 derive instance Generic MultiAsset _
-derive newtype instance Eq MultiAsset
+
+instance Eq MultiAsset where
+  eq a b = eq (unwrap $ normalizeMultiAsset a) (unwrap $ normalizeMultiAsset b)
+
 derive instance Newtype MultiAsset _
 -- no Ord instance to prevent confusion
 
@@ -95,7 +98,10 @@ unflatten =
   accumulate ma = unionWithNonAda BigNum.add ma <<< uncurry2 singleton
 
 singleton :: ScriptHash -> AssetName -> BigNum -> MultiAsset
-singleton sh tn amount = MultiAsset $ Map.singleton sh $ Map.singleton tn amount
+singleton sh tn amount = normalizeMultiAsset
+  $ MultiAsset
+  $ Map.singleton sh
+  $ Map.singleton tn amount
 
 pprintMultiAsset :: MultiAsset -> TagSet
 pprintMultiAsset mp = TagSet.fromArray $
@@ -185,7 +191,8 @@ union l r =
     Map.fromFoldable (ls' <> rs'')
 
 toCsl :: MultiAsset -> Csl.MultiAsset
-toCsl (MultiAsset mp) = packMapContainer $ map (unwrap *** assetsToCsl) $ Map.toUnfoldable mp
+toCsl ma | MultiAsset mp <- normalizeMultiAsset ma =
+  packMapContainer $ map (unwrap *** assetsToCsl) $ Map.toUnfoldable mp
   where
   assetsToCsl :: Map AssetName BigNum -> Csl.Assets
   assetsToCsl assets = packMapContainer $ map (unwrap *** unwrap) $ Map.toUnfoldable assets
