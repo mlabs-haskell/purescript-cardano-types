@@ -7,6 +7,8 @@ module Cardano.Types.Transaction
   ) where
 
 import Prelude
+
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (transaction_setIsValid)
 import Cardano.Serialization.Lib as Csl
@@ -42,6 +44,9 @@ instance Show Transaction where
 instance AsCbor Transaction where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+derive newtype instance EncodeAeson Transaction
+derive newtype instance DecodeAeson Transaction
 
 empty :: Transaction
 empty = Transaction
