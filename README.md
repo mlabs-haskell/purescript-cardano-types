@@ -26,7 +26,7 @@ Here's what is included:
 
 ## Limitations
 
-- `Semigroup` instances for `Value` and `Mint` are unlawful (they unsafely throw on numeric overflows)
+- `Semigroup` instances for `Value`, `ExUnits` and `Mint` are unlawful (they unsafely throw on numeric overflows)
 - No `TransactionBuilder` - for a framework to build transactions, see [`cardano-transaction-lib`](https://github.com/Plutonomicon/cardano-transaction-lib/)
 - No `Block`, `BlockHeader` - these are not needed for an in-browser dApp.
 - Recursion max-depth issues (JavaScript...)
