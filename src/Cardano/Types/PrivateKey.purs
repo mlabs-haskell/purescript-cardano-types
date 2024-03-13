@@ -8,6 +8,7 @@ import Cardano.Serialization.Lib
   , privateKey_fromBech32
   , privateKey_fromNormalBytes
   , privateKey_generateEd25519
+  , privateKey_generateEd25519extended
   , privateKey_sign
   , privateKey_toBech32
   , privateKey_toPublic
@@ -71,3 +72,6 @@ sign pk bytes = wrap $ privateKey_sign (unwrap pk) bytes
 makeVkeyWitness :: TransactionHash -> PrivateKey -> Vkeywitness
 makeVkeyWitness th pk =
   Vkeywitness.fromCsl $ Csl.makeVkeyWitness (unwrap th) (unwrap pk)
+
+generateExtended :: Effect PrivateKey
+generateExtended = wrap <$> privateKey_generateEd25519extended
