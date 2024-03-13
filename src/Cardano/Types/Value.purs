@@ -30,6 +30,7 @@ import Cardano.Types.MultiAsset
   , unionWithNonAda
   )
 import Cardano.Types.MultiAsset as MultiAsset
+import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array (foldr)
 import Data.Foldable (all)
 import Data.Generic.Rep (class Generic)
@@ -136,6 +137,9 @@ getCoin (Value coin _) = coin
 
 getMultiAsset :: Value -> MultiAsset
 getMultiAsset (Value _ nonAdaAsset) = nonAdaAsset
+
+singleton :: ScriptHash -> AssetName -> BigNum -> Value
+singleton sh an n = Value Coin.zero $ MultiAsset.singleton sh an n
 
 -- https://playground.plutus.iohkdev.io/doc/haddock/plutus-ledger-api/html/src/Plutus.V1.Ledger.Value.html#unionWith
 -- | Combines `Value` with a binary function on `BigInt`s.
