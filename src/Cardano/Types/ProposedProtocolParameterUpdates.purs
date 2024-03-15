@@ -3,6 +3,7 @@ module Cardano.Types.ProposedProtocolParameterUpdates where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GenesisHash (GenesisHash)
@@ -24,6 +25,10 @@ derive newtype instance Eq ProposedProtocolParameterUpdates
 derive newtype instance Ord ProposedProtocolParameterUpdates
 derive newtype instance EncodeAeson ProposedProtocolParameterUpdates
 derive newtype instance DecodeAeson ProposedProtocolParameterUpdates
+
+instance AsCbor ProposedProtocolParameterUpdates where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 derive instance Generic ProposedProtocolParameterUpdates _
 

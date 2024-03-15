@@ -3,6 +3,7 @@ module Cardano.Types.Coin where
 import Prelude hiding (zero)
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.BigNum (BigNum(BigNum))
 import Cardano.Types.BigNum as BigNum
 import Data.Generic.Rep (class Generic)
@@ -25,6 +26,7 @@ derive newtype instance Eq Coin
 derive newtype instance Ord Coin
 derive newtype instance DecodeAeson Coin
 derive newtype instance EncodeAeson Coin
+derive newtype instance AsCbor Coin
 
 instance Semigroup Coin where
   append (Coin x) (Coin y) =

@@ -227,19 +227,19 @@ valueAssets (Value _ assets) =
     <#> \(cs /\ tn /\ quantity) -> AssetClass cs tn /\ quantity
 
 flatten :: Value -> Array (Asset /\ BigNum)
-flatten (Value coin assets) = [ adaAsset ]  <> nonAdaAssets
+flatten (Value coin assets) = [ adaAsset ] <> nonAdaAssets
   where
-    adaAsset = AdaAsset /\ unwrap coin
-    nonAdaAssets = MultiAsset.flatten assets <#>
-      \(sh /\ an /\ amount) -> Asset sh an /\ amount
+  adaAsset = AdaAsset /\ unwrap coin
+  nonAdaAssets = MultiAsset.flatten assets <#>
+    \(sh /\ an /\ amount) -> Asset sh an /\ amount
 
 unflatten :: Array (Asset /\ BigNum) -> Maybe Value
 unflatten = foldr consume (pure empty)
   where
-    consume (AdaAsset /\ amount) acc = do
-      acc >>= add (Value (Coin amount) MultiAsset.empty)
-    consume (Asset sh tn /\ amount) acc = do
-      acc >>= add (Value Coin.zero (MultiAsset.singleton sh tn amount))
+  consume (AdaAsset /\ amount) acc = do
+    acc >>= add (Value (Coin amount) MultiAsset.empty)
+  consume (Asset sh tn /\ amount) acc = do
+    acc >>= add (Value Coin.zero (MultiAsset.singleton sh tn amount))
 
 valueAssetClasses :: Value -> Array AssetClass
 valueAssetClasses = map fst <<< valueAssets

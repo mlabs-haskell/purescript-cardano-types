@@ -69,7 +69,7 @@ import Cardano.Types.NativeScript
       )
   ) as X
 import Cardano.Types.NetworkId (NetworkId(TestnetId, MainnetId)) as X
-import Cardano.Types.OutputDatum (OutputDatum(OutputDatum)) as X
+import Cardano.Types.OutputDatum (OutputDatum(OutputDatum, OutputDatumHash)) as X
 import Cardano.Types.PaymentCredential (PaymentCredential(PaymentCredential)) as X
 import Cardano.Types.PaymentPubKeyHash (PaymentPubKeyHash(PaymentPubKeyHash)) as X
 import Cardano.Types.PlutusData

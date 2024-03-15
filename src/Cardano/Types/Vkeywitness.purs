@@ -11,7 +11,7 @@ import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Vkey (Vkey)
 import Cardano.Types.Vkey as Vkey
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (unwrap, wrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
 newtype Vkeywitness = Vkeywitness
@@ -20,6 +20,7 @@ newtype Vkeywitness = Vkeywitness
   }
 
 derive instance Generic Vkeywitness _
+derive instance Newtype Vkeywitness _
 derive instance Eq Vkeywitness
 derive instance Ord Vkeywitness
 derive newtype instance EncodeAeson Vkeywitness
