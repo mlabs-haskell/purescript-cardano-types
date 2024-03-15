@@ -69,6 +69,9 @@ instance Partial => Semigroup Value where
     unsafePerformEffect $ maybe (throw "Value.append: numeric overflow") pure $
       unionWith BigNum.add x y
 
+instance Partial => Monoid Value where
+  mempty = empty
+
 instance Ord Value where
   compare a b = if a `lt` b then LT else if a `gt` b then GT else EQ
 

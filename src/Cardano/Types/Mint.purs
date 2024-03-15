@@ -55,6 +55,9 @@ instance Partial => Semigroup Mint where
     unsafePerformEffect $ maybe (throw "Mint.append: numeric overflow") pure $
       unionWithNonAda Int.add x y
 
+instance Partial => Monoid Mint where
+  mempty = empty
+
 empty :: Mint
 empty = Mint Map.empty
 

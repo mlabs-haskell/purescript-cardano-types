@@ -35,6 +35,9 @@ instance Partial => Semigroup ExUnits where
       steps <- BigNum.add steps1 steps2
       pure $ ExUnits { mem, steps }
 
+instance Partial => Monoid ExUnits where
+  mempty = empty
+
 empty :: ExUnits
 empty = ExUnits { mem: BigNum.zero, steps: BigNum.zero }
 

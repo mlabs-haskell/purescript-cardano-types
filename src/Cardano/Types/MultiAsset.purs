@@ -81,6 +81,9 @@ instance AsCbor MultiAsset where
 instance Partial => Semigroup MultiAsset where
   append a b = unsafePerformEffect $ maybe (throw "MultiAsset.append: numeric overflow") pure $ add a b
 
+instance Partial => Monoid MultiAsset where
+  mempty = empty
+
 empty :: MultiAsset
 empty = MultiAsset Map.empty
 
