@@ -50,13 +50,10 @@ instance EncodeAeson Mint where
 instance DecodeAeson Mint where
   decodeAeson = map fromCsl <<< decodeAeson
 
-instance Semigroup Mint where
+instance Partial => Semigroup Mint where
   append x y =
     unsafePerformEffect $ maybe (throw "Mint.append: numeric overflow") pure $
       unionWithNonAda Int.add x y
-
-instance Monoid Mint where
-  mempty = empty
 
 empty :: Mint
 empty = Mint Map.empty

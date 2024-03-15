@@ -2,6 +2,7 @@ module Cardano.Types.ExUnits
   ( ExUnits(ExUnits)
   , fromCsl
   , toCsl
+  , empty
   ) where
 
 import Prelude
@@ -27,15 +28,15 @@ derive instance Generic ExUnits _
 derive newtype instance EncodeAeson ExUnits
 derive newtype instance DecodeAeson ExUnits
 
-instance Semigroup ExUnits where
+instance Partial => Semigroup ExUnits where
   append (ExUnits { mem: mem1, steps: steps1 }) (ExUnits { mem: mem2, steps: steps2 }) =
     unsafePerformEffect $ maybe (throw "ExUnits.append: numeric overflow") pure do
       mem <- BigNum.add mem1 mem2
       steps <- BigNum.add steps1 steps2
       pure $ ExUnits { mem, steps }
 
-instance Monoid ExUnits where
-  mempty = ExUnits { mem: BigNum.zero, steps: BigNum.zero }
+empty :: ExUnits
+empty = ExUnits { mem: BigNum.zero, steps: BigNum.zero }
 
 instance Show ExUnits where
   show = genericShow

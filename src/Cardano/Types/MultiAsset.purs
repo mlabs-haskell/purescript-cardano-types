@@ -22,12 +22,14 @@ import Data.Log.Tag as TagSet
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Map.Gen (genMap)
-import Data.Maybe (Maybe(Just, Nothing), fromJust)
+import Data.Maybe (Maybe(Just, Nothing), fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Profunctor.Strong ((***))
 import Data.These (These(Both, That, This))
 import Data.Traversable (for, traverse)
 import Data.Tuple.Nested (type (/\), (/\))
+import Effect.Exception (throw)
+import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (Gen, suchThat)
@@ -75,6 +77,9 @@ instance DecodeAeson MultiAsset where
 instance AsCbor MultiAsset where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+instance Partial => Semigroup MultiAsset where
+  append a b = unsafePerformEffect $ maybe (throw "MultiAsset.append: numeric overflow") pure $ add a b
 
 empty :: MultiAsset
 empty = MultiAsset Map.empty

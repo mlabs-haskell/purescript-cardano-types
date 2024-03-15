@@ -74,6 +74,17 @@ instance AsCbor Address where
   encodeCbor = toCsl >>> toBytes >>> wrap
   decodeCbor = unwrap >>> fromBytes >>> map fromCsl
 
+mkPaymentAddress
+  :: NetworkId
+  -> PaymentCredential
+  -> Maybe StakeCredential
+  -> Address
+mkPaymentAddress networkId paymentCredential = case _ of
+  Just stakeCredential ->
+    BaseAddress { networkId, paymentCredential, stakeCredential }
+  Nothing ->
+    EnterpriseAddress { networkId, paymentCredential }
+
 getNetworkId :: Address -> NetworkId
 getNetworkId = unsafePartial $
   toCsl >>> address_networkId >>> Int.fromNumber >>> fromJust >>> NetworkId.fromInt >>> fromJust
