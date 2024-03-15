@@ -9,6 +9,7 @@ module Cardano.Types.PlutusData
   , pprintPlutusData
   , toCsl
   , fromCsl
+  , unit
   ) where
 
 import Prelude
@@ -140,6 +141,9 @@ instance EncodeAeson PlutusData where
 instance AsCbor PlutusData where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+unit :: PlutusData
+unit = Constr BigNum.zero []
 
 pprintPlutusData :: PlutusData -> TagSet
 pprintPlutusData (Constr n children) = TagSet.fromArray
