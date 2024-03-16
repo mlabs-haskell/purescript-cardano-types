@@ -24,10 +24,11 @@ import Prelude hiding (sub, add, one, zero, max)
 
 import Aeson (JsonDecodeError(TypeMismatch)) as Aeson
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (bigNum_checkedAdd, bigNum_checkedMul, bigNum_checkedSub, bigNum_compare, bigNum_divFloor, bigNum_fromStr, bigNum_max, bigNum_maxValue, bigNum_one, bigNum_toStr, bigNum_zero, fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Types.Internal.Helpers (eqOrd)
+import Data.Array.NonEmpty as NA
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
 import Data.Int (fromString) as Int
@@ -40,6 +41,8 @@ import JS.BigInt (BigInt)
 import JS.BigInt (fromString, toString) as BigInt
 import Partial.Unsafe (unsafePartial)
 import Safe.Coerce (coerce)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Gen (chooseInt, oneOf)
 
 -- | Unisigned 64-bit integer, 0..18446744073709551615
 newtype BigNum = BigNum Csl.BigNum
@@ -71,6 +74,13 @@ instance EncodeAeson BigNum where
 instance AsCbor BigNum where
   encodeCbor = unwrap >>> toBytes >>> wrap
   decodeCbor = unwrap >>> fromBytes >>> map wrap
+
+instance Arbitrary BigNum where
+  arbitrary = oneOf $ unsafePartial $ fromJust $ NA.fromFoldable
+    [ fromInt <$> chooseInt 0 top
+    , pure $ fromInt 0
+    , pure $ unsafePartial $ fromJust $ fromString "18446744073709551615"
+    ]
 
 -- Semiring cannot be implemented, because add and mul returns Maybe BigNum
 

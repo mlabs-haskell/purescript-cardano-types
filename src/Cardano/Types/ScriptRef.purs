@@ -19,12 +19,17 @@ import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 data ScriptRef = NativeScriptRef NativeScript | PlutusScriptRef PlutusScript
 
 derive instance Eq ScriptRef
 derive instance Ord ScriptRef
 derive instance Generic ScriptRef _
+
+instance Arbitrary ScriptRef where
+  arbitrary = genericArbitrary
 
 instance Show ScriptRef where
   show = genericShow

@@ -47,6 +47,7 @@ import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Control.Alt ((<|>))
+import Data.Array.NonEmpty as NA
 import Data.ByteArray (ByteArray, byteArrayToHex, hexToByteArray)
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
@@ -63,6 +64,8 @@ import Data.Tuple.Nested (type (/\), (/\))
 import JS.BigInt (BigInt)
 import JS.BigInt (toString) as BigInt
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck (class Arbitrary, arbitrary)
+import Test.QuickCheck.Gen (oneOf, resize, sized)
 
 -- Doesn't distinguish "BuiltinData" and "Data", unlike Plutus:
 data PlutusData
@@ -141,6 +144,15 @@ instance EncodeAeson PlutusData where
 instance AsCbor PlutusData where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+instance Arbitrary PlutusData where
+  arbitrary = oneOf $ unsafePartial $ fromJust $ NA.fromFoldable
+    [ Constr <$> arbitrary <*> sized (\i -> resize (i `div` 2) arbitrary)
+    , Map <$> sized (\i -> resize (i `div` 2) arbitrary)
+    , List <$> sized (\i -> resize (i `div` 2) arbitrary)
+    , Integer <<< BigNum.toBigInt <$> arbitrary
+    , Bytes <$> arbitrary
+    ]
 
 unit :: PlutusData
 unit = Constr BigNum.zero []

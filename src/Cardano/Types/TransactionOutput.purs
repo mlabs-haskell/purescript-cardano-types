@@ -50,6 +50,8 @@ import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Data.Tuple.Nested ((/\))
 import Effect.Unsafe (unsafePerformEffect)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 newtype TransactionOutput = TransactionOutput
   { address :: Address
@@ -84,6 +86,9 @@ instance Show TransactionOutput where
 instance AsCbor TransactionOutput where
   encodeCbor = toCsl >>> Csl.toBytes >>> wrap
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+
+instance Arbitrary TransactionOutput where
+  arbitrary = genericArbitrary
 
 pprintTransactionOutput :: TransactionOutput -> TagSet
 pprintTransactionOutput

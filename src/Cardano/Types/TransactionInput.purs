@@ -25,7 +25,9 @@ import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.UInt (UInt, toInt)
 import Data.UInt as UInt
+import Test.QuickCheck (class Arbitrary, arbitrary)
 import Test.QuickCheck.Arbitrary (class Coarbitrary, coarbitrary)
+import Test.QuickCheck.Gen (chooseInt)
 
 newtype TransactionInput = TransactionInput
   { transactionId :: TransactionHash
@@ -63,6 +65,13 @@ instance FromData TransactionInput where
 instance ToData TransactionInput where
   toData (TransactionInput { transactionId, index }) =
     Constr BigNum.zero [ toData transactionId, toData index ]
+
+instance Arbitrary TransactionInput where
+  arbitrary = TransactionInput <$>
+    ( { transactionId: _
+      , index: _
+      } <$> arbitrary <*> (UInt.fromInt <$> chooseInt 0 1000)
+    )
 
 instance Coarbitrary TransactionInput where
   coarbitrary (TransactionInput input) generator =

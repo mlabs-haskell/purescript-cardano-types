@@ -46,6 +46,8 @@ import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 data OutputDatum = OutputDatumHash DataHash | OutputDatum PlutusData
 
@@ -95,6 +97,9 @@ instance DecodeAeson OutputDatum where
             $ UnexpectedValue
             $ toStringifiedNumbersJson
             $ fromString tagValue
+
+instance Arbitrary OutputDatum where
+  arbitrary = genericArbitrary
 
 fromCsl :: Csl.OutputDatum -> OutputDatum
 fromCsl cslOd = case toMaybe (Csl.outputDatum_dataHash cslOd) of

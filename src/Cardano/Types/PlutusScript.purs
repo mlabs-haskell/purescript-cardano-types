@@ -21,6 +21,8 @@ import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.Tuple.Nested (type (/\), (/\))
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 -- | Corresponds to "Script" in Plutus
 newtype PlutusScript = PlutusScript (ByteArray /\ Language)
@@ -31,6 +33,9 @@ derive newtype instance Eq PlutusScript
 derive newtype instance Ord PlutusScript
 derive newtype instance DecodeAeson PlutusScript
 derive newtype instance EncodeAeson PlutusScript
+
+instance Arbitrary PlutusScript where
+  arbitrary = genericArbitrary
 
 instance Show PlutusScript where
   show = genericShow

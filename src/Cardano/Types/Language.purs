@@ -24,6 +24,8 @@ import Data.Newtype (unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 data Language
   = PlutusV1
@@ -32,6 +34,9 @@ data Language
 derive instance Eq Language
 derive instance Ord Language
 derive instance Generic Language _
+
+instance Arbitrary Language where
+  arbitrary = genericArbitrary
 
 instance DecodeAeson Language where
   decodeAeson = decodeAeson >=>
