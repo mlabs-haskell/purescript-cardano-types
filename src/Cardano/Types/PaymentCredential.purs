@@ -12,6 +12,8 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 -- in CSL, StakeCredential and PaymentCredential are the same type, because they are
 -- literally the same, but we treat them differently as domain types
@@ -19,6 +21,9 @@ newtype PaymentCredential = PaymentCredential Credential
 
 derive instance Newtype PaymentCredential _
 derive instance Generic PaymentCredential _
+
+instance Arbitrary PaymentCredential where
+  arbitrary = genericArbitrary
 
 instance AsCbor PaymentCredential where
   encodeCbor = unwrap >>> encodeCbor

@@ -39,6 +39,7 @@ import Cardano.Types.PointerAddress (PointerAddress) as PA
 import Cardano.Types.RewardAddress as RA
 import Cardano.Types.StakeCredential (StakeCredential)
 import Control.Alt ((<|>))
+import Data.Array.NonEmpty as NonEmpty
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
@@ -48,6 +49,8 @@ import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Literals.Undefined (undefined)
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck (class Arbitrary, arbitrary)
+import Test.QuickCheck.Gen (oneOf)
 import Unsafe.Coerce (unsafeCoerce)
 
 data Address
@@ -73,6 +76,13 @@ instance Show Address where
 instance AsCbor Address where
   encodeCbor = toCsl >>> toBytes >>> wrap
   decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+
+instance Arbitrary Address where
+  arbitrary = oneOf $ NonEmpty.cons' (BaseAddress <$> arbitrary)
+    [ ByronAddress <$> arbitrary
+    , EnterpriseAddress <$> arbitrary
+    , RewardAddress <$> arbitrary
+    ]
 
 mkPaymentAddress
   :: NetworkId

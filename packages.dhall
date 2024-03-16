@@ -99,8 +99,8 @@ in  upstream
 -------------------------------
 -}
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.15.10-20231023/packages.dhall
-        sha256:b9a482e743055ba8f2d65b08a88cd772b59c6e2084d0e5ad854025fa90417fd4
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.4-20230105/packages.dhall
+        sha256:3e9fbc9ba03e9a1fcfd895f65e2d50ee2f5e86c4cd273f3d5c841b655a0e1bda
 
 let additions =
       { aeson =
@@ -192,7 +192,12 @@ let additions =
         { dependencies = [ "prelude" ]
         , repo =
             "https://github.com/mlabs-haskell/purescript-cardano-plutus-data-schema"
-        , version = "351003d931990949ce3d73f399a179e4a0fa40f1"
+        , version = "eb0bb78927c50c4bee364e932c9fa8cf94546191"
+        }
+      , js-bigints =
+        { dependencies = [ "integers", "maybe", "prelude" ]
+        , repo = "https://github.com/purescript-contrib/purescript-js-bigints"
+        , version = "36a7d8ac75a7230043ae511f3145f9ed130954a9"
         }
       }
 

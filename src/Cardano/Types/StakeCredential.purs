@@ -14,8 +14,10 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential))
 import Cardano.Serialization.Lib as Csl
+import Cardano.Types.Credential
+  ( Credential(PubKeyHashCredential, ScriptHashCredential)
+  )
 import Data.ByteArray (hexToByteArray)
 import Data.Either (Either(Left, Right))
 import Data.Function (on)
@@ -26,6 +28,8 @@ import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Arbitrary (genericArbitrary)
 
 newtype StakeCredential = StakeCredential Credential
 
@@ -53,6 +57,9 @@ instance DecodeAeson StakeCredential where
 
 instance EncodeAeson StakeCredential where
   encodeAeson sh = encodeAeson $ encodeCbor sh
+
+instance Arbitrary StakeCredential where
+  arbitrary = genericArbitrary
 
 fromCsl :: Csl.StakeCredential -> StakeCredential
 fromCsl cslc = case toMaybe (Csl.stakeCredential_toKeyhash cslc) of

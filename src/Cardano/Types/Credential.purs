@@ -9,7 +9,7 @@ import Aeson
   , decodeAeson
   , (.:)
   )
-import Cardano.AsCbor (class AsCbor)
+import Cardano.AsCbor (class AsCbor, decodeCbor)
 import Cardano.Serialization.Lib
   ( fromBytes
   , stakeCredential_fromKeyhash
@@ -23,13 +23,19 @@ import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.ScriptHash (ScriptHash)
 import Control.Alt ((<|>))
+import Data.Array (replicate)
+import Data.Array.NonEmpty as NonEmptyArray
+import Data.ByteArray (byteArrayFromIntArrayUnsafe)
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
+import Data.Traversable (sequence)
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck (class Arbitrary)
+import Test.QuickCheck.Gen (chooseInt, oneOf)
 
 -- In CSL, this type is called StakeCredential. They reuse it for Payment Credentials as well.
 data Credential = PubKeyHashCredential Ed25519KeyHash | ScriptHashCredential ScriptHash
@@ -45,6 +51,25 @@ asScriptHash _ = Nothing
 derive instance Generic Credential _
 derive instance Eq Credential
 derive instance Ord Credential
+
+instance Arbitrary Credential where
+  arbitrary = oneOf $
+    NonEmptyArray.cons' (PubKeyHashCredential <$> genKeyHash) [ ScriptHashCredential <$> genScriptHash ]
+    where
+    genKeyHash = do
+      arr <- byteArrayFromIntArrayUnsafe <$> sequence
+        ( replicate 28 (chooseInt 0 256)
+        )
+      pure $ unsafePartial $ fromJust
+        $ decodeCbor
+        $ wrap arr
+    genScriptHash = do
+      arr <- byteArrayFromIntArrayUnsafe <$> sequence
+        ( replicate 28 (chooseInt 0 256)
+        )
+      pure $ unsafePartial $ fromJust
+        $ decodeCbor
+        $ wrap arr
 
 instance EncodeAeson Credential where
   encodeAeson = case _ of
