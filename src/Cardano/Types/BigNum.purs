@@ -23,20 +23,41 @@ module Cardano.Types.BigNum
 import Prelude hiding (sub, add, one, zero, max)
 
 import Aeson (JsonDecodeError(TypeMismatch)) as Aeson
-import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , decodeAeson
+  , encodeAeson
+  )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (bigNum_checkedAdd, bigNum_checkedMul, bigNum_checkedSub, bigNum_compare, bigNum_divFloor, bigNum_fromStr, bigNum_max, bigNum_maxValue, bigNum_one, bigNum_toStr, bigNum_zero, fromBytes, toBytes)
+import Cardano.Serialization.Lib
+  ( bigNum_checkedAdd
+  , bigNum_checkedMul
+  , bigNum_checkedSub
+  , bigNum_compare
+  , bigNum_divFloor
+  , bigNum_fromStr
+  , bigNum_max
+  , bigNum_maxValue
+  , bigNum_one
+  , bigNum_toStr
+  , bigNum_zero
+  , fromBytes
+  , toBytes
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (eqOrd)
 import Data.Array.NonEmpty as NA
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
 import Data.Int (fromString) as Int
-import Data.Maybe (Maybe, fromJust, fromMaybe)
+import Data.Maybe (Maybe, fromJust, fromMaybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.UInt (UInt)
 import Data.UInt (fromInt, fromString, toString) as UInt
+import Effect.Exception (throw)
+import Effect.Unsafe (unsafePerformEffect)
 import JS.BigInt (BigInt)
 import JS.BigInt (fromString, toString) as BigInt
 import Partial.Unsafe (unsafePartial)
@@ -82,7 +103,12 @@ instance Arbitrary BigNum where
     , pure $ unsafePartial $ fromJust $ fromString "18446744073709551615"
     ]
 
--- Semiring cannot be implemented, because add and mul returns Maybe BigNum
+instance Partial => Semigroup BigNum where
+  append a b =
+    unsafePerformEffect $ maybe (throw "BigNum.append: numeric overflow") pure $ add a b
+
+instance Partial => Monoid BigNum where
+  mempty = zero
 
 one :: BigNum
 one = BigNum bigNum_one
