@@ -61,7 +61,7 @@ derive instance Generic Int _
 derive instance Newtype Int _
 
 instance Eq Int where
-  eq = eq `on` toString
+  eq = eq `on` toBigInt
 
 instance Ord Int where
   compare = compare `on` toBigInt

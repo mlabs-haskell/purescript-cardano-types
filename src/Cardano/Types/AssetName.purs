@@ -100,7 +100,7 @@ instance EncodeAeson AssetName where
     )
 
 instance Show AssetName where
-  show (AssetName tn) = "(AssetName " <> show tn <> ")"
+  show (AssetName tn) = "(mkAssetName " <> show (assetName_name tn) <> ")"
 
 -- | Create a `AssetName` from a `ByteArray` since AssetName data constructor is
 -- | not exported

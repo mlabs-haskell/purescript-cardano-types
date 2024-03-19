@@ -155,7 +155,11 @@ toCsl
       }
   ) = unsafePerformEffect do
   -- inputs, outputs, fee
-  let tb = transactionBody_newTxBody (packListContainer $ TransactionInput.toCsl <$> inputs) (packListContainer $ TransactionOutput.toCsl <$> outputs) (unwrap $ unwrap fee)
+  let
+    tb = transactionBody_newTxBody
+      (packListContainer $ TransactionInput.toCsl <$> inputs)
+      (packListContainer $ TransactionOutput.toCsl <$> outputs)
+      (unwrap $ unwrap fee)
   -- ttl
   for_ ttl $ transactionBody_setTtl tb <<< unwrap <<< unwrap
   -- certs
