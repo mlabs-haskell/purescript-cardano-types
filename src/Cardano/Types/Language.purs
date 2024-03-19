@@ -62,7 +62,7 @@ fromCsl :: Csl.Language -> Language
 fromCsl lang =
   case language_kind lang of
     0.0 -> PlutusV1
-    1.1 -> PlutusV2
+    1.0 -> PlutusV2
     _ -> unsafePerformEffect $ throw "Cardano.Types.Language.fromCsl: unknown kind"
 
 toCsl :: Language -> Csl.Language
