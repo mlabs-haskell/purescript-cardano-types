@@ -116,7 +116,7 @@ binaryViaBigInt f x y = fromBigInt $ f (toBigInt x) (toBigInt y)
 
 fromInt :: Prim.Int -> Int
 fromInt n
-  | n < 0 = newNegative $ BigNum.fromInt n
+  | n < 0 = newNegative $ BigNum.fromInt (0 - n)
   | otherwise = newPositive $ BigNum.fromInt n
 
 toInt :: Int -> Maybe Prim.Int

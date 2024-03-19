@@ -145,12 +145,11 @@ toBigInt =
 toInt :: BigNum -> Maybe Int
 toInt = Int.fromString <<< toString
 
--- | Converts an `Int` to a `BigNum` turning negative `Int`s into `BigNum`s
--- | in range from `2^31` to `2^32-1`.
+-- | Converts an `Int` to a `BigNum` turning negative `Int`s into `0`
 fromInt :: Int -> BigNum
-fromInt =
-  -- Converting `UInt` (u32) to a `BigNum` (u64) should never fail.
-  fromStringUnsafe <<< UInt.toString <<< UInt.fromInt
+fromInt x
+  | x >= 0 = fromStringUnsafe <<< UInt.toString $ UInt.fromInt x
+  | otherwise = zero
 
 toString :: BigNum -> String
 toString = unwrap >>> bigNum_toStr
