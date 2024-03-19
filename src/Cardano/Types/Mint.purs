@@ -7,6 +7,8 @@ module Cardano.Types.Mint
   , toCsl
   , fromCsl
   , union
+  , fromMultiAsset
+  , toMultiAsset
   ) where
 
 import Prelude
@@ -16,20 +18,22 @@ import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
+import Cardano.Types.MultiAsset (MultiAsset)
 import Cardano.Types.MultiAsset as MultiAsset
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array (foldM)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe, maybe)
+import Data.Maybe (Maybe, fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.These (These(Both, That, This))
-import Data.Traversable (traverse)
+import Data.Traversable (for, traverse)
 import Data.Tuple.Nested ((/\), type (/\))
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
+import Partial.Unsafe (unsafePartial)
 
 newtype Mint = Mint (Map ScriptHash (Map AssetName Int.Int))
 
@@ -60,6 +64,18 @@ instance Partial => Monoid Mint where
 
 empty :: Mint
 empty = Mint Map.empty
+
+toMultiAsset :: Mint -> Maybe MultiAsset
+toMultiAsset mint = MultiAsset.unflatten =<<
+  for (flatten mint) \(sh /\ an /\ i) -> do
+    bi <- Int.asPositive i
+    pure (sh /\ an /\ bi)
+
+fromMultiAsset :: MultiAsset -> Mint
+fromMultiAsset ma =
+  unsafePartial $ fromJust $
+  unflatten $ MultiAsset.flatten ma <#>
+  \(sh /\ an /\ bi) -> sh /\ an /\ Int.newPositive bi
 
 singleton :: ScriptHash -> AssetName -> Int.Int -> Mint
 singleton sh an n = normalizeMint $ Mint (Map.singleton sh (Map.singleton an n))
