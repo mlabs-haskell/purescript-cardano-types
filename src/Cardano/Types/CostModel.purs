@@ -45,5 +45,5 @@ toCsl (CostModel mdls) = unsafePerformEffect do
 fromCsl :: Csl.CostModel -> CostModel
 fromCsl mdl = CostModel $ unsafePerformEffect do
   length <- unsafePartial $ fromJust <<< PInt.fromNumber <$> costModel_len mdl
-  for (Array.range 0 length) \ix -> do
+  for (Array.range 0 $ length - 1) \ix -> do
     wrap <$> costModel_get mdl (Int.toNumber ix)
