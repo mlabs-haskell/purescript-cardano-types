@@ -148,7 +148,7 @@ toInt = Int.fromString <<< toString
 -- | Converts an `Int` to a `BigNum` turning negative `Int`s into `0`
 fromInt :: Int -> BigNum
 fromInt x
-  | x >= 0 = fromStringUnsafe <<< UInt.toString $ UInt.fromInt x
+  | x >= 0 = fromStringUnsafe $ show x
   | otherwise = zero
 
 toString :: BigNum -> String

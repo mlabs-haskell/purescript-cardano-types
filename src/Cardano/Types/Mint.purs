@@ -14,6 +14,7 @@ module Cardano.Types.Mint
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AssetName (AssetName)
@@ -61,6 +62,10 @@ instance Partial => Semigroup Mint where
 
 instance Partial => Monoid Mint where
   mempty = empty
+
+instance AsCbor Mint where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 empty :: Mint
 empty = Mint Map.empty
