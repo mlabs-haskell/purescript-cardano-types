@@ -73,9 +73,10 @@ toMultiAsset mint = MultiAsset.unflatten =<<
 
 fromMultiAsset :: MultiAsset -> Mint
 fromMultiAsset ma =
-  unsafePartial $ fromJust $
-  unflatten $ MultiAsset.flatten ma <#>
-  \(sh /\ an /\ bi) -> sh /\ an /\ Int.newPositive bi
+  unsafePartial $ fromJust
+    $ unflatten
+    $ MultiAsset.flatten ma <#>
+        \(sh /\ an /\ bi) -> sh /\ an /\ Int.newPositive bi
 
 singleton :: ScriptHash -> AssetName -> Int.Int -> Mint
 singleton sh an n = normalizeMint $ Mint (Map.singleton sh (Map.singleton an n))
