@@ -1,20 +1,21 @@
 module Cardano.Types.Int
   ( Int(Int)
-  , newPositive
-  , newNegative
-  , fromBigInt
-  , toBigInt
-  , fromInt
-  , toInt
-  , fromString
   , add
-  , mul
-  , sub
-  , max
-  , zero
-  , negate
-  , asPositive
   , asNegative
+  , asPositive
+  , fromBigInt
+  , fromInt
+  , fromString
+  , max
+  , mul
+  , negate
+  , newNegative
+  , newPositive
+  , one
+  , sub
+  , toBigInt
+  , toInt
+  , zero
   ) where
 
 import Prelude hiding (zero, sub)
@@ -91,6 +92,9 @@ toBigInt int =
 
 zero :: Int
 zero = fromInt 0
+
+one :: Int
+one = fromInt 1
 
 add :: Int -> Int -> Maybe Int
 add = binaryViaBigInt Prelude.add

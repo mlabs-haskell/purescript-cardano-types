@@ -3,7 +3,7 @@ module Cardano.Types.Transaction
   , empty
   , toCsl
   , fromCsl
-  , hashTransaction
+  , hash
   ) where
 
 import Prelude
@@ -56,8 +56,8 @@ empty = Transaction
   , isValid: true
   }
 
-hashTransaction :: Transaction -> TransactionHash
-hashTransaction = unwrap
+hash :: Transaction -> TransactionHash
+hash = unwrap
   >>> _.body
   >>> TransactionBody.toCsl
   >>> Csl.hashTransaction
