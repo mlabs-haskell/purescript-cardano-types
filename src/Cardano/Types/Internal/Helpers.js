@@ -7,3 +7,5 @@ export const _decodeUtf8 = buffer => left => right => {
     return left(err);
   }
 };
+
+export const _clone = x => x.constructor.from_bytes(x.to_bytes());

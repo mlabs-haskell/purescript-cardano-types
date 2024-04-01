@@ -19,6 +19,7 @@ import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
+import Cardano.Types.Internal.Helpers (clone)
 import Cardano.Types.MultiAsset (MultiAsset)
 import Cardano.Types.MultiAsset as MultiAsset
 import Cardano.Types.ScriptHash (ScriptHash)
@@ -156,4 +157,4 @@ toCsl mint | Mint mp <- normalizeMint mint =
 
 fromCsl :: Csl.Mint -> Mint
 fromCsl = wrap <<< unpackMapContainerToMapWith wrap
-  (unpackMapContainerToMapWith wrap wrap)
+  (clone >>> unpackMapContainerToMapWith wrap wrap)

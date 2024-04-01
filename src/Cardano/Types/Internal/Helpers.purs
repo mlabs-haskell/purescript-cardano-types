@@ -9,6 +9,7 @@ module Cardano.Types.Internal.Helpers
   , encodeMap
   , decodeUtf8
   , withNonEmptyArray
+  , clone
   ) where
 
 import Prelude
@@ -132,3 +133,8 @@ withNonEmptyArray
   -> Effect Unit
 withNonEmptyArray [] _ = pure unit
 withNonEmptyArray els f = f $ packListContainer els
+
+clone :: forall a. IsCsl a => a -> a
+clone = _clone
+
+foreign import _clone :: forall a. a -> a
