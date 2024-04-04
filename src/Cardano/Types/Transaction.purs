@@ -20,16 +20,18 @@ import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet)
 import Cardano.Types.TransactionWitnessSet as TransactionWitnessSet
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Effect.Unsafe (unsafePerformEffect)
+import Literals.Undefined (undefined)
+import Unsafe.Coerce (unsafeCoerce)
 
 newtype Transaction = Transaction
   { body :: TransactionBody
   , witnessSet :: TransactionWitnessSet
-  , auxiliaryData :: AuxiliaryData
+  , auxiliaryData :: Maybe AuxiliaryData
   , isValid :: Boolean
   }
 
@@ -68,7 +70,7 @@ fromCsl tx =
   let
     body = TransactionBody.fromCsl $ Csl.transaction_body tx
     witnessSet = TransactionWitnessSet.fromCsl $ Csl.transaction_witnessSet tx
-    auxiliaryData = fromMaybe mempty $ map AuxiliaryData.fromCsl $ toMaybe $ Csl.transaction_auxiliaryData tx
+    auxiliaryData = map AuxiliaryData.fromCsl $ toMaybe $ Csl.transaction_auxiliaryData tx
     isValid = Csl.transaction_isValid tx
   in
     Transaction { body, witnessSet, auxiliaryData, isValid }
@@ -79,6 +81,7 @@ toCsl (Transaction { body, witnessSet, auxiliaryData, isValid }) = do
     let
       tx = Csl.transaction_new (TransactionBody.toCsl body)
         (TransactionWitnessSet.toCsl witnessSet)
-        (AuxiliaryData.toCsl auxiliaryData)
+        -- TODO: fix partiality here
+        (fromMaybe (unsafeCoerce undefined) (AuxiliaryData.toCsl <$> auxiliaryData))
     transaction_setIsValid tx isValid
     pure tx

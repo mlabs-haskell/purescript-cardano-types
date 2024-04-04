@@ -28,7 +28,7 @@ import Cardano.Types.RawBytes (RawBytes)
 import Data.Either (note)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 
@@ -60,7 +60,7 @@ instance FromData PublicKey where
   fromData = map wrap <<< toMaybe <<< publicKey_fromBytes <=< fromData
 
 instance Show PublicKey where
-  show pk = "(PublicKey " <> (publicKey_toBech32 <<< unwrap $ pk) <> ")"
+  show pk = "(PublicKey.fromBech32Unsafe " <> show (publicKey_toBech32 <<< unwrap $ pk) <> ")"
 
 toRawBytes :: PublicKey -> RawBytes
 toRawBytes = unwrap >>> publicKey_asBytes >>> wrap
@@ -70,6 +70,9 @@ fromRawBytes = unwrap >>> publicKey_fromBytes >>> toMaybe >>> map wrap
 
 fromBech32 :: Bech32String -> Maybe PublicKey
 fromBech32 = publicKey_fromBech32 >>> toMaybe >>> map wrap
+
+fromBech32Unsafe :: Partial => Bech32String -> PublicKey
+fromBech32Unsafe = fromBech32 >>> fromJust
 
 toBech32 :: PublicKey -> Bech32String
 toBech32 = unwrap >>> publicKey_toBech32
