@@ -8,4 +8,11 @@ export const _decodeUtf8 = buffer => left => right => {
   }
 };
 
-export const _clone = x => x.constructor.from_bytes(x.to_bytes());
+export const _clone = x => {
+  if (typeof x.to_bytes === 'function' &&
+      typeof x.constructor.from_bytes === 'function') {
+    return x.constructor.from_bytes(x.to_bytes());
+  } else {
+    return x;
+  }
+};
