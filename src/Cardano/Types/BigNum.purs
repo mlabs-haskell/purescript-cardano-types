@@ -55,7 +55,7 @@ import Data.Maybe (Maybe, fromJust, fromMaybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.UInt (UInt)
-import Data.UInt (fromInt, fromString, toString) as UInt
+import Data.UInt (fromString, toString) as UInt
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
 import JS.BigInt (BigInt)

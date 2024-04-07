@@ -37,6 +37,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing), fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
+import Data.Show.Generic (genericShow)
 import Effect.Exception (try)
 import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafePartial)
@@ -55,10 +56,7 @@ instance Ord Ed25519KeyHash where
   compare = compare `on` encodeCbor
 
 instance Show Ed25519KeyHash where
-  show edkh =
-    "(Ed25519KeyHash $ unsafePartial $ fromJust $ ed25519KeyHashFromBech32 "
-      <> show (toBech32 "pool" edkh)
-      <> ")"
+  show = genericShow
 
 instance AsCbor Ed25519KeyHash where
   encodeCbor = unwrap >>> toBytes >>> wrap

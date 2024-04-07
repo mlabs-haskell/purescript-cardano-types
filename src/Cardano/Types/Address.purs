@@ -46,7 +46,6 @@ import Data.Int as Int
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
-import Data.Show.Generic (genericShow)
 import Literals.Undefined (undefined)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary, arbitrary)
@@ -71,7 +70,7 @@ instance DecodeAeson Address where
   decodeAeson = decodeAeson >=> fromBech32 >>> note (TypeMismatch "Address")
 
 instance Show Address where
-  show = genericShow
+  show addr = "(Address.fromBech32Unsafe " <> show (toBech32 addr) <> ")"
 
 instance AsCbor Address where
   encodeCbor = toCsl >>> toBytes >>> wrap
@@ -120,6 +119,9 @@ toBech32 = toCsl >>> flip address_toBech32 (unsafeCoerce undefined)
 
 fromBech32 :: Bech32String -> Maybe Address
 fromBech32 = map fromCsl <<< toMaybe <<< address_fromBech32
+
+fromBech32Unsafe :: Partial => Bech32String -> Address
+fromBech32Unsafe = fromJust <<< fromBech32
 
 toCsl :: Address -> Csl.Address
 toCsl = case _ of
