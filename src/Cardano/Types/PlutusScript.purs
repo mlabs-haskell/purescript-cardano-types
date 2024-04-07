@@ -7,10 +7,9 @@ import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( fromBytes
   , plutusScript_bytes
+  , plutusScript_fromBytesWithVersion
   , plutusScript_hash
   , plutusScript_languageVersion
-  , plutusScript_new
-  , plutusScript_newV2
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
@@ -56,9 +55,7 @@ hash = toCsl >>> plutusScript_hash >>> wrap
 
 toCsl :: PlutusScript -> Csl.PlutusScript
 toCsl (PlutusScript (bytes /\ lang)) =
-  case lang of
-    PlutusV1 -> plutusScript_new bytes
-    PlutusV2 -> plutusScript_newV2 bytes
+  plutusScript_fromBytesWithVersion bytes $ Language.toCsl lang
 
 fromCsl :: Csl.PlutusScript -> PlutusScript
-fromCsl ps = PlutusScript (plutusScript_bytes ps /\ Language.fromCsl (plutusScript_languageVersion ps))
+fromCsl ps = PlutusScript (toBytes ps /\ Language.fromCsl (plutusScript_languageVersion ps))
