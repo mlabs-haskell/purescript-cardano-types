@@ -28,7 +28,7 @@ import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BootstrapWitness (BootstrapWitness)
 import Cardano.Types.BootstrapWitness as BoostrapWitness
 import Cardano.Types.BootstrapWitness as BootstrapWitness
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, withNonEmptyArray)
+import Cardano.Types.Internal.Helpers (withNonEmptyArray)
 import Cardano.Types.NativeScript (NativeScript)
 import Cardano.Types.NativeScript as NativeScript
 import Cardano.Types.PlutusData (PlutusData)
@@ -39,7 +39,6 @@ import Cardano.Types.Redeemer (Redeemer)
 import Cardano.Types.Redeemer as Redeemer
 import Cardano.Types.Vkeywitness (Vkeywitness)
 import Cardano.Types.Vkeywitness as Vkeywitness
-import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -62,12 +61,8 @@ derive newtype instance EncodeAeson TransactionWitnessSet
 derive newtype instance DecodeAeson TransactionWitnessSet
 derive newtype instance Semigroup TransactionWitnessSet
 derive newtype instance Monoid TransactionWitnessSet
-
-instance Eq TransactionWitnessSet where
-  eq = eqOrd
-
-instance Ord TransactionWitnessSet where
-  compare = compareViaCslBytes `on` toCsl
+derive instance Eq TransactionWitnessSet
+derive instance Ord TransactionWitnessSet
 
 instance Show TransactionWitnessSet where
   show = genericShow

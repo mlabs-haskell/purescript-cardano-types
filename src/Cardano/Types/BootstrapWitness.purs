@@ -27,6 +27,7 @@ newtype BootstrapWitness = BootstrapWitness
 
 derive instance Newtype BootstrapWitness _
 derive instance Eq BootstrapWitness
+derive instance Ord BootstrapWitness
 derive instance Generic BootstrapWitness _
 
 instance Show BootstrapWitness where
