@@ -6,7 +6,6 @@ import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( fromBytes
-  , plutusScript_bytes
   , plutusScript_fromBytesWithVersion
   , plutusScript_hash
   , plutusScript_languageVersion
