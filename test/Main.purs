@@ -7,12 +7,49 @@ import Cardano.Types (TransactionWitnessSet)
 import Data.ByteArray (ByteArray)
 import Data.Maybe (Maybe(Just))
 import Data.Newtype (wrap)
-import Data.Time.Duration (Milliseconds(..))
+import Data.Time.Duration (Milliseconds(Milliseconds))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Mote (group, test)
 import Mote.TestPlanM (TestPlanM, interpretWithConfig)
-import Test.Fixtures (int1, mint0, mint1, nativeScriptFixture1, nativeScriptFixture2, nativeScriptFixture3, nativeScriptFixture4, nativeScriptFixture5, nativeScriptFixture6, nativeScriptFixture7, plutusDataFixture1, plutusDataFixture2, plutusDataFixture3, plutusDataFixture4, plutusDataFixture5, plutusDataFixture6, plutusDataFixture7, plutusDataFixture8, plutusScriptFixture1, plutusScriptFixture2, plutusScriptFixture3, txFixture1, txFixture2, txFixture3, txFixture4, txFixture5, txFixture6, txInputFixture1, txOutputFixture1, witnessSetFixture1, witnessSetFixture2, witnessSetFixture2Value, witnessSetFixture3, witnessSetFixture3Value, witnessSetFixture4)
+import Test.Fixtures
+  ( int1
+  , mint0
+  , mint1
+  , nativeScriptFixture1
+  , nativeScriptFixture2
+  , nativeScriptFixture3
+  , nativeScriptFixture4
+  , nativeScriptFixture5
+  , nativeScriptFixture6
+  , nativeScriptFixture7
+  , plutusDataFixture1
+  , plutusDataFixture2
+  , plutusDataFixture3
+  , plutusDataFixture4
+  , plutusDataFixture5
+  , plutusDataFixture6
+  , plutusDataFixture7
+  , plutusDataFixture8
+  , plutusScriptFixture1
+  , plutusScriptFixture2
+  , plutusScriptFixture3
+  , txFixture1
+  , txFixture2
+  , txFixture3
+  , txFixture4
+  , txFixture5
+  , txFixture6
+  , txFixture7
+  , txInputFixture1
+  , txOutputFixture1
+  , witnessSetFixture1
+  , witnessSetFixture2
+  , witnessSetFixture2Value
+  , witnessSetFixture3
+  , witnessSetFixture3Value
+  , witnessSetFixture4
+  )
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Runner (defaultConfig)
 import Type.Proxy (Proxy(Proxy))
@@ -48,6 +85,7 @@ suite = do
       roundtripTest "txFixture4" txFixture4
       roundtripTest "txFixture5" txFixture5
       roundtripTest "txFixture6" txFixture6
+      roundtripTest "txFixture6" txFixture7
     group "TransactionInput" do
       roundtripTest "txInputFixture1" txInputFixture1
     group "Int" do
@@ -101,6 +139,6 @@ roundtripTestBytes label _ bytes = do
 
 main :: Effect Unit
 main = launchAff_ do
-    interpretWithConfig
-      defaultConfig { timeout = Just $ Milliseconds 30_000.0, exit = true }
-      suite
+  interpretWithConfig
+    defaultConfig { timeout = Just $ Milliseconds 30_000.0, exit = true }
+    suite

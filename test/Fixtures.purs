@@ -71,14 +71,25 @@ module Test.Fixtures
   , witnessSetFixture3
   , witnessSetFixture3Value
   , witnessSetFixture4
+  , txFixture7
   ) where
 
 import Prelude
 
 import Aeson (decodeAeson, fromString)
 import Cardano.AsCbor (decodeCbor)
+import Cardano.Serialization.Lib (fromBytes)
 import Cardano.Types
   ( AuxiliaryData(AuxiliaryData)
+  , Certificate
+      ( StakeRegistration
+      , StakeDeregistration
+      , StakeDelegation
+      , PoolRegistration
+      , PoolRetirement
+      , GenesisKeyDelegation
+      , MoveInstantaneousRewardsCert
+      )
   , Coin(Coin)
   , Credential(PubKeyHashCredential)
   , Ed25519KeyHash
@@ -87,17 +98,24 @@ import Cardano.Types
   , ExUnits(ExUnits)
   , GeneralTransactionMetadata(GeneralTransactionMetadata)
   , Language(PlutusV2)
+  , MIRPot(Reserves, Treasury)
+  , MIRToStakeCredentials(MIRToStakeCredentials)
+  , MoveInstantaneousReward(ToOtherPot, ToStakeCreds)
   , NativeScript(TimelockExpiry, TimelockStart, ScriptNOfK, ScriptAny, ScriptAll, ScriptPubkey)
   , NetworkId(TestnetId, MainnetId)
   , OutputDatum(OutputDatum)
   , PaymentPubKeyHash(PaymentPubKeyHash)
   , PlutusData(Integer, Bytes, Constr, List, Map)
   , PlutusScript(PlutusScript)
+  , PoolMetadata(PoolMetadata)
+  , PoolParams(PoolParams)
+  , PoolPubKeyHash(PoolPubKeyHash)
   , ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
   , ProtocolParamUpdate(ProtocolParamUpdate)
   , ProtocolVersion(ProtocolVersion)
   , Redeemer(Redeemer)
   , RedeemerTag(Spend)
+  , Relay(SingleHostAddr, SingleHostName, MultiHostName)
   , RewardAddress
   , ScriptHash
   , Slot(Slot)
@@ -107,7 +125,9 @@ import Cardano.Types
   , TransactionOutput(TransactionOutput)
   , TransactionUnspentOutput(TransactionUnspentOutput)
   , TransactionWitnessSet(TransactionWitnessSet)
+  , URL(URL)
   , UnitInterval(UnitInterval)
+  , Update(Update)
   , UtxoMap
   , Value(Value)
   , Vkey(Vkey)
@@ -116,6 +136,8 @@ import Cardano.Types
 import Cardano.Types.Address (Address(BaseAddress))
 import Cardano.Types.AssetName (AssetName, mkAssetName)
 import Cardano.Types.Bech32String (Bech32String)
+import Cardano.Types.BigNum (BigNum)
+import Cardano.Types.BigNum (fromInt, one, zero) as BigNum
 import Cardano.Types.Ed25519KeyHash as Ed25519KeyHash
 import Cardano.Types.Ed25519Signature as Ed25519Signature
 import Cardano.Types.Int as Int
@@ -125,9 +147,13 @@ import Cardano.Types.PlutusScript (plutusV1Script, plutusV2Script)
 import Cardano.Types.PublicKey as PublicKey
 import Cardano.Types.ScriptRef (ScriptRef(PlutusScriptRef))
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum(Text))
-import Cardano.Types.BigNum (BigNum)
-import Cardano.Types.BigNum (fromInt, one, zero) as BigNum
-import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, hexToByteArrayUnsafe)
+import Data.Array as Array
+import Data.ByteArray
+  ( ByteArray
+  , byteArrayFromIntArrayUnsafe
+  , hexToByteArray
+  , hexToByteArrayUnsafe
+  )
 import Data.Either (hush)
 import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
@@ -344,7 +370,7 @@ plutusScriptFixture2 = unsafePartial $ fromJust $ map plutusV2Script $ hush
   $ fromString "4d010000deadbeef33222220051200120011"
 
 plutusScriptFixture3 :: PlutusScript
-plutusScriptFixture3 = (PlutusScript (Tuple (hexToByteArrayUnsafe "59088501000032332232323233223232323232323232323322323232323232322223232533532325335001101b13357389211d556e657870656374656420646174756d206174206f776e20696e7075740001a323253335002153335001101c2101c2101c2153335002101c21333573466ebc00800407807484074854ccd400840708407484ccd5cd19b8f00200101e01d323500122220023235001220013553353500222350022222222222223333500d2501e2501e2501e233355302d12001321233001225335002210031001002501e2350012253355335333573466e3cd400888008d4010880080b40b04ccd5cd19b873500222001350042200102d02c102c1350220031502100d21123001002162001300a0053333573466e1cd55cea80124000466442466002006004646464646464646464646464646666ae68cdc39aab9d500c480008cccccccccccc88888888888848cccccccccccc00403403002c02802402001c01801401000c008cd4054058d5d0a80619a80a80b1aba1500b33501501735742a014666aa034eb94064d5d0a804999aa80d3ae501935742a01066a02a0426ae85401cccd54068089d69aba150063232323333573466e1cd55cea801240004664424660020060046464646666ae68cdc39aab9d5002480008cc8848cc00400c008cd40b1d69aba15002302d357426ae8940088c98c80bccd5ce01901881689aab9e5001137540026ae854008c8c8c8cccd5cd19b8735573aa004900011991091980080180119a8163ad35742a004605a6ae84d5d1280111931901799ab9c03203102d135573ca00226ea8004d5d09aba2500223263202b33573805c05a05226aae7940044dd50009aba1500533501575c6ae854010ccd540680788004d5d0a801999aa80d3ae200135742a00460406ae84d5d1280111931901399ab9c02a029025135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d55cf280089baa00135742a00460206ae84d5d1280111931900c99ab9c01c01b017101a132632018335738921035054350001a135573ca00226ea800448c88c008dd6000990009aa80d111999aab9f0012501c233501b30043574200460066ae8800805c8c8c8cccd5cd19b8735573aa004900011991091980080180118069aba150023005357426ae8940088c98c8054cd5ce00c00b80989aab9e5001137540024646464646666ae68cdc39aab9d5004480008cccc888848cccc00401401000c008c8c8c8cccd5cd19b8735573aa0049000119910919800801801180b1aba1500233500e015357426ae8940088c98c8068cd5ce00e80e00c09aab9e5001137540026ae854010ccd54025d728041aba150033232323333573466e1d400520042300b357426aae79400c8cccd5cd19b875002480088c84888c004010dd71aba135573ca00846666ae68cdc3a801a400042444006464c6403866ae7007c0780680640604d55cea80089baa00135742a00466a014eb8d5d09aba2500223263201633573803203002826ae8940044d5d1280089aab9e500113754002424446004008266aa002eb9d6889119118011bab00132001355016223233335573e0044a032466a03066442466002006004600c6aae754008c014d55cf280118021aba200301413574200224464646666ae68cdc3a800a400046a00e600a6ae84d55cf280191999ab9a3370ea00490011280391931900919ab9c01501401000f135573aa00226ea800448488c00800c44880048c8c8cccd5cd19b875001480188c848888c010014c01cd5d09aab9e500323333573466e1d400920042321222230020053009357426aae7940108cccd5cd19b875003480088c848888c004014c01cd5d09aab9e500523333573466e1d40112000232122223003005375c6ae84d55cf280311931900819ab9c01301200e00d00c00b135573aa00226ea80048c8c8cccd5cd19b8735573aa004900011991091980080180118029aba15002375a6ae84d5d1280111931900619ab9c00f00e00a135573ca00226ea80048c8cccd5cd19b8735573aa002900011bae357426aae7940088c98c8028cd5ce00680600409baa001232323232323333573466e1d4005200c21222222200323333573466e1d4009200a21222222200423333573466e1d400d2008233221222222233001009008375c6ae854014dd69aba135744a00a46666ae68cdc3a8022400c4664424444444660040120106eb8d5d0a8039bae357426ae89401c8cccd5cd19b875005480108cc8848888888cc018024020c030d5d0a8049bae357426ae8940248cccd5cd19b875006480088c848888888c01c020c034d5d09aab9e500b23333573466e1d401d2000232122222223005008300e357426aae7940308c98c804ccd5ce00b00a80880800780700680600589aab9d5004135573ca00626aae7940084d55cf280089baa0012323232323333573466e1d400520022333222122333001005004003375a6ae854010dd69aba15003375a6ae84d5d1280191999ab9a3370ea0049000119091180100198041aba135573ca00c464c6401866ae7003c0380280244d55cea80189aba25001135573ca00226ea80048c8c8cccd5cd19b875001480088c8488c00400cdd71aba135573ca00646666ae68cdc3a8012400046424460040066eb8d5d09aab9e500423263200933573801801600e00c26aae7540044dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6401466ae7003403002001c0184d55cea80089baa0012323333573466e1d40052002200623333573466e1d40092000200623263200633573801201000800626aae74dd5000a4c24400424400224002920103505431003200135500322112225335001135003220012213335005220023004002333553007120010050040011122002122122330010040031123230010012233003300200200101") PlutusV2))
+plutusScriptFixture3 = (PlutusScript (Tuple (unsafePartial $ fromJust $ fromBytes $ hexToByteArrayUnsafe "59088501000032332232323233223232323232323232323322323232323232322223232533532325335001101b13357389211d556e657870656374656420646174756d206174206f776e20696e7075740001a323253335002153335001101c2101c2101c2153335002101c21333573466ebc00800407807484074854ccd400840708407484ccd5cd19b8f00200101e01d323500122220023235001220013553353500222350022222222222223333500d2501e2501e2501e233355302d12001321233001225335002210031001002501e2350012253355335333573466e3cd400888008d4010880080b40b04ccd5cd19b873500222001350042200102d02c102c1350220031502100d21123001002162001300a0053333573466e1cd55cea80124000466442466002006004646464646464646464646464646666ae68cdc39aab9d500c480008cccccccccccc88888888888848cccccccccccc00403403002c02802402001c01801401000c008cd4054058d5d0a80619a80a80b1aba1500b33501501735742a014666aa034eb94064d5d0a804999aa80d3ae501935742a01066a02a0426ae85401cccd54068089d69aba150063232323333573466e1cd55cea801240004664424660020060046464646666ae68cdc39aab9d5002480008cc8848cc00400c008cd40b1d69aba15002302d357426ae8940088c98c80bccd5ce01901881689aab9e5001137540026ae854008c8c8c8cccd5cd19b8735573aa004900011991091980080180119a8163ad35742a004605a6ae84d5d1280111931901799ab9c03203102d135573ca00226ea8004d5d09aba2500223263202b33573805c05a05226aae7940044dd50009aba1500533501575c6ae854010ccd540680788004d5d0a801999aa80d3ae200135742a00460406ae84d5d1280111931901399ab9c02a029025135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d55cf280089baa00135742a00460206ae84d5d1280111931900c99ab9c01c01b017101a132632018335738921035054350001a135573ca00226ea800448c88c008dd6000990009aa80d111999aab9f0012501c233501b30043574200460066ae8800805c8c8c8cccd5cd19b8735573aa004900011991091980080180118069aba150023005357426ae8940088c98c8054cd5ce00c00b80989aab9e5001137540024646464646666ae68cdc39aab9d5004480008cccc888848cccc00401401000c008c8c8c8cccd5cd19b8735573aa0049000119910919800801801180b1aba1500233500e015357426ae8940088c98c8068cd5ce00e80e00c09aab9e5001137540026ae854010ccd54025d728041aba150033232323333573466e1d400520042300b357426aae79400c8cccd5cd19b875002480088c84888c004010dd71aba135573ca00846666ae68cdc3a801a400042444006464c6403866ae7007c0780680640604d55cea80089baa00135742a00466a014eb8d5d09aba2500223263201633573803203002826ae8940044d5d1280089aab9e500113754002424446004008266aa002eb9d6889119118011bab00132001355016223233335573e0044a032466a03066442466002006004600c6aae754008c014d55cf280118021aba200301413574200224464646666ae68cdc3a800a400046a00e600a6ae84d55cf280191999ab9a3370ea00490011280391931900919ab9c01501401000f135573aa00226ea800448488c00800c44880048c8c8cccd5cd19b875001480188c848888c010014c01cd5d09aab9e500323333573466e1d400920042321222230020053009357426aae7940108cccd5cd19b875003480088c848888c004014c01cd5d09aab9e500523333573466e1d40112000232122223003005375c6ae84d55cf280311931900819ab9c01301200e00d00c00b135573aa00226ea80048c8c8cccd5cd19b8735573aa004900011991091980080180118029aba15002375a6ae84d5d1280111931900619ab9c00f00e00a135573ca00226ea80048c8cccd5cd19b8735573aa002900011bae357426aae7940088c98c8028cd5ce00680600409baa001232323232323333573466e1d4005200c21222222200323333573466e1d4009200a21222222200423333573466e1d400d2008233221222222233001009008375c6ae854014dd69aba135744a00a46666ae68cdc3a8022400c4664424444444660040120106eb8d5d0a8039bae357426ae89401c8cccd5cd19b875005480108cc8848888888cc018024020c030d5d0a8049bae357426ae8940248cccd5cd19b875006480088c848888888c01c020c034d5d09aab9e500b23333573466e1d401d2000232122222223005008300e357426aae7940308c98c804ccd5ce00b00a80880800780700680600589aab9d5004135573ca00626aae7940084d55cf280089baa0012323232323333573466e1d400520022333222122333001005004003375a6ae854010dd69aba15003375a6ae84d5d1280191999ab9a3370ea0049000119091180100198041aba135573ca00c464c6401866ae7003c0380280244d55cea80189aba25001135573ca00226ea80048c8c8cccd5cd19b875001480088c8488c00400cdd71aba135573ca00646666ae68cdc3a8012400046424460040066eb8d5d09aab9e500423263200933573801801600e00c26aae7540044dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6401466ae7003403002001c0184d55cea80089baa0012323333573466e1d40052002200623333573466e1d40092000200623263200633573801201000800626aae74dd5000a4c24400424400224002920103505431003200135500322112225335001135003220012213335005220023004002333553007120010050040011122002122122330010040031123230010012233003300200200101") PlutusV2))
 
 txFixture1 :: Transaction
 txFixture1 =
@@ -466,12 +492,14 @@ txFixture3 =
     , auxiliaryData: mempty
     }
 
+mint1 :: Mint
 mint1 = Mint $ Map.fromFoldable
   [ currencySymbol1 /\ Map.fromFoldable
       [ tokenName2 /\ Int.newPositive BigNum.one
       ]
   ]
 
+mint0 :: Mint
 mint0 = Mint $ Map.fromFoldable
   [ currencySymbol1 /\ Map.fromFoldable
       [ tokenName2 /\ Int.newPositive BigNum.zero
@@ -513,86 +541,84 @@ txFixture4 =
             --     }
             ]
         , fee: Coin $ BigNum.fromInt 177513
-        , ttl: Just $ Slot $ BigNum.fromInt 123
+        , ttl: Nothing -- Just $ Slot $ BigNum.fromInt 123
         , certs:
-            [ -- StakeRegistration $ wrap stake1
-            -- , StakeDeregistration $ wrap stake1
-            -- , StakeDelegation (wrap stake1)
-            --     (PoolPubKeyHash ed25519KeyHash1)
-            -- , PoolRegistration $ PoolParams
-            --     { operator: PoolPubKeyHash ed25519KeyHash1
-            --     , vrfKeyhash: unsafePartial $ fromJust $
-            --         hexToByteArray
-            --           "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
-            --           >>= wrap >>> decodeCbor
-            --     , pledge: bigNumOne
-            --     , cost: bigNumOne
-            --     , margin: UnitInterval
-            --         { numerator: bigNumOne, denominator: bigNumOne }
-            --     , rewardAccount:
-            --         { networkId: MainnetId, stakeCredential: wrap stake1 }
-            --     , poolOwners: [ ed25519KeyHash1 ]
-            --     , relays:
-            --         [ SingleHostAddr
-            --             { port: Just 8080
-            --             , ipv4: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
-            --                 [ 127, 0, 0, 1 ]
-            --             , ipv6: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
-            --                 $ Array.replicate 16 123
-            --             }
-            --         , SingleHostName
-            --             { port: Just 8080
-            --             , dnsName: "example.com"
-            --             }
-            --         , MultiHostName { dnsName: "example.com" }
-            --         ]
-            --     , poolMetadata: Just $ PoolMetadata
-            --         { url: URL "https://example.com/"
-            --         , hash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-            --             hexToByteArrayUnsafe
-            --               "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
-            --         }
-            --     }
-            -- , PoolRetirement
-            --     { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
-            --     , epoch: Epoch one
-            --     }
-            -- , GenesisKeyDelegation
-            --     { genesisHash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-            --         hexToByteArrayUnsafe
-            --           "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-            --     , genesisDelegateHash: unsafePartial $ fromJust $ decodeCbor
-            --         $ wrap
-            --         $
-            --           hexToByteArrayUnsafe
-            --             "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-            --     , vrfKeyhash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-            --         hexToByteArrayUnsafe
-            --           "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
-            --     }
-            -- , MoveInstantaneousRewardsCert $ ToOtherPot
-            --     { pot: Reserves
-            --     , amount: wrap bigNumOne
-            --     }
-            -- , MoveInstantaneousRewardsCert $ ToStakeCreds
-            --     { pot: Treasury
-            --     , amounts: MIRToStakeCredentials $ Map.fromFoldable
-            --         [ wrap stake1 /\ Int.newPositive bigNumOne ]
-            --     }
+            [ StakeRegistration $ wrap stake1
+            , StakeDeregistration $ wrap stake1
+            , StakeDelegation (wrap stake1)
+                (PoolPubKeyHash ed25519KeyHash1)
+            , PoolRegistration $ PoolParams
+                { operator: PoolPubKeyHash ed25519KeyHash1
+                , vrfKeyhash: unsafePartial $ fromJust $
+                    hexToByteArray
+                      "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
+                      >>= wrap >>> decodeCbor
+                , pledge: bigNumOne
+                , cost: bigNumOne
+                , margin: UnitInterval
+                    { numerator: bigNumOne, denominator: bigNumOne }
+                , rewardAccount:
+                    { networkId: MainnetId, stakeCredential: wrap stake1 }
+                , poolOwners: [ ed25519KeyHash1 ]
+                , relays:
+                    [ SingleHostAddr
+                        { port: Just 8080
+                        , ipv4: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
+                            [ 127, 0, 0, 1 ]
+                        , ipv6: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
+                            $ Array.replicate 16 123
+                        }
+                    , SingleHostName
+                        { port: Just 8080
+                        , dnsName: "example.com"
+                        }
+                    , MultiHostName { dnsName: "example.com" }
+                    ]
+                , poolMetadata: Just $ PoolMetadata
+                    { url: URL "https://example.com/"
+                    , hash: unsafePartial $ fromJust $ decodeCbor $ wrap $
+                        hexToByteArrayUnsafe
+                          "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
+                    }
+                }
+            , PoolRetirement
+                { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
+                , epoch: Epoch one
+                }
+            , GenesisKeyDelegation
+                { genesisHash: unsafePartial $ fromJust $ decodeCbor $ wrap $
+                    hexToByteArrayUnsafe
+                      "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
+                , genesisDelegateHash: unsafePartial $ fromJust $ decodeCbor
+                    $ wrap
+                    $
+                      hexToByteArrayUnsafe
+                        "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
+                , vrfKeyhash: unsafePartial $ fromJust $ decodeCbor $ wrap $
+                    hexToByteArrayUnsafe
+                      "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
+                }
+            , MoveInstantaneousRewardsCert $ ToOtherPot
+                { pot: Reserves
+                , amount: wrap bigNumOne
+                }
+            , MoveInstantaneousRewardsCert $ ToStakeCreds
+                { pot: Treasury
+                , amounts: MIRToStakeCredentials $ Map.fromFoldable
+                    [ wrap stake1 /\ Int.newPositive bigNumOne ]
+                }
             ]
         , withdrawals: Map.fromFoldable
             [ rewardAddress1 /\ Coin BigNum.one ]
-        , update: -- Just $ Update
-            -- { proposedProtocolParameterUpdates:
-            --     proposedProtocolParameterUpdates1
-            -- , epoch: Epoch zero
-            -- }
-            Nothing
-        , auxiliaryDataHash: -- decodeCbor $ wrap
-            -- $ byteArrayFromIntArrayUnsafe
-            -- $ Array.replicate 32 0
-            Nothing
-        , validityStartInterval: Nothing -- Just $ Slot $ BigNum.fromInt 124
+        , update: Just $ Update
+            { proposedProtocolParameterUpdates:
+                proposedProtocolParameterUpdates1
+            , epoch: Epoch zero
+            }
+        , auxiliaryDataHash: decodeCbor $ wrap
+            $ byteArrayFromIntArrayUnsafe
+            $ Array.replicate 32 0
+        , validityStartInterval: Nothing -- Just $ Slot $ BigNum.one
         , mint: Just $ Mint $ Map.fromFoldable
             [ currencySymbol1 /\ Map.fromFoldable
                 [ tokenName2 /\ Int.newPositive BigNum.one
@@ -705,6 +731,40 @@ txFixture6 =
         , nativeScripts: Nothing
         , plutusScripts: Nothing
         }
+    }
+
+txFixture7 :: Transaction
+txFixture7 =
+  Transaction
+    { body: TransactionBody
+        { inputs: []
+        , outputs: []
+        , fee: Coin $ BigNum.fromInt 177513
+        , ttl: Just $ Slot $ BigNum.fromInt 123
+        , certs: []
+        , withdrawals: Map.empty
+        , update: Nothing
+        , auxiliaryDataHash: Nothing
+        , validityStartInterval: Nothing -- Just $ Slot $ BigNum.one
+        , mint: Nothing
+        , referenceInputs: mempty
+        , scriptDataHash: Nothing
+        , collateral: []
+        , requiredSigners: []
+        , networkId: Nothing
+        , collateralReturn: Nothing
+        , totalCollateral: Nothing
+        }
+    , witnessSet: TransactionWitnessSet
+        { vkeys: []
+        , nativeScripts: []
+        , bootstraps: []
+        , plutusScripts: []
+        , plutusData: []
+        , redeemers: []
+        }
+    , isValid: true
+    , auxiliaryData: mempty
     }
 
 -- | To quickly check a serialized tx, create a file with the following contents:
@@ -1107,7 +1167,7 @@ witnessSetFixture3Value =
                 ]
             )
         ]
-    , plutusScripts: [ plutusScriptFixture3 ]
+    , plutusScripts: [ plutusScriptFixture1, plutusScriptFixture2, plutusScriptFixture3 ]
     , redeemers: []
     , vkeys:
         [ Vkeywitness

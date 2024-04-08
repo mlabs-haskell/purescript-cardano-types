@@ -48,7 +48,7 @@ import Cardano.Types.Certificate as Certificate
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.Coin as Coin
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
-import Cardano.Types.Internal.Helpers (withNonEmptyArray)
+import Cardano.Types.Internal.Helpers (clone, withNonEmptyArray)
 import Cardano.Types.Mint (Mint)
 import Cardano.Types.Mint as Mint
 import Cardano.Types.NetworkId (NetworkId)
@@ -172,7 +172,10 @@ toCsl
   -- auxiliaryDataHash
   for_ auxiliaryDataHash $ transactionBody_setAuxiliaryDataHash tb <<< unwrap
   -- validityStartInterval
-  for_ validityStartInterval $ transactionBody_setValidityStartIntervalBignum tb <<< unwrap <<< unwrap
+  for_ validityStartInterval $ transactionBody_setValidityStartIntervalBignum tb
+    <<< clone
+    <<< unwrap
+    <<< unwrap
   -- mint
   for_ mint $ transactionBody_setMint tb <<< Mint.toCsl
   -- scriptDataHash

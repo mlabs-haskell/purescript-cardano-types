@@ -46,7 +46,7 @@ import Cardano.Serialization.Lib
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.Internal.Helpers (eqOrd)
+import Cardano.Types.Internal.Helpers (clone, eqOrd)
 import Data.Array.NonEmpty as NA
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
@@ -76,7 +76,7 @@ instance Eq BigNum where
 
 instance Ord BigNum where
   compare (BigNum lhs) (BigNum rhs) =
-    case bigNum_compare lhs rhs of
+    case bigNum_compare (clone lhs) (clone rhs) of
       1.0 -> GT
       0.0 -> EQ
       _ -> LT
@@ -117,13 +117,13 @@ zero :: BigNum
 zero = BigNum bigNum_zero
 
 add :: BigNum -> BigNum -> Maybe BigNum
-add (BigNum a) (BigNum b) = coerce $ toMaybe $ bigNum_checkedAdd a b
+add (BigNum a) (BigNum b) = coerce $ toMaybe $ bigNum_checkedAdd (clone a) (clone b)
 
 mul :: BigNum -> BigNum -> Maybe BigNum
-mul (BigNum a) (BigNum b) = coerce $ toMaybe $ bigNum_checkedMul a b
+mul (BigNum a) (BigNum b) = coerce $ toMaybe $ bigNum_checkedMul (clone a) (clone b)
 
 sub :: BigNum -> BigNum -> Maybe BigNum
-sub (BigNum a) (BigNum b) = coerce $ toMaybe $ bigNum_checkedSub a b
+sub (BigNum a) (BigNum b) = coerce $ toMaybe $ bigNum_checkedSub (clone a) (clone b)
 
 max :: BigNum -> BigNum -> BigNum
 max = coerce bigNum_max
