@@ -219,9 +219,6 @@ tokenName1 = tokenNameFromString "4974657374546f6b656e"
 tokenName2 :: AssetName
 tokenName2 = tokenNameFromString "54657374546f6b656e32"
 
-tokenName4 :: AssetName
-tokenName4 = tokenNameFromString "abcdef"
-
 txOutputBinaryFixture1 :: String
 txOutputBinaryFixture1 =
   "8258390030fb3b8539951e26f034910a5a37f22cb99d94d1d409f69ddbaea9711c12f03c1ef2\
