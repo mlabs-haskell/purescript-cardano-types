@@ -12,7 +12,7 @@ import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib
   ( fromBytes
   , plutusScript_bytes
-  , plutusScript_fromBytesWithVersion
+  , plutusScript_fromBytesV2
   , plutusScript_hash
   , plutusScript_languageVersion
   , toBytes
@@ -23,7 +23,6 @@ import Cardano.Types.Language as Language
 import Cardano.Types.RawBytes (RawBytes)
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array.NonEmpty as NEA
-import Data.ByteArray (ByteArray)
 import Data.Either (hush)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
@@ -63,11 +62,15 @@ instance Arbitrary PlutusScript where
 instance Show PlutusScript where
   show = genericShow
 
-plutusV1Script :: ByteArray -> PlutusScript
-plutusV1Script ba = PlutusScript (plutusScript_fromBytesWithVersion ba (Language.toCsl PlutusV1) /\ PlutusV1)
+plutusV1Script :: RawBytes -> PlutusScript
+plutusV1Script ba =
+  PlutusScript $
+    unsafePartial (fromJust (fromBytes (unwrap ba))) /\ PlutusV1
 
-plutusV2Script :: ByteArray -> PlutusScript
-plutusV2Script ba = PlutusScript (plutusScript_fromBytesWithVersion ba (Language.toCsl PlutusV2) /\ PlutusV2)
+plutusV2Script :: RawBytes -> PlutusScript
+plutusV2Script ba =
+  PlutusScript $
+    plutusScript_fromBytesV2 (unwrap ba) /\ PlutusV2
 
 instance AsCbor PlutusScript where
   encodeCbor = toCsl >>> toBytes >>> wrap
