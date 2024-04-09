@@ -12,9 +12,10 @@ import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib
   ( fromBytes
   , plutusScript_bytes
-  , plutusScript_fromBytesV2
   , plutusScript_hash
   , plutusScript_languageVersion
+  , plutusScript_new
+  , plutusScript_newV2
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
@@ -65,12 +66,12 @@ instance Show PlutusScript where
 plutusV1Script :: RawBytes -> PlutusScript
 plutusV1Script ba =
   PlutusScript $
-    unsafePartial (fromJust (fromBytes (unwrap ba))) /\ PlutusV1
+    plutusScript_new (unwrap ba) /\ PlutusV1
 
 plutusV2Script :: RawBytes -> PlutusScript
 plutusV2Script ba =
   PlutusScript $
-    plutusScript_fromBytesV2 (unwrap ba) /\ PlutusV2
+    plutusScript_newV2 (unwrap ba) /\ PlutusV2
 
 instance AsCbor PlutusScript where
   encodeCbor = toCsl >>> toBytes >>> wrap
