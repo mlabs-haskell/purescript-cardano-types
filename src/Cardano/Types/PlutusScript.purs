@@ -11,6 +11,7 @@ import Aeson
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Serialization.Lib
   ( fromBytes
+  , plutusScript_bytes
   , plutusScript_fromBytesWithVersion
   , plutusScript_hash
   , plutusScript_languageVersion
@@ -19,6 +20,7 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2))
 import Cardano.Types.Language as Language
+import Cardano.Types.RawBytes (RawBytes)
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array.NonEmpty as NEA
 import Data.ByteArray (ByteArray)
@@ -73,6 +75,10 @@ instance AsCbor PlutusScript where
 
 hash :: PlutusScript -> ScriptHash
 hash = toCsl >>> plutusScript_hash >>> wrap
+
+-- | Get raw Plutus script bytes
+getBytes :: PlutusScript -> RawBytes
+getBytes (PlutusScript (script /\ _)) = wrap $ plutusScript_bytes script
 
 toCsl :: PlutusScript -> Csl.PlutusScript
 toCsl (PlutusScript (script /\ _lang)) =
