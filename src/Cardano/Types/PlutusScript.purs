@@ -31,6 +31,8 @@ import Data.Maybe (fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.Tuple.Nested (type (/\), (/\))
+import Effect.Exception (throw)
+import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (oneOf)
@@ -64,14 +66,20 @@ instance Show PlutusScript where
   show = genericShow
 
 plutusV1Script :: RawBytes -> PlutusScript
-plutusV1Script ba =
-  PlutusScript $
-    plutusScript_new (unwrap ba) /\ PlutusV1
+plutusV1Script ba = unsafePerformEffect do
+  let p = plutusScript_new (unwrap ba)
+  let v = Language.fromCsl $ plutusScript_languageVersion p
+  when (v /= PlutusV1) do
+    throw "wrong plutus version - v1"
+  pure $ PlutusScript $ p /\ PlutusV1
 
 plutusV2Script :: RawBytes -> PlutusScript
-plutusV2Script ba =
-  PlutusScript $
-    plutusScript_newV2 (unwrap ba) /\ PlutusV2
+plutusV2Script ba = unsafePerformEffect do
+  let p = plutusScript_newV2 (unwrap ba)
+  let v = Language.fromCsl $ plutusScript_languageVersion p
+  when (v /= PlutusV2) do
+    throw "wrong plutus version - v2"
+  pure $ PlutusScript $ p /\ PlutusV2
 
 instance AsCbor PlutusScript where
   encodeCbor = toCsl >>> toBytes >>> wrap
