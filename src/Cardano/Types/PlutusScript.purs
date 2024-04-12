@@ -40,17 +40,10 @@ newtype PlutusScript = PlutusScript (ByteArray /\ Language)
 
 derive instance Generic PlutusScript _
 derive instance Newtype PlutusScript _
+derive instance Eq PlutusScript
+derive instance Ord PlutusScript
 derive newtype instance DecodeAeson PlutusScript
 derive newtype instance EncodeAeson PlutusScript
-
-instance Eq PlutusScript where
-  eq = eqOrd
-
-instance Ord PlutusScript where
-  compare (PlutusScript (s1 /\ l1)) (PlutusScript (s2 /\ l2)) =
-    case compare l1 l2 of
-      EQ -> compare s1 s2
-      other -> other
 
 instance Arbitrary PlutusScript where
   arbitrary = oneOf $ NEA.cons'

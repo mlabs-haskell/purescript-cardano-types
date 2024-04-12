@@ -39,6 +39,7 @@ import Cardano.Types.Redeemer (Redeemer)
 import Cardano.Types.Redeemer as Redeemer
 import Cardano.Types.Vkeywitness (Vkeywitness)
 import Cardano.Types.Vkeywitness as Vkeywitness
+import Data.Array (nub)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -115,7 +116,7 @@ toCsl
     transactionWitnessSet_setNativeScripts ws
   withNonEmptyArray (BootstrapWitness.toCsl <$> bootstraps) $
     transactionWitnessSet_setBootstraps ws
-  withNonEmptyArray (PlutusScript.toCsl <$> plutusScripts) $
+  withNonEmptyArray (PlutusScript.toCsl <$> nub plutusScripts) $
     transactionWitnessSet_setPlutusScripts ws
   withNonEmptyArray (PlutusData.toCsl <$> plutusData) $
     transactionWitnessSet_setPlutusData ws
