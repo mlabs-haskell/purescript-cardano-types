@@ -52,7 +52,9 @@ instance Ord TransactionInput where
       x -> x
 
 instance Show TransactionInput where
-  show = genericShow
+  show (TransactionInput { transactionId, index }) = -- fixup unlawful UInt instance
+    "(TransactionInput { transactionId: " <> show transactionId <> ", index: UInt.fromInt " <> show (UInt.toInt index) <> " })"
+
 
 -- `Constr` is used for indexing, and `TransactionInput` is always zero-indexed
 instance FromData TransactionInput where

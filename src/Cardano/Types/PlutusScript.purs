@@ -23,6 +23,7 @@ import Cardano.Types.Language (Language(PlutusV1, PlutusV2))
 import Cardano.Types.Language as Language
 import Cardano.Types.RawBytes (RawBytes)
 import Cardano.Types.ScriptHash (ScriptHash)
+import Cardano.Types.Internal.Helpers (eqOrd)
 import Data.Array.NonEmpty as NEA
 import Data.Either (hush)
 import Data.Function (on)
@@ -46,10 +47,13 @@ derive newtype instance DecodeAeson PlutusScript
 derive newtype instance EncodeAeson PlutusScript
 
 instance Eq PlutusScript where
-  eq = eq `on` encodeCbor
+  eq = eqOrd
 
 instance Ord PlutusScript where
-  compare = compare `on` encodeCbor
+  compare (PlutusScript (s1 /\ l1)) (PlutusScript (s2 /\ l2)) =
+    case compare l1 l2 of
+      EQ -> compare (toBytes s1) (toBytes s2)
+      other -> other
 
 instance Arbitrary PlutusScript where
   arbitrary = oneOf $ NEA.cons'
