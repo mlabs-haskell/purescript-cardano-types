@@ -93,11 +93,8 @@ getBytes :: PlutusScript -> RawBytes
 getBytes (PlutusScript (script /\ _)) = wrap $ plutusScript_bytes script
 
 toCsl :: PlutusScript -> Csl.PlutusScript
-toCsl (PlutusScript (script /\ lang)) =
-  ( case lang of
-      PlutusV1 -> plutusScript_new
-      PlutusV2 -> plutusScript_newV2
-  ) $ plutusScript_bytes script
+toCsl (PlutusScript (script /\ _lang)) =
+  script
 
 fromCsl :: Csl.PlutusScript -> PlutusScript
 fromCsl ps = PlutusScript (ps /\ Language.fromCsl (plutusScript_languageVersion ps))
