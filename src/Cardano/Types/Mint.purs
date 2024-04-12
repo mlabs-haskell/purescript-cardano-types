@@ -15,8 +15,9 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (packMapContainer, unpackMapContainerToMapWith)
+import Cardano.Serialization.Lib (unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
+import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
 import Cardano.Types.Internal.Helpers (clone)
@@ -149,9 +150,9 @@ unionNonAda (Mint l) (Mint r) =
 
 toCsl :: Mint -> Csl.Mint
 toCsl mint | Mint mp <- normalizeMint mint =
-  packMapContainer $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
+  packMapContainerWithClone $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
     unwrap scriptHash /\
-      packMapContainer do
+      packMapContainerWithClone do
         Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
           unwrap assetName /\ unwrap quantity
 

@@ -59,8 +59,13 @@ suite = do
   group "deserialization and serialization roundtrip" $ do
     group "PlutusScript" do
       roundtripTest "plutusScriptFixture1" plutusScriptFixture1
-      roundtripTest "plutusScriptFixture2" plutusScriptFixture2
-      roundtripTest "plutusScriptFixture3" plutusScriptFixture3
+      -- These are not supposed to work: plutus script version is not encoded
+      -- in the cbor. instead, TransactionWitness using the scripts is encoded
+      -- differently depending on the language version. See the CDDL spec of Cardano
+      -- ledger.
+
+      -- roundtripTest "plutusScriptFixture2" plutusScriptFixture2
+      -- roundtripTest "plutusScriptFixture3" plutusScriptFixture3
     group "NativeScript" do
       roundtripTest "nativeScriptFixture1" nativeScriptFixture1
       roundtripTest "nativeScriptFixture2" nativeScriptFixture2
