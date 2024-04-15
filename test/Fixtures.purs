@@ -81,15 +81,7 @@ import Cardano.AsCbor (decodeCbor)
 import Cardano.Serialization.Lib (fromBytes)
 import Cardano.Types
   ( AuxiliaryData(AuxiliaryData)
-  , Certificate
-      ( StakeRegistration
-      , StakeDeregistration
-      , StakeDelegation
-      , PoolRegistration
-      , PoolRetirement
-      , GenesisKeyDelegation
-      , MoveInstantaneousRewardsCert
-      )
+  , Certificate(StakeRegistration, StakeDeregistration, StakeDelegation, PoolRegistration, PoolRetirement, GenesisKeyDelegation, MoveInstantaneousRewardsCert)
   , Coin(Coin)
   , Credential(PubKeyHashCredential)
   , Ed25519KeyHash
@@ -118,6 +110,7 @@ import Cardano.Types
   , Relay(SingleHostAddr, SingleHostName, MultiHostName)
   , RewardAddress
   , ScriptHash
+  , ScriptRef(NativeScriptRef)
   , Slot(Slot)
   , Transaction(Transaction)
   , TransactionBody(TransactionBody)
@@ -512,30 +505,30 @@ txFixture4 =
     { body: TransactionBody
         { inputs: [ txInputFixture1 ]
         , outputs:
-            [ -- TransactionOutput
-            --   { address: keyHashBaseAddress
-            --       { stake:
-            --           "0f45aaf1b2959db6e5ff94dbb1f823bf257680c3c723ac2d49f97546"
-            --       -- $ T.Bech32 "hbas_1xranhpfej50zdup5jy995dlj9juem9x36syld8wm465hz92acfp"
-            --       , payment:
-            --           "30fb3b8539951e26f034910a5a37f22cb99d94d1d409f69ddbaea971"
-            --       }
-            --   , amount: Value (Coin $ BigNum.fromInt 2353402) MultiAsset.empty
-            --   , datum: Just $ OutputDatum plutusDataFixture1
-            --   , scriptRef: Just $ PlutusScriptRef plutusScriptFixture1
-            --   }
-            -- , TransactionOutput
-            --     { address: keyHashBaseAddress
-            --         { stake:
-            --             "0f45aaf1b2959db6e5ff94dbb1f823bf257680c3c723ac2d49f97546"
-            --         -- $ T.Bech32 "hbas_1xranhpfej50zdup5jy995dlj9juem9x36syld8wm465hz92acfp"
-            --         , payment:
-            --             "30fb3b8539951e26f034910a5a37f22cb99d94d1d409f69ddbaea971"
-            --         }
-            --     , amount: Value (Coin $ BigNum.fromInt 1000000) MultiAsset.empty
-            --     , datum: Nothing
-            --     , scriptRef: Just $ NativeScriptRef nativeScriptFixture5
-            --     }
+            [ TransactionOutput
+                { address: keyHashBaseAddress
+                    { stake:
+                        "0f45aaf1b2959db6e5ff94dbb1f823bf257680c3c723ac2d49f97546"
+                    -- $ T.Bech32 "hbas_1xranhpfej50zdup5jy995dlj9juem9x36syld8wm465hz92acfp"
+                    , payment:
+                        "30fb3b8539951e26f034910a5a37f22cb99d94d1d409f69ddbaea971"
+                    }
+                , amount: Value (Coin $ BigNum.fromInt 2353402) MultiAsset.empty
+                , datum: Just $ OutputDatum plutusDataFixture1
+                , scriptRef: Just $ PlutusScriptRef plutusScriptFixture1
+                }
+            , TransactionOutput
+                { address: keyHashBaseAddress
+                    { stake:
+                        "0f45aaf1b2959db6e5ff94dbb1f823bf257680c3c723ac2d49f97546"
+                    -- $ T.Bech32 "hbas_1xranhpfej50zdup5jy995dlj9juem9x36syld8wm465hz92acfp"
+                    , payment:
+                        "30fb3b8539951e26f034910a5a37f22cb99d94d1d409f69ddbaea971"
+                    }
+                , amount: Value (Coin $ BigNum.fromInt 1000000) MultiAsset.empty
+                , datum: Nothing
+                , scriptRef: Just $ NativeScriptRef nativeScriptFixture5
+                }
             ]
         , fee: Coin $ BigNum.fromInt 177513
         , ttl: Nothing -- Just $ Slot $ BigNum.fromInt 123
