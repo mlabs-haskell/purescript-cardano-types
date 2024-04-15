@@ -22,7 +22,6 @@ import Cardano.ToData (class ToData, toData)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
-import Data.Show.Generic (genericShow)
 import Data.UInt (UInt, toInt)
 import Data.UInt as UInt
 import Test.QuickCheck (class Arbitrary, arbitrary)

@@ -109,6 +109,6 @@ fromBech32 = map wrap <<< toMaybe <<< ed25519KeyHash_fromBech32
 -- | More on prefixes: https://cips.cardano.org/cips/cip5
 toBech32 :: String -> Ed25519KeyHash -> Maybe Bech32String
 toBech32 prefix kh =
-  hush $ unsafePerformEffect $ try $ unsafePartial
-    $ pure
-    $ toBech32Unsafe prefix kh
+  hush $ unsafePartial $ unsafePerformEffect $ do
+    -- do not inline or simplify. We need the exception to be thrown in Effect.
+    try $ pure unit <#> \_ -> toBech32Unsafe prefix kh
