@@ -78,7 +78,6 @@ import Prelude
 
 import Aeson (decodeAeson, fromString)
 import Cardano.AsCbor (decodeCbor)
-import Cardano.Serialization.Lib (fromBytes)
 import Cardano.Types
   ( AuxiliaryData(AuxiliaryData)
   , Certificate(StakeRegistration, StakeDeregistration, StakeDelegation, PoolRegistration, PoolRetirement, GenesisKeyDelegation, MoveInstantaneousRewardsCert)

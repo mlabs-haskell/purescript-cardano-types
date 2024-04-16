@@ -32,8 +32,6 @@ import Test.Fixtures
   , plutusDataFixture7
   , plutusDataFixture8
   , plutusScriptFixture1
-  , plutusScriptFixture2
-  , plutusScriptFixture3
   , txFixture1
   , txFixture2
   , txFixture3
