@@ -18,7 +18,6 @@ import Cardano.Serialization.Lib
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.Internal.Helpers (eqOrd)
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2))
 import Cardano.Types.Language as Language
 import Cardano.Types.RawBytes (RawBytes)

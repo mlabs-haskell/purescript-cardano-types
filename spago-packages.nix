@@ -175,11 +175,11 @@ let
 
     "cardano-serialization-lib" = pkgs.stdenv.mkDerivation {
         name = "cardano-serialization-lib";
-        version = "ed634b0863b7c443a35a9624a879e92a63057388";
+        version = "6636bd0fa48f3608ce3988d55384b00756aa0375";
         src = pkgs.fetchgit {
           url = "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib";
-          rev = "ed634b0863b7c443a35a9624a879e92a63057388";
-          sha256 = "1js08xgwy6bvyx3z1hkzszrdb2ix6zxjjb4bz1gxxkwsqb9bjn3z";
+          rev = "6636bd0fa48f3608ce3988d55384b00756aa0375";
+          sha256 = "0zxwhw66v576h4z8cs6zgfaax1mqg9ljgii6h737lh6kkk5bza6l";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";

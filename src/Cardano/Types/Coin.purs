@@ -11,7 +11,6 @@ import Data.Lattice (class JoinSemilattice, class MeetSemilattice)
 import Data.Maybe (Maybe, fromJust, maybe)
 import Data.Newtype (class Newtype, wrap)
 import Data.Semiring as Num
-import Data.Show.Generic (genericShow)
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
 import Safe.Coerce (coerce)
