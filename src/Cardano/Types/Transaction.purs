@@ -4,6 +4,10 @@ module Cardano.Types.Transaction
   , toCsl
   , fromCsl
   , hash
+  , _body
+  , _isValid
+  , _witnessSet
+  , _auxiliaryData
   ) where
 
 import Prelude
@@ -20,12 +24,16 @@ import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet)
 import Cardano.Types.TransactionWitnessSet as TransactionWitnessSet
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens')
+import Data.Lens.Iso.Newtype (_Newtype)
+import Data.Lens.Record (prop)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Effect.Unsafe (unsafePerformEffect)
 import Literals.Undefined (undefined)
+import Type.Proxy (Proxy(Proxy))
 import Unsafe.Coerce (unsafeCoerce)
 
 newtype Transaction = Transaction
@@ -85,3 +93,15 @@ toCsl (Transaction { body, witnessSet, auxiliaryData, isValid }) = do
         (fromMaybe (unsafeCoerce undefined) (AuxiliaryData.toCsl <$> auxiliaryData))
     transaction_setIsValid tx isValid
     pure tx
+
+_body :: Lens' Transaction TransactionBody
+_body = _Newtype <<< prop (Proxy :: Proxy "body")
+
+_isValid :: Lens' Transaction Boolean
+_isValid = _Newtype <<< prop (Proxy :: Proxy "isValid")
+
+_witnessSet :: Lens' Transaction TransactionWitnessSet
+_witnessSet = _Newtype <<< prop (Proxy :: Proxy "witnessSet")
+
+_auxiliaryData :: Lens' Transaction (Maybe AuxiliaryData)
+_auxiliaryData = _Newtype <<< prop (Proxy :: Proxy "auxiliaryData")

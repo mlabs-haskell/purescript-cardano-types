@@ -4,6 +4,10 @@ module Cardano.Types.TransactionOutput
   , fromCsl
   , toCsl
   , minAdaForOutput
+  , _amount
+  , _scriptRef
+  , _datum
+  , _address
   ) where
 
 import Prelude
@@ -42,6 +46,9 @@ import Data.ByteArray (byteArrayToHex)
 import Data.Foldable (for_)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens')
+import Data.Lens.Iso.Newtype (_Newtype)
+import Data.Lens.Record (prop)
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
 import Data.Maybe (Maybe, maybe)
@@ -52,6 +59,7 @@ import Data.Tuple.Nested ((/\))
 import Effect.Unsafe (unsafePerformEffect)
 import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Arbitrary (genericArbitrary)
+import Type.Proxy (Proxy(Proxy))
 
 newtype TransactionOutput = TransactionOutput
   { address :: Address
@@ -126,3 +134,15 @@ toCsl (TransactionOutput { address, amount, datum, scriptRef }) = unsafePerformE
     OutputDatum dt -> transactionOutput_setPlutusData cslOutput $ PlutusData.toCsl dt
   for_ scriptRef $ transactionOutput_setScriptRef cslOutput <<< ScriptRef.toCsl
   pure cslOutput
+
+_amount :: Lens' TransactionOutput Value
+_amount = _Newtype <<< prop (Proxy :: Proxy "amount")
+
+_scriptRef :: Lens' TransactionOutput (Maybe ScriptRef)
+_scriptRef = _Newtype <<< prop (Proxy :: Proxy "scriptRef")
+
+_datum :: Lens' TransactionOutput (Maybe OutputDatum)
+_datum = _Newtype <<< prop (Proxy :: Proxy "datum")
+
+_address :: Lens' TransactionOutput Address
+_address = _Newtype <<< prop (Proxy :: Proxy "address")

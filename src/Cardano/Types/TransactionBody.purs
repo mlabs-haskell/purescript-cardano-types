@@ -65,6 +65,9 @@ import Cardano.Types.Update (Update)
 import Cardano.Types.Update as Update
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens')
+import Data.Lens.Iso.Newtype (_Newtype)
+import Data.Lens.Record (prop)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(Nothing), fromMaybe)
@@ -74,6 +77,7 @@ import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for_)
 import Effect.Unsafe (unsafePerformEffect)
+import Type.Proxy (Proxy(Proxy))
 
 newtype TransactionBody = TransactionBody
   { inputs :: Array TransactionInput
@@ -251,3 +255,55 @@ fromCsl tb =
     toMaybe (transactionBody_totalCollateral tb)
   referenceInputs = map TransactionInput.fromCsl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_referenceInputs tb)
+
+_inputs :: Lens' TransactionBody (Array TransactionInput)
+_inputs = _Newtype <<< prop (Proxy :: Proxy "inputs")
+
+_fee :: Lens' TransactionBody Coin
+_fee = _Newtype <<< prop (Proxy :: Proxy "fee")
+
+_outputs :: Lens' TransactionBody (Array TransactionOutput)
+_outputs = _Newtype <<< prop (Proxy :: Proxy "outputs")
+
+_certs :: Lens' TransactionBody (Array Certificate)
+_certs = _Newtype <<< prop (Proxy :: Proxy "certs")
+
+_networkId :: Lens' TransactionBody (Maybe NetworkId)
+_networkId = _Newtype <<< prop (Proxy :: Proxy "networkId")
+
+_scriptDataHash :: Lens' TransactionBody (Maybe ScriptDataHash)
+_scriptDataHash = _Newtype <<< prop (Proxy :: Proxy "scriptDataHash")
+
+_collateral :: Lens' TransactionBody (Array TransactionInput)
+_collateral = _Newtype <<< prop (Proxy :: Proxy "collateral")
+
+_collateralReturn :: Lens' TransactionBody (Maybe TransactionOutput)
+_collateralReturn = _Newtype <<< prop (Proxy :: Proxy "collateralReturn")
+
+_totalCollateral :: Lens' TransactionBody (Maybe Coin)
+_totalCollateral = _Newtype <<< prop (Proxy :: Proxy "totalCollateral")
+
+_referenceInputs :: Lens' TransactionBody (Array TransactionInput)
+_referenceInputs = _Newtype <<< prop (Proxy :: Proxy "referenceInputs")
+
+_requiredSigners :: Lens' TransactionBody (Array Ed25519KeyHash)
+_requiredSigners = _Newtype <<< prop (Proxy :: Proxy "requiredSigners")
+
+_withdrawals :: Lens' TransactionBody (Map RewardAddress Coin)
+_withdrawals = _Newtype <<< prop (Proxy :: Proxy "withdrawals")
+
+_mint :: Lens' TransactionBody (Maybe Mint)
+_mint = _Newtype <<< prop (Proxy :: Proxy "mint")
+
+_auxiliaryDataHash :: Lens' TransactionBody (Maybe AuxiliaryDataHash)
+_auxiliaryDataHash = _Newtype <<< prop (Proxy :: Proxy "auxiliaryDataHash")
+
+_ttl :: Lens' TransactionBody (Maybe Slot)
+_ttl = _Newtype <<< prop (Proxy :: Proxy "ttl")
+
+_update :: Lens' TransactionBody (Maybe Update)
+_update = _Newtype <<< prop (Proxy :: Proxy "update")
+
+_validityStartInterval :: Lens' TransactionBody (Maybe Slot)
+_validityStartInterval = _Newtype <<< prop
+  (Proxy :: Proxy "validityStartInterval")

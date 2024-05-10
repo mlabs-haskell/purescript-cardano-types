@@ -110,14 +110,57 @@ import Cardano.Types.ScriptRef (ScriptRef(NativeScriptRef, PlutusScriptRef)) as 
 import Cardano.Types.Slot (Slot(Slot)) as X
 import Cardano.Types.StakeCredential (StakeCredential(StakeCredential)) as X
 import Cardano.Types.StakePubKeyHash (StakePubKeyHash(StakePubKeyHash)) as X
-import Cardano.Types.TransactionBody (TransactionBody(TransactionBody)) as X
+import Cardano.Types.TransactionBody
+  ( TransactionBody(TransactionBody)
+  , _inputs
+  , _outputs
+  , _fee
+  , _ttl
+  , _certs
+  , _withdrawals
+  , _update
+  , _auxiliaryDataHash
+  , _validityStartInterval
+  , _mint
+  , _scriptDataHash
+  , _collateral
+  , _requiredSigners
+  , _networkId
+  , _collateralReturn
+  , _totalCollateral
+  , _referenceInputs
+  ) as X
 import Cardano.Types.TransactionHash (TransactionHash(TransactionHash)) as X
 import Cardano.Types.TransactionInput (TransactionInput(TransactionInput)) as X
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum) as X -- name conflicts with PlutusData
-import Cardano.Types.TransactionOutput (TransactionOutput(TransactionOutput)) as X
-import Cardano.Types.Transaction (Transaction(Transaction)) as X
-import Cardano.Types.TransactionUnspentOutput (TransactionUnspentOutput(TransactionUnspentOutput)) as X
-import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet(TransactionWitnessSet)) as X
+import Cardano.Types.TransactionOutput
+  ( TransactionOutput(TransactionOutput)
+  , _amount
+  , _scriptRef
+  , _datum
+  , _address
+  ) as X
+import Cardano.Types.Transaction
+  ( Transaction(Transaction)
+  , _body
+  , _isValid
+  , _witnessSet
+  , _auxiliaryData
+  ) as X
+import Cardano.Types.TransactionUnspentOutput
+  ( TransactionUnspentOutput(TransactionUnspentOutput)
+  , _input
+  , _output
+  ) as X
+import Cardano.Types.TransactionWitnessSet
+  ( TransactionWitnessSet(TransactionWitnessSet)
+  , _redeemers
+  , _plutusData
+  , _plutusScripts
+  , _nativeScripts
+  , _vkeys
+  , _bootstraps
+  ) as X
 import Cardano.Types.UnitInterval (UnitInterval(UnitInterval)) as X
 import Cardano.Types.Update (Update(Update)) as X
 import Cardano.Types.URL (URL(URL)) as X
