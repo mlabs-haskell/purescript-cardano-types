@@ -1,6 +1,16 @@
-# V1.0.1
+# v1.0.2
 
-# Changed
+## Added
+
+- `RedeemerDatum` type (a tagged newtype over `PlutusData`)
+
+## Changed
+
+- `datum` field of a `Redeemer`: use `RedeemerDatum` instead of `PlutusData`
+
+# v1.0.1
+
+## Changed
 
 - `Aeson` instances for `AssetName`: encode as byte string instead of Plutus-compatible encoding. The instances have been moved to `purescript-plutus-types` (`TokenName`).
 
