@@ -61,13 +61,18 @@ instance EncodeAeson StakeCredential where
 instance Arbitrary StakeCredential where
   arbitrary = genericArbitrary
 
-fromCsl :: Csl.StakeCredential -> StakeCredential
-fromCsl cslc = case toMaybe (Csl.stakeCredential_toKeyhash cslc) of
-  Just hash -> StakeCredential $ PubKeyHashCredential (wrap hash)
-  Nothing -> case toMaybe (Csl.stakeCredential_toScripthash cslc) of
-    Just hash -> StakeCredential $ ScriptHashCredential (wrap hash)
-    Nothing -> unsafePerformEffect $ throw "Cardano.Types.StakeCredential.fromCsl: unknown kind"
+fromCsl :: Csl.Credential -> StakeCredential
+fromCsl cslCred =
+  case toMaybe (Csl.credential_toKeyhash cslCred) of
+    Just hash -> StakeCredential $ PubKeyHashCredential (wrap hash)
+    Nothing -> case toMaybe (Csl.credential_toScripthash cslCred) of
+      Just hash -> StakeCredential $ ScriptHashCredential (wrap hash)
+      Nothing -> unsafePerformEffect $ throw "Cardano.Types.StakeCredential.fromCsl: unknown kind"
 
-toCsl :: StakeCredential -> Csl.StakeCredential
-toCsl (StakeCredential (PubKeyHashCredential hash)) = Csl.stakeCredential_fromKeyhash (unwrap hash)
-toCsl (StakeCredential (ScriptHashCredential hash)) = Csl.stakeCredential_fromScripthash (unwrap hash)
+toCsl :: StakeCredential -> Csl.Credential
+toCsl (StakeCredential cred) =
+  case cred of
+    PubKeyHashCredential hash ->
+      Csl.credential_fromKeyhash (unwrap hash)
+    ScriptHashCredential hash ->
+      Csl.credential_fromScripthash (unwrap hash)

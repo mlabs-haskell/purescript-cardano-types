@@ -1,23 +1,19 @@
-module Cardano.Types.MoveInstantaneousReward where
+module Cardano.Types.MoveInstantaneousReward
+  ( MoveInstantaneousReward(ToOtherPot, ToStakeCreds)
+  , fromCsl
+  , toCsl
+  ) where
 
 import Prelude
 
 import Aeson (class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
-  ( moveInstantaneousReward_asToOtherPot
-  , moveInstantaneousReward_asToStakeCreds
-  , moveInstantaneousReward_newToOtherPot
-  , moveInstantaneousReward_newToStakeCreds
-  , moveInstantaneousReward_pot
-  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum(BigNum))
 import Cardano.Types.Coin (Coin(Coin))
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.MIRPot (MIRPot)
 import Cardano.Types.MIRPot as MIRPot
-import Cardano.Types.MIRPot as Pot
 import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials)
 import Cardano.Types.MIRToStakeCredentials as MIRToStakeCredentials
 import Control.Alt ((<|>))
@@ -39,9 +35,9 @@ data MoveInstantaneousReward
       , amounts :: MIRToStakeCredentials
       }
 
+derive instance Generic MoveInstantaneousReward _
 derive instance Eq MoveInstantaneousReward
 derive instance Ord MoveInstantaneousReward
-derive instance Generic MoveInstantaneousReward _
 
 instance Show MoveInstantaneousReward where
   show = genericShow
@@ -55,7 +51,7 @@ instance EncodeAeson MoveInstantaneousReward where
       -- We assume the numbers are finite
       { pot = MIRPot.toInt r.pot }
 
---  TODO
+-- TODO
 -- instance DecodeAeson MoveInstantaneousReward where
 
 instance AsCbor MoveInstantaneousReward where
@@ -65,18 +61,30 @@ instance AsCbor MoveInstantaneousReward where
 toCsl :: MoveInstantaneousReward -> Csl.MoveInstantaneousReward
 toCsl = case _ of
   ToOtherPot { pot, amount } ->
-    moveInstantaneousReward_newToOtherPot (Int.toNumber $ Pot.toInt pot) (unwrap $ unwrap amount)
+    Csl.moveInstantaneousReward_newToOtherPot
+      (MIRPot.toCsl pot)
+      (unwrap $ unwrap amount)
   ToStakeCreds { pot, amounts } ->
-    moveInstantaneousReward_newToStakeCreds (Int.toNumber $ Pot.toInt pot) (MIRToStakeCredentials.toCsl amounts)
+    Csl.moveInstantaneousReward_newToStakeCreds
+      (MIRPot.toCsl pot)
+      (MIRToStakeCredentials.toCsl amounts)
 
 fromCsl :: Csl.MoveInstantaneousReward -> MoveInstantaneousReward
 fromCsl csl = unsafePartial $ fromJust $
   toOtherPot <|> toStakeCreds
   where
-  pot =
-    unsafePartial $ fromJust $
-      MIRPot.fromInt =<< Int.fromNumber (moveInstantaneousReward_pot csl)
-  toOtherPot = toMaybe (moveInstantaneousReward_asToOtherPot csl) <#> \amount ->
-    ToOtherPot { amount: Coin $ BigNum amount, pot }
-  toStakeCreds = toMaybe (moveInstantaneousReward_asToStakeCreds csl) <#> \amounts ->
-    ToStakeCreds { amounts: MIRToStakeCredentials.fromCsl amounts, pot }
+  pot = MIRPot.fromCsl $ Csl.moveInstantaneousReward_pot csl
+
+  toOtherPot =
+    toMaybe (Csl.moveInstantaneousReward_asToOtherPot csl) <#> \amount ->
+      ToOtherPot
+        { amount: Coin $ BigNum amount
+        , pot
+        }
+
+  toStakeCreds =
+    toMaybe (Csl.moveInstantaneousReward_asToStakeCreds csl) <#> \amounts ->
+      ToStakeCreds
+        { amounts: MIRToStakeCredentials.fromCsl amounts
+        , pot
+        }
