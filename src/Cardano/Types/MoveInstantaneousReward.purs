@@ -18,7 +18,6 @@ import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials)
 import Cardano.Types.MIRToStakeCredentials as MIRToStakeCredentials
 import Control.Alt ((<|>))
 import Data.Generic.Rep (class Generic)
-import Data.Int as Int
 import Data.Maybe (fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
