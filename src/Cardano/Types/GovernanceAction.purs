@@ -1,7 +1,5 @@
 module Cardano.Types.GovernanceAction where
 
-import Prelude
-
 import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction)
 import Cardano.Types.NewConstitutionAction (NewConstitutionAction)
 import Cardano.Types.NoConfidenceAction (NoConfidenceAction)
