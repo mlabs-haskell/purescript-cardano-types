@@ -25,9 +25,10 @@ import Cardano.Types.MultiAsset (MultiAsset)
 import Cardano.Types.MultiAsset as MultiAsset
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array (foldM)
+import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
-import Data.Map (empty, filter, isEmpty, singleton, toUnfoldable, unions) as Map
+import Data.Map (empty, filter, isEmpty, singleton, toUnfoldable, unionWith) as Map
 import Data.Maybe (Maybe, fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -156,6 +157,15 @@ toCsl mint | Mint mp <- normalizeMint mint =
         Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
           unwrap assetName /\ unwrap quantity
 
+-- NOTE: CSL.Mint can store multiple entries for the same policy id.
+-- https://github.com/Emurgo/cardano-serialization-lib/blob/4a35ef11fd5c4931626c03025fe6f67743a6bdf9/rust/src/lib.rs#L3627
 fromCsl :: Csl.Mint -> Mint
 fromCsl = wrap <<< unpackMultiMapContainerToMapWith wrap
-  (Map.unions <<< map (unpackMapContainerToMapWith wrap wrap <<< clone))
+  ( foldl (Map.unionWith addTokenQuantities) Map.empty
+      <<< map (unpackMapContainerToMapWith wrap wrap <<< clone)
+  )
+  where
+  addTokenQuantities :: Int.Int -> Int.Int -> Int.Int
+  addTokenQuantities x y =
+    unsafePerformEffect $ maybe (throw "Mint.fromCsl: numeric overflow") pure $
+      Int.add x y
