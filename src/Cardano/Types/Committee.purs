@@ -6,6 +6,7 @@ module Cardano.Types.Committee
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib (unpackListContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Credential (Credential)
@@ -34,6 +35,9 @@ newtype Committee = Committee
 derive instance Generic Committee _
 derive instance Newtype Committee _
 derive instance Eq Committee
+derive instance Ord Committee
+derive newtype instance EncodeAeson Committee
+derive newtype instance DecodeAeson Committee
 
 instance Show Committee where
   show = genericShow

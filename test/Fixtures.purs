@@ -88,6 +88,7 @@ import Cardano.Types
   , ExUnitPrices(ExUnitPrices)
   , ExUnits(ExUnits)
   , GeneralTransactionMetadata(GeneralTransactionMetadata)
+  , GovernanceAction(ChangePParams)
   , Language(PlutusV2)
   , MIRPot(Reserves, Treasury)
   , MIRToStakeCredentials(MIRToStakeCredentials)
@@ -102,7 +103,7 @@ import Cardano.Types
   , PoolParams(PoolParams)
   , PoolPubKeyHash(PoolPubKeyHash)
   , ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
-  , ProtocolParamUpdate(ProtocolParamUpdate)
+  , ProtocolParamUpdate
   , ProtocolVersion(ProtocolVersion)
   , Redeemer(Redeemer)
   , RedeemerTag(Spend)
@@ -122,6 +123,7 @@ import Cardano.Types
   , Update(Update)
   , UtxoMap
   , Value(Value)
+  , VotingProposal
   , Vkey(Vkey)
   , Vkeywitness(Vkeywitness)
   )
@@ -149,7 +151,7 @@ import Data.ByteArray
 import Data.Either (hush)
 import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
-import Data.Newtype (wrap)
+import Data.Newtype (unwrap, wrap)
 import Data.Tuple (Tuple(Tuple))
 import Data.Tuple.Nested ((/\))
 import Data.UInt as UInt
@@ -237,43 +239,45 @@ proposedProtocolParameterUpdates1 = ProposedProtocolParameterUpdates $
   Map.fromFoldable
     [ ( unsafePartial $ fromJust $ decodeCbor $ wrap $ hexToByteArrayUnsafe
           "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-      ) /\
-        ProtocolParamUpdate
-          { minfeeA: Just $ Coin $ BigNum.fromInt 1
-          , minfeeB: Just $ Coin $ BigNum.fromInt 1
-          , maxBlockBodySize: Just $ UInt.fromInt 10000
-          , maxTxSize: Just $ UInt.fromInt 10000
-          , maxBlockHeaderSize: Just $ UInt.fromInt 1000
-          , keyDeposit: Just $ Coin $ BigNum.fromInt 1
-          , poolDeposit: Just $ Coin $ BigNum.fromInt 1
-          , maxEpoch: Just $ Epoch one
-          , nOpt: Just $ UInt.fromInt 1
-          , poolPledgeInfluence: Just $ UnitInterval
-              { numerator: bigNumOne, denominator: bigNumOne }
-          , expansionRate: Just $ UnitInterval
-              { numerator: bigNumOne, denominator: bigNumOne }
-          , treasuryGrowthRate: Just $ UnitInterval
-              { numerator: bigNumOne, denominator: bigNumOne }
-          , protocolVersion: Just $ ProtocolVersion
-              { major: 1, minor: 1 }
-          , minPoolCost: Just $ wrap bigNumOne
-          , adaPerUtxoByte: Just $ wrap bigNumOne
-          , costModels: Just costModelsFixture1
-          , executionCosts: Just $ ExUnitPrices
-              { memPrice: UnitInterval
-                  { numerator: bigNumOne, denominator: bigNumOne }
-              , stepPrice: UnitInterval
-                  { numerator: bigNumOne, denominator: bigNumOne }
-              }
-          , maxTxExUnits: Just $ ExUnits
-              { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
-          , maxBlockExUnits: Just $ ExUnits
-              { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
-          , maxValueSize: Just $ UInt.fromInt 1
-          , collateralPercentage: Just $ UInt.fromInt 140
-          , maxCollateralInputs: Just $ UInt.fromInt 10
-          }
+      ) /\ protocolParamUpdate1
     ]
+
+protocolParamUpdate1 :: ProtocolParamUpdate
+protocolParamUpdate1 = wrap
+  { minfeeA: Just $ Coin $ BigNum.fromInt 1
+  , minfeeB: Just $ Coin $ BigNum.fromInt 1
+  , maxBlockBodySize: Just $ UInt.fromInt 10000
+  , maxTxSize: Just $ UInt.fromInt 10000
+  , maxBlockHeaderSize: Just $ UInt.fromInt 1000
+  , keyDeposit: Just $ Coin $ BigNum.fromInt 1
+  , poolDeposit: Just $ Coin $ BigNum.fromInt 1
+  , maxEpoch: Just $ Epoch one
+  , nOpt: Just $ UInt.fromInt 1
+  , poolPledgeInfluence: Just $ UnitInterval
+      { numerator: bigNumOne, denominator: bigNumOne }
+  , expansionRate: Just $ UnitInterval
+      { numerator: bigNumOne, denominator: bigNumOne }
+  , treasuryGrowthRate: Just $ UnitInterval
+      { numerator: bigNumOne, denominator: bigNumOne }
+  , protocolVersion: Just $ ProtocolVersion
+      { major: 1, minor: 1 }
+  , minPoolCost: Just $ wrap bigNumOne
+  , adaPerUtxoByte: Just $ wrap bigNumOne
+  , costModels: Just costModelsFixture1
+  , executionCosts: Just $ ExUnitPrices
+      { memPrice: UnitInterval
+          { numerator: bigNumOne, denominator: bigNumOne }
+      , stepPrice: UnitInterval
+          { numerator: bigNumOne, denominator: bigNumOne }
+      }
+  , maxTxExUnits: Just $ ExUnits
+      { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
+  , maxBlockExUnits: Just $ ExUnits
+      { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
+  , maxValueSize: Just $ UInt.fromInt 1
+  , collateralPercentage: Just $ UInt.fromInt 140
+  , maxCollateralInputs: Just $ UInt.fromInt 10
+  }
 
 -- | Extend this for your needs.
 type SampleTxConfig =
@@ -314,6 +318,7 @@ mkSampleTx startTx changes =
             , networkId
             , collateralReturn
             , totalCollateral
+            , votingProposals
             }
         , witnessSet
         , isValid
@@ -340,6 +345,7 @@ mkSampleTx startTx changes =
             , networkId
             , collateralReturn
             , totalCollateral
+            , votingProposals
             }
         , witnessSet
         , isValid
@@ -382,6 +388,7 @@ txFixture1 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -416,6 +423,7 @@ txFixture2 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
         }
     , witnessSet: witnessSetFixture3Value
     , isValid: true
@@ -468,6 +476,7 @@ txFixture3 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -620,6 +629,7 @@ txFixture4 =
         , networkId: Just MainnetId
         , collateralReturn: Just txOutputFixture1
         , totalCollateral: Just $ Coin $ BigNum.fromInt 5_000_000
+        , votingProposals: [ votingProposalFixture1 ]
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -632,6 +642,26 @@ txFixture4 =
     , isValid: true
     , auxiliaryData: mempty
     }
+
+votingProposalFixture1 :: VotingProposal
+votingProposalFixture1 = wrap
+  { govAction:
+      ChangePParams $ wrap
+        { pparamsUpdate: protocolParamUpdate1
+        , actionId: Just $ wrap $ unwrap txInputFixture1
+        , policyHash: Just $ currencySymbol1
+        }
+  , anchor:
+      wrap
+        { url: URL "https://example.com/"
+        , dataHash:
+            unsafePartial $ fromJust $ decodeCbor $ wrap $
+              hexToByteArrayUnsafe
+                "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
+        }
+  , deposit: BigNum.fromInt 5_000_000
+  , returnAddr: rewardAddress1
+  }
 
 txFixture5 :: Transaction
 txFixture5 =
@@ -668,6 +698,7 @@ txFixture5 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -702,6 +733,7 @@ txFixture6 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -743,6 +775,7 @@ txFixture7 =
         , networkId: Nothing
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []

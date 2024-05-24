@@ -32,11 +32,13 @@ import Cardano.Serialization.Lib
   , transactionBody_setTtl
   , transactionBody_setUpdate
   , transactionBody_setValidityStartIntervalBignum
+  , transactionBody_setVotingProposals
   , transactionBody_setWithdrawals
   , transactionBody_totalCollateral
   , transactionBody_ttlBignum
   , transactionBody_update
   , transactionBody_validityStartIntervalBignum
+  , transactionBody_votingProposals
   , transactionBody_withdrawals
   , unpackListContainer
   , unpackMapContainerToMapWith
@@ -63,6 +65,8 @@ import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.Update (Update)
 import Cardano.Types.Update as Update
+import Cardano.Types.VotingProposal (VotingProposal)
+import Cardano.Types.VotingProposal as VotingProposal
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
@@ -93,6 +97,7 @@ newtype TransactionBody = TransactionBody
   , collateralReturn :: Maybe TransactionOutput
   , totalCollateral :: Maybe Coin
   , referenceInputs :: Array TransactionInput
+  , votingProposals :: Array VotingProposal
   }
 
 derive instance Newtype TransactionBody _
@@ -118,6 +123,7 @@ empty = TransactionBody
   , collateralReturn: Nothing
   , totalCollateral: Nothing
   , referenceInputs: []
+  , votingProposals: []
   }
 
 instance Ord TransactionBody where
@@ -152,6 +158,7 @@ toCsl
       , collateralReturn
       , totalCollateral
       , referenceInputs
+      , votingProposals
       }
   ) = unsafePerformEffect do
   -- inputs, outputs, fee
@@ -193,6 +200,9 @@ toCsl
   -- referenceInputs
   withNonEmptyArray (TransactionInput.toCsl <$> referenceInputs) $
     transactionBody_setReferenceInputs tb
+  -- votingProposals
+  withNonEmptyArray (VotingProposal.toCsl <$> votingProposals) $
+    transactionBody_setVotingProposals tb
   pure tb
 
 fromCsl :: Csl.TransactionBody -> TransactionBody
@@ -215,6 +225,7 @@ fromCsl tb =
     , collateralReturn
     , totalCollateral
     , referenceInputs
+    , votingProposals
     }
   where
   inputs = map TransactionInput.fromCsl $ unpackListContainer $
@@ -251,3 +262,5 @@ fromCsl tb =
     toMaybe (transactionBody_totalCollateral tb)
   referenceInputs = map TransactionInput.fromCsl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_referenceInputs tb)
+  votingProposals = map VotingProposal.fromCsl $ fromMaybe [] $ unpackListContainer <$>
+    toMaybe (transactionBody_votingProposals tb)

@@ -6,6 +6,7 @@ module Cardano.Types.GovernanceActionId
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.TransactionHash (TransactionHash)
 import Data.Generic.Rep (class Generic)
@@ -20,7 +21,10 @@ newtype GovernanceActionId = GovernanceActionId
 
 derive instance Newtype GovernanceActionId _
 derive instance Generic GovernanceActionId _
-derive newtype instance Eq GovernanceActionId
+derive instance Eq GovernanceActionId
+derive instance Ord GovernanceActionId
+derive newtype instance EncodeAeson GovernanceActionId
+derive newtype instance DecodeAeson GovernanceActionId
 
 instance Show GovernanceActionId where
   show (GovernanceActionId rec) = -- fixup unlawful UInt instance

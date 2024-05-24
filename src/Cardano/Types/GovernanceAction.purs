@@ -14,9 +14,11 @@ module Cardano.Types.GovernanceAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction)
 import Cardano.Types.HardForkInitiationAction (fromCsl, toCsl) as HardForkInitiationAction
+import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.NewConstitutionAction (NewConstitutionAction)
 import Cardano.Types.NewConstitutionAction (fromCsl, toCsl) as NewConstitutionAction
 import Cardano.Types.NoConfidenceAction (NoConfidenceAction)
@@ -28,6 +30,7 @@ import Cardano.Types.TreasuryWithdrawalsAction (fromCsl, toCsl) as TreasuryWithd
 import Cardano.Types.UpdateCommitteeAction (UpdateCommitteeAction)
 import Cardano.Types.UpdateCommitteeAction (fromCsl, toCsl) as UpdateCommitteeAction
 import Control.Alt ((<|>))
+import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromJust)
 import Data.Nullable (toMaybe)
@@ -45,6 +48,33 @@ data GovernanceAction
 
 derive instance Generic GovernanceAction _
 derive instance Eq GovernanceAction
+derive instance Ord GovernanceAction
+
+instance EncodeAeson GovernanceAction where
+  encodeAeson = case _ of
+    ChangePParams rec -> encodeTagged' "ChangePParams" rec
+    TriggerHF rec -> encodeTagged' "TriggerHF" rec
+    TreasuryWdrl rec -> encodeTagged' "TreasuryWdrl" rec
+    NoConfidence rec -> encodeTagged' "NoConfidence" rec
+    NewCommittee rec -> encodeTagged' "NewCommittee" rec
+    NewConstitution rec -> encodeTagged' "NewConstitution" rec
+    Info -> encodeAeson { tag: "Info" }
+
+instance DecodeAeson GovernanceAction where
+  decodeAeson = decodeAeson >=> \obj -> do
+    tag <- obj .: "tag"
+    let
+      aesonContents :: forall (a :: Type). DecodeAeson a => Either JsonDecodeError a
+      aesonContents = obj .: "contents"
+    case tag of
+      "ChangePParams" -> ChangePParams <$> aesonContents
+      "TriggerHF" -> TriggerHF <$> aesonContents
+      "TreasuryWdrl" -> TreasuryWdrl <$> aesonContents
+      "NoConfidence" -> NoConfidence <$> aesonContents
+      "NewCommittee" -> NewCommittee <$> aesonContents
+      "NewConstitution" -> NewConstitution <$> aesonContents
+      "Info" -> pure Info
+      _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
 
 instance Show GovernanceAction where
   show = genericShow

@@ -6,6 +6,7 @@ module Cardano.Types.Constitution
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Anchor (Anchor)
 import Cardano.Types.Anchor (fromCsl, toCsl) as Anchor
@@ -24,6 +25,9 @@ newtype Constitution = Constitution
 derive instance Generic Constitution _
 derive instance Newtype Constitution _
 derive instance Eq Constitution
+derive instance Ord Constitution
+derive newtype instance EncodeAeson Constitution
+derive newtype instance DecodeAeson Constitution
 
 instance Show Constitution where
   show = genericShow

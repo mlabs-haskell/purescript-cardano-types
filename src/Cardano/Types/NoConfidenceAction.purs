@@ -6,6 +6,7 @@ module Cardano.Types.NoConfidenceAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
@@ -22,6 +23,9 @@ newtype NoConfidenceAction = NoConfidenceAction
 derive instance Generic NoConfidenceAction _
 derive instance Newtype NoConfidenceAction _
 derive instance Eq NoConfidenceAction
+derive instance Ord NoConfidenceAction
+derive newtype instance EncodeAeson NoConfidenceAction
+derive newtype instance DecodeAeson NoConfidenceAction
 
 instance Show NoConfidenceAction where
   show = genericShow

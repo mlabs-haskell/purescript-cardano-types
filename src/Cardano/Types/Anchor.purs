@@ -6,6 +6,7 @@ module Cardano.Types.Anchor
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AnchorDataHash (AnchorDataHash)
 import Cardano.Types.URL (URL)
@@ -22,6 +23,9 @@ newtype Anchor = Anchor
 derive instance Generic Anchor _
 derive instance Newtype Anchor _
 derive instance Eq Anchor
+derive instance Ord Anchor
+derive newtype instance EncodeAeson Anchor
+derive newtype instance DecodeAeson Anchor
 
 instance Show Anchor where
   show = genericShow

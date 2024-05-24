@@ -6,6 +6,7 @@ module Cardano.Types.HardForkInitiationAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
@@ -29,6 +30,9 @@ newtype HardForkInitiationAction = HardForkInitiationAction
 derive instance Generic HardForkInitiationAction _
 derive instance Newtype HardForkInitiationAction _
 derive instance Eq HardForkInitiationAction
+derive instance Ord HardForkInitiationAction
+derive newtype instance EncodeAeson HardForkInitiationAction
+derive newtype instance DecodeAeson HardForkInitiationAction
 
 instance Show HardForkInitiationAction where
   show = genericShow

@@ -6,6 +6,7 @@ module Cardano.Types.NewConstitutionAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Constitution (Constitution)
 import Cardano.Types.Constitution (fromCsl, toCsl) as Constitution
@@ -25,6 +26,9 @@ newtype NewConstitutionAction = NewConstitutionAction
 derive instance Generic NewConstitutionAction _
 derive instance Newtype NewConstitutionAction _
 derive instance Eq NewConstitutionAction
+derive instance Ord NewConstitutionAction
+derive newtype instance EncodeAeson NewConstitutionAction
+derive newtype instance DecodeAeson NewConstitutionAction
 
 instance Show NewConstitutionAction where
   show = genericShow

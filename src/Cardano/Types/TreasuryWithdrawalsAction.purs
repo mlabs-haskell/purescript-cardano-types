@@ -6,6 +6,7 @@ module Cardano.Types.TreasuryWithdrawalsAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.RewardAddress (RewardAddress)
@@ -28,6 +29,9 @@ newtype TreasuryWithdrawalsAction = TreasuryWithdrawalsAction
 derive instance Generic TreasuryWithdrawalsAction _
 derive instance Newtype TreasuryWithdrawalsAction _
 derive instance Eq TreasuryWithdrawalsAction
+derive instance Ord TreasuryWithdrawalsAction
+derive newtype instance EncodeAeson TreasuryWithdrawalsAction
+derive newtype instance DecodeAeson TreasuryWithdrawalsAction
 
 instance Show TreasuryWithdrawalsAction where
   show = genericShow

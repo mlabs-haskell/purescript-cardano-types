@@ -6,6 +6,7 @@ module Cardano.Types.ParameterChangeAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
@@ -32,6 +33,9 @@ newtype ParameterChangeAction = ParameterChangeAction
 derive instance Generic ParameterChangeAction _
 derive instance Newtype ParameterChangeAction _
 derive instance Eq ParameterChangeAction
+derive instance Ord ParameterChangeAction
+derive newtype instance EncodeAeson ParameterChangeAction
+derive newtype instance DecodeAeson ParameterChangeAction
 
 instance Show ParameterChangeAction where
   show = genericShow

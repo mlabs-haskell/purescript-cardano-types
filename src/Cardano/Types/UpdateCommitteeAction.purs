@@ -6,6 +6,7 @@ module Cardano.Types.UpdateCommitteeAction
 
 import Prelude
 
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib (packListContainer, unpackListContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Committee (Committee)
@@ -29,6 +30,9 @@ newtype UpdateCommitteeAction = UpdateCommitteeAction
 derive instance Generic UpdateCommitteeAction _
 derive instance Newtype UpdateCommitteeAction _
 derive instance Eq UpdateCommitteeAction
+derive instance Ord UpdateCommitteeAction
+derive newtype instance EncodeAeson UpdateCommitteeAction
+derive newtype instance DecodeAeson UpdateCommitteeAction
 
 instance Show UpdateCommitteeAction where
   show = genericShow

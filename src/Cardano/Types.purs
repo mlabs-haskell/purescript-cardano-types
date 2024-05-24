@@ -11,6 +11,8 @@ import Cardano.Types.Address
       , PointerAddress
       )
   ) as X
+import Cardano.Types.Anchor (Anchor(Anchor)) as X
+import Cardano.Types.AnchorDataHash (AnchorDataHash(AnchorDataHash)) as X
 import Cardano.Types.AssetClass (AssetClass(AssetClass)) as X
 import Cardano.Types.AssetName (AssetName(AssetName)) as X
 import Cardano.Types.Asset (Asset(Asset)) as X
@@ -36,6 +38,8 @@ import Cardano.Types.Certificate
       )
   ) as X
 import Cardano.Types.Coin (Coin(Coin)) as X
+import Cardano.Types.Committee (Committee(Committee)) as X
+import Cardano.Types.Constitution (Constitution(Constitution)) as X
 import Cardano.Types.CostModel (CostModel(CostModel)) as X
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential)) as X
 import Cardano.Types.DataHash (DataHash(DataHash)) as X
@@ -48,11 +52,24 @@ import Cardano.Types.ExUnits (ExUnits(ExUnits)) as X
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata(GeneralTransactionMetadata)) as X
 import Cardano.Types.GenesisDelegateHash (GenesisDelegateHash(GenesisDelegateHash)) as X
 import Cardano.Types.GenesisHash (GenesisHash(GenesisHash)) as X
+import Cardano.Types.GovernanceAction
+  ( GovernanceAction
+      ( ChangePParams
+      , TriggerHF
+      , TreasuryWdrl
+      , NoConfidence
+      , NewCommittee
+      , NewConstitution
+      , Info
+      )
+  ) as X
+import Cardano.Types.GovernanceActionId (GovernanceActionId(GovernanceActionId)) as X
+import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction(HardForkInitiationAction)) as X
 -- Commented out, because it conflicts with Prim.Int
 -- import Cardano.Types.Int (Int(Int)) as X
 import Cardano.Types.Ipv4 (Ipv4(Ipv4)) as X
 import Cardano.Types.Ipv6 (Ipv6(Ipv6)) as X
-import Cardano.Types.Language (Language(PlutusV1, PlutusV2)) as X
+import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3)) as X
 import Cardano.Types.Mint (Mint) as X
 import Cardano.Types.MIRPot (MIRPot(Reserves, Treasury)) as X
 import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials(MIRToStakeCredentials)) as X
@@ -69,7 +86,10 @@ import Cardano.Types.NativeScript
       )
   ) as X
 import Cardano.Types.NetworkId (NetworkId(TestnetId, MainnetId)) as X
+import Cardano.Types.NewConstitutionAction (NewConstitutionAction(NewConstitutionAction)) as X
+import Cardano.Types.NoConfidenceAction (NoConfidenceAction(NoConfidenceAction)) as X
 import Cardano.Types.OutputDatum (OutputDatum(OutputDatum, OutputDatumHash)) as X
+import Cardano.Types.ParameterChangeAction (ParameterChangeAction(ParameterChangeAction)) as X
 import Cardano.Types.PaymentCredential (PaymentCredential(PaymentCredential)) as X
 import Cardano.Types.PaymentPubKeyHash (PaymentPubKeyHash(PaymentPubKeyHash)) as X
 import Cardano.Types.PlutusData
@@ -100,6 +120,8 @@ import Cardano.Types.RedeemerTag
       , Mint
       , Cert
       , Reward
+      , Vote
+      , Propose
       )
   ) as X
 import Cardano.Types.Relay (Relay(SingleHostAddr, SingleHostName, MultiHostName)) as X
@@ -118,11 +140,14 @@ import Cardano.Types.TransactionOutput (TransactionOutput(TransactionOutput)) as
 import Cardano.Types.Transaction (Transaction(Transaction)) as X
 import Cardano.Types.TransactionUnspentOutput (TransactionUnspentOutput(TransactionUnspentOutput)) as X
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet(TransactionWitnessSet)) as X
+import Cardano.Types.TreasuryWithdrawalsAction (TreasuryWithdrawalsAction(TreasuryWithdrawalsAction)) as X
 import Cardano.Types.UnitInterval (UnitInterval(UnitInterval)) as X
 import Cardano.Types.Update (Update(Update)) as X
+import Cardano.Types.UpdateCommitteeAction (UpdateCommitteeAction(UpdateCommitteeAction)) as X
 import Cardano.Types.URL (URL(URL)) as X
 import Cardano.Types.UtxoMap (UtxoMap) as X
 import Cardano.Types.Value (Value(Value)) as X
+import Cardano.Types.VotingProposal (VotingProposal(VotingProposal)) as X
 import Cardano.Types.Vkey (Vkey(Vkey)) as X
 import Cardano.Types.Vkeywitness (Vkeywitness(Vkeywitness)) as X
 import Cardano.Types.VRFKeyHash (VRFKeyHash(VRFKeyHash)) as X
