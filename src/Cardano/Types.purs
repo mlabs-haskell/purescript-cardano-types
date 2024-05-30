@@ -147,6 +147,10 @@ import Cardano.Types.UpdateCommitteeAction (UpdateCommitteeAction(UpdateCommitte
 import Cardano.Types.URL (URL(URL)) as X
 import Cardano.Types.UtxoMap (UtxoMap) as X
 import Cardano.Types.Value (Value(Value)) as X
+import Cardano.Types.Vote (Vote(VoteNo, VoteYes, VoteAbstain)) as X
+import Cardano.Types.Voter (Voter(Cc, Drep, Spo)) as X
+import Cardano.Types.VotingProcedure (VotingProcedure(VotingProcedure)) as X
+import Cardano.Types.VotingProcedures (VotingProcedures(VotingProcedures)) as X
 import Cardano.Types.VotingProposal (VotingProposal(VotingProposal)) as X
 import Cardano.Types.Vkey (Vkey(Vkey)) as X
 import Cardano.Types.Vkeywitness (Vkeywitness(Vkeywitness)) as X

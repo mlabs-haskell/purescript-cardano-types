@@ -78,55 +78,7 @@ import Prelude
 
 import Aeson (decodeAeson, fromString)
 import Cardano.AsCbor (decodeCbor)
-import Cardano.Types
-  ( AuxiliaryData(AuxiliaryData)
-  , Certificate(StakeRegistration, StakeDeregistration, StakeDelegation, PoolRegistration, PoolRetirement, GenesisKeyDelegation, MoveInstantaneousRewardsCert)
-  , Coin(Coin)
-  , Credential(PubKeyHashCredential)
-  , Ed25519KeyHash
-  , Epoch(Epoch)
-  , ExUnitPrices(ExUnitPrices)
-  , ExUnits(ExUnits)
-  , GeneralTransactionMetadata(GeneralTransactionMetadata)
-  , GovernanceAction(ChangePParams)
-  , Language(PlutusV2)
-  , MIRPot(Reserves, Treasury)
-  , MIRToStakeCredentials(MIRToStakeCredentials)
-  , MoveInstantaneousReward(ToOtherPot, ToStakeCreds)
-  , NativeScript(TimelockExpiry, TimelockStart, ScriptNOfK, ScriptAny, ScriptAll, ScriptPubkey)
-  , NetworkId(TestnetId, MainnetId)
-  , OutputDatum(OutputDatum)
-  , PaymentPubKeyHash(PaymentPubKeyHash)
-  , PlutusData(Integer, Bytes, Constr, List, Map)
-  , PlutusScript(PlutusScript)
-  , PoolMetadata(PoolMetadata)
-  , PoolParams(PoolParams)
-  , PoolPubKeyHash(PoolPubKeyHash)
-  , ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
-  , ProtocolParamUpdate
-  , ProtocolVersion(ProtocolVersion)
-  , Redeemer(Redeemer)
-  , RedeemerTag(Spend)
-  , Relay(SingleHostAddr, SingleHostName, MultiHostName)
-  , RewardAddress
-  , ScriptHash
-  , ScriptRef(NativeScriptRef)
-  , Slot(Slot)
-  , Transaction(Transaction)
-  , TransactionBody(TransactionBody)
-  , TransactionInput(TransactionInput)
-  , TransactionOutput(TransactionOutput)
-  , TransactionUnspentOutput(TransactionUnspentOutput)
-  , TransactionWitnessSet(TransactionWitnessSet)
-  , URL(URL)
-  , UnitInterval(UnitInterval)
-  , Update(Update)
-  , UtxoMap
-  , Value(Value)
-  , VotingProposal
-  , Vkey(Vkey)
-  , Vkeywitness(Vkeywitness)
-  )
+import Cardano.Types (AuxiliaryData(AuxiliaryData), Certificate(StakeRegistration, StakeDeregistration, StakeDelegation, PoolRegistration, PoolRetirement, GenesisKeyDelegation, MoveInstantaneousRewardsCert), Coin(Coin), Credential(PubKeyHashCredential), Ed25519KeyHash, Epoch(Epoch), ExUnitPrices(ExUnitPrices), ExUnits(ExUnits), GeneralTransactionMetadata(GeneralTransactionMetadata), GovernanceAction(ChangePParams), Language(PlutusV2), MIRPot(Reserves, Treasury), MIRToStakeCredentials(MIRToStakeCredentials), MoveInstantaneousReward(ToOtherPot, ToStakeCreds), NativeScript(TimelockExpiry, TimelockStart, ScriptNOfK, ScriptAny, ScriptAll, ScriptPubkey), NetworkId(TestnetId, MainnetId), OutputDatum(OutputDatum), PaymentPubKeyHash(PaymentPubKeyHash), PlutusData(Integer, Bytes, Constr, List, Map), PlutusScript(PlutusScript), PoolMetadata(PoolMetadata), PoolParams(PoolParams), PoolPubKeyHash(PoolPubKeyHash), ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates), ProtocolParamUpdate, ProtocolVersion(ProtocolVersion), Redeemer(Redeemer), RedeemerTag(Spend), Relay(SingleHostAddr, SingleHostName, MultiHostName), RewardAddress, ScriptHash, ScriptRef(NativeScriptRef), Slot(Slot), Transaction(Transaction), TransactionBody(TransactionBody), TransactionInput(TransactionInput), TransactionOutput(TransactionOutput), TransactionUnspentOutput(TransactionUnspentOutput), TransactionWitnessSet(TransactionWitnessSet), URL(URL), UnitInterval(UnitInterval), Update(Update), UtxoMap, Value(Value), VotingProposal, Vkey(Vkey), Vkeywitness(Vkeywitness))
 import Cardano.Types.Address (Address(BaseAddress))
 import Cardano.Types.AssetName (AssetName, mkAssetName)
 import Cardano.Types.Bech32String (Bech32String)
@@ -141,13 +93,9 @@ import Cardano.Types.PlutusScript (plutusV1Script, plutusV2Script)
 import Cardano.Types.PublicKey as PublicKey
 import Cardano.Types.ScriptRef (ScriptRef(PlutusScriptRef))
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum(Text))
+import Cardano.Types.VotingProcedures (empty) as VotingProcedures
 import Data.Array as Array
-import Data.ByteArray
-  ( ByteArray
-  , byteArrayFromIntArrayUnsafe
-  , hexToByteArray
-  , hexToByteArrayUnsafe
-  )
+import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, hexToByteArray, hexToByteArrayUnsafe)
 import Data.Either (hush)
 import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
@@ -319,6 +267,7 @@ mkSampleTx startTx changes =
             , collateralReturn
             , totalCollateral
             , votingProposals
+            , votingProcedures
             }
         , witnessSet
         , isValid
@@ -346,6 +295,7 @@ mkSampleTx startTx changes =
             , collateralReturn
             , totalCollateral
             , votingProposals
+            , votingProcedures
             }
         , witnessSet
         , isValid
@@ -389,6 +339,7 @@ txFixture1 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -424,6 +375,7 @@ txFixture2 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: witnessSetFixture3Value
     , isValid: true
@@ -477,6 +429,7 @@ txFixture3 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -630,6 +583,7 @@ txFixture4 =
         , collateralReturn: Just txOutputFixture1
         , totalCollateral: Just $ Coin $ BigNum.fromInt 5_000_000
         , votingProposals: [ votingProposalFixture1 ]
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -699,6 +653,7 @@ txFixture5 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -734,6 +689,7 @@ txFixture6 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -776,6 +732,7 @@ txFixture7 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
+        , votingProcedures: VotingProcedures.empty
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []

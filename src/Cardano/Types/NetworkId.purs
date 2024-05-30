@@ -8,14 +8,7 @@ module Cardano.Types.NetworkId
 
 import Prelude
 
-import Aeson
-  ( class DecodeAeson
-  , class EncodeAeson
-  , JsonDecodeError(UnexpectedValue, AtKey, Named)
-  , decodeAeson
-  , fromString
-  , toStringifiedNumbersJson
-  )
+import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(UnexpectedValue, AtKey, Named), decodeAeson, fromString, toStringifiedNumbersJson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
@@ -25,8 +18,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Newtype (unwrap, wrap)
 import Data.Show.Generic (genericShow)
-import Test.QuickCheck.Arbitrary (class Arbitrary)
-import Test.QuickCheck.Gen (elements)
+import Test.QuickCheck.Arbitrary (class Arbitrary, genericArbitrary)
 
 data NetworkId
   = TestnetId
@@ -62,7 +54,7 @@ instance AsCbor NetworkId where
   decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 instance Arbitrary NetworkId where
-  arbitrary = elements $ cons' TestnetId [ MainnetId ]
+  arbitrary = genericArbitrary
 
 toInt :: NetworkId -> Int
 toInt = case _ of

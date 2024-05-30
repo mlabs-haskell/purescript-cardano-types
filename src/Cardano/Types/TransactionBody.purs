@@ -3,46 +3,7 @@ module Cardano.Types.TransactionBody where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.Serialization.Lib
-  ( packListContainer
-  , packMapContainer
-  , transactionBody_auxiliaryDataHash
-  , transactionBody_certs
-  , transactionBody_collateral
-  , transactionBody_collateralReturn
-  , transactionBody_fee
-  , transactionBody_inputs
-  , transactionBody_mint
-  , transactionBody_networkId
-  , transactionBody_newTxBody
-  , transactionBody_outputs
-  , transactionBody_referenceInputs
-  , transactionBody_requiredSigners
-  , transactionBody_scriptDataHash
-  , transactionBody_setAuxiliaryDataHash
-  , transactionBody_setCerts
-  , transactionBody_setCollateral
-  , transactionBody_setCollateralReturn
-  , transactionBody_setMint
-  , transactionBody_setNetworkId
-  , transactionBody_setReferenceInputs
-  , transactionBody_setRequiredSigners
-  , transactionBody_setScriptDataHash
-  , transactionBody_setTotalCollateral
-  , transactionBody_setTtl
-  , transactionBody_setUpdate
-  , transactionBody_setValidityStartIntervalBignum
-  , transactionBody_setVotingProposals
-  , transactionBody_setWithdrawals
-  , transactionBody_totalCollateral
-  , transactionBody_ttlBignum
-  , transactionBody_update
-  , transactionBody_validityStartIntervalBignum
-  , transactionBody_votingProposals
-  , transactionBody_withdrawals
-  , unpackListContainer
-  , unpackMapContainerToMapWith
-  )
+import Cardano.Serialization.Lib (packListContainer, packMapContainer, transactionBody_auxiliaryDataHash, transactionBody_certs, transactionBody_collateral, transactionBody_collateralReturn, transactionBody_fee, transactionBody_inputs, transactionBody_mint, transactionBody_networkId, transactionBody_newTxBody, transactionBody_outputs, transactionBody_referenceInputs, transactionBody_requiredSigners, transactionBody_scriptDataHash, transactionBody_setAuxiliaryDataHash, transactionBody_setCerts, transactionBody_setCollateral, transactionBody_setCollateralReturn, transactionBody_setMint, transactionBody_setNetworkId, transactionBody_setReferenceInputs, transactionBody_setRequiredSigners, transactionBody_setScriptDataHash, transactionBody_setTotalCollateral, transactionBody_setTtl, transactionBody_setUpdate, transactionBody_setValidityStartIntervalBignum, transactionBody_setVotingProcedures, transactionBody_setVotingProposals, transactionBody_setWithdrawals, transactionBody_totalCollateral, transactionBody_ttlBignum, transactionBody_update, transactionBody_validityStartIntervalBignum, transactionBody_votingProcedures, transactionBody_votingProposals, transactionBody_withdrawals, unpackListContainer, unpackMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.Certificate (Certificate)
@@ -65,13 +26,15 @@ import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.Update (Update)
 import Cardano.Types.Update as Update
+import Cardano.Types.VotingProcedures (VotingProcedures)
+import Cardano.Types.VotingProcedures (empty, fromCsl, toCsl) as VotingProcedures
 import Cardano.Types.VotingProposal (VotingProposal)
 import Cardano.Types.VotingProposal as VotingProposal
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(Nothing), fromMaybe)
+import Data.Maybe (Maybe(Nothing), fromMaybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Profunctor.Strong ((***))
@@ -98,6 +61,7 @@ newtype TransactionBody = TransactionBody
   , totalCollateral :: Maybe Coin
   , referenceInputs :: Array TransactionInput
   , votingProposals :: Array VotingProposal
+  , votingProcedures :: VotingProcedures
   }
 
 derive instance Newtype TransactionBody _
@@ -124,6 +88,7 @@ empty = TransactionBody
   , totalCollateral: Nothing
   , referenceInputs: []
   , votingProposals: []
+  , votingProcedures: VotingProcedures.empty
   }
 
 instance Ord TransactionBody where
@@ -159,6 +124,7 @@ toCsl
       , totalCollateral
       , referenceInputs
       , votingProposals
+      , votingProcedures
       }
   ) = unsafePerformEffect do
   -- inputs, outputs, fee
@@ -203,6 +169,9 @@ toCsl
   -- votingProposals
   withNonEmptyArray (VotingProposal.toCsl <$> votingProposals) $
     transactionBody_setVotingProposals tb
+  -- votingProcedures
+  when (votingProcedures /= VotingProcedures.empty) do
+    transactionBody_setVotingProcedures tb $ VotingProcedures.toCsl votingProcedures
   pure tb
 
 fromCsl :: Csl.TransactionBody -> TransactionBody
@@ -226,6 +195,7 @@ fromCsl tb =
     , totalCollateral
     , referenceInputs
     , votingProposals
+    , votingProcedures
     }
   where
   inputs = map TransactionInput.fromCsl $ unpackListContainer $
@@ -264,3 +234,6 @@ fromCsl tb =
     toMaybe (transactionBody_referenceInputs tb)
   votingProposals = map VotingProposal.fromCsl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_votingProposals tb)
+  votingProcedures =
+    toMaybe (transactionBody_votingProcedures tb) #
+      maybe VotingProcedures.empty VotingProcedures.fromCsl
