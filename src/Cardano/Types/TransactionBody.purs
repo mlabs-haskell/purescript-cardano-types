@@ -10,6 +10,8 @@ import Cardano.Serialization.Lib
   , transactionBody_certs
   , transactionBody_collateral
   , transactionBody_collateralReturn
+  , transactionBody_currentTreasuryValue
+  , transactionBody_donation
   , transactionBody_fee
   , transactionBody_inputs
   , transactionBody_mint
@@ -23,6 +25,8 @@ import Cardano.Serialization.Lib
   , transactionBody_setCerts
   , transactionBody_setCollateral
   , transactionBody_setCollateralReturn
+  , transactionBody_setCurrentTreasuryValue
+  , transactionBody_setDonation
   , transactionBody_setMint
   , transactionBody_setNetworkId
   , transactionBody_setReferenceInputs
@@ -103,6 +107,8 @@ newtype TransactionBody = TransactionBody
   , referenceInputs :: Array TransactionInput
   , votingProposals :: Array VotingProposal
   , votingProcedures :: VotingProcedures
+  , currentTreasuryValue :: Maybe Coin
+  , donation :: Maybe Coin
   }
 
 derive instance Newtype TransactionBody _
@@ -130,6 +136,8 @@ empty = TransactionBody
   , referenceInputs: []
   , votingProposals: []
   , votingProcedures: VotingProcedures.empty
+  , currentTreasuryValue: Nothing
+  , donation: Nothing
   }
 
 instance Ord TransactionBody where
@@ -166,6 +174,8 @@ toCsl
       , referenceInputs
       , votingProposals
       , votingProcedures
+      , currentTreasuryValue
+      , donation
       }
   ) = unsafePerformEffect do
   -- inputs, outputs, fee
@@ -213,6 +223,10 @@ toCsl
   -- votingProcedures
   when (votingProcedures /= VotingProcedures.empty) do
     transactionBody_setVotingProcedures tb $ VotingProcedures.toCsl votingProcedures
+  -- currentTreasuryValue
+  for_ currentTreasuryValue $ transactionBody_setCurrentTreasuryValue tb <<< unwrap <<< unwrap
+  -- donation
+  for_ donation $ transactionBody_setDonation tb <<< unwrap <<< unwrap
   pure tb
 
 fromCsl :: Csl.TransactionBody -> TransactionBody
@@ -237,6 +251,8 @@ fromCsl tb =
     , referenceInputs
     , votingProposals
     , votingProcedures
+    , currentTreasuryValue
+    , donation
     }
   where
   inputs = map TransactionInput.fromCsl $ unpackListContainer $
@@ -275,6 +291,9 @@ fromCsl tb =
     toMaybe (transactionBody_referenceInputs tb)
   votingProposals = map VotingProposal.fromCsl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_votingProposals tb)
-  votingProcedures =
-    toMaybe (transactionBody_votingProcedures tb) #
-      maybe VotingProcedures.empty VotingProcedures.fromCsl
+  votingProcedures = maybe VotingProcedures.empty VotingProcedures.fromCsl $
+    toMaybe (transactionBody_votingProcedures tb)
+  currentTreasuryValue = wrap <<< wrap <$>
+    toMaybe (transactionBody_currentTreasuryValue tb)
+  donation = wrap <<< wrap <$>
+    toMaybe (transactionBody_donation tb)

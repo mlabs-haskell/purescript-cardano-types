@@ -324,6 +324,8 @@ mkSampleTx startTx changes =
             , totalCollateral
             , votingProposals
             , votingProcedures
+            , currentTreasuryValue
+            , donation
             }
         , witnessSet
         , isValid
@@ -352,6 +354,8 @@ mkSampleTx startTx changes =
             , totalCollateral
             , votingProposals
             , votingProcedures
+            , currentTreasuryValue
+            , donation
             }
         , witnessSet
         , isValid
@@ -404,6 +408,8 @@ txFixture1 =
         , totalCollateral: Nothing
         , votingProposals: []
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -440,6 +446,8 @@ txFixture2 =
         , totalCollateral: Nothing
         , votingProposals: []
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: witnessSetFixture3Value
     , isValid: true
@@ -494,6 +502,8 @@ txFixture3 =
         , totalCollateral: Nothing
         , votingProposals: []
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -648,6 +658,8 @@ txFixture4 =
         , totalCollateral: Just $ Coin $ BigNum.fromInt 5_000_000
         , votingProposals: [ votingProposalFixture1 ]
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -718,6 +730,8 @@ txFixture5 =
         , totalCollateral: Nothing
         , votingProposals: []
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -754,6 +768,8 @@ txFixture6 =
         , totalCollateral: Nothing
         , votingProposals: []
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -797,6 +813,8 @@ txFixture7 =
         , totalCollateral: Nothing
         , votingProposals: []
         , votingProcedures: VotingProcedures.empty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
