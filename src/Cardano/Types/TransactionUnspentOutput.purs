@@ -10,7 +10,11 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (transactionUnspentOutput_input, transactionUnspentOutput_new, transactionUnspentOutput_output)
+import Cardano.Serialization.Lib
+  ( transactionUnspentOutput_input
+  , transactionUnspentOutput_new
+  , transactionUnspentOutput_output
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.TransactionInput (TransactionInput)
 import Cardano.Types.TransactionInput as TransactionInput

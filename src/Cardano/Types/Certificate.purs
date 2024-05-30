@@ -3,6 +3,7 @@ module Cardano.Types.Certificate where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( certificate_asGenesisKeyDelegation
   , certificate_asMoveInstantaneousRewardsCert
@@ -37,10 +38,9 @@ import Cardano.Serialization.Lib
   , stakeRegistration_new
   , stakeRegistration_stakeCredential
   )
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.Credential as Credential
+import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.GenesisDelegateHash (GenesisDelegateHash)
 import Cardano.Types.GenesisHash (GenesisHash)
 import Cardano.Types.MoveInstantaneousReward (MoveInstantaneousReward)

@@ -2,9 +2,24 @@ module Cardano.Types.ScriptRef where
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(UnexpectedValue), decodeAeson, fromString, toStringifiedNumbersJson, (.:))
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(UnexpectedValue)
+  , decodeAeson
+  , fromString
+  , toStringifiedNumbersJson
+  , (.:)
+  )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (fromBytes, scriptRef_nativeScript, scriptRef_newNativeScript, scriptRef_newPlutusScript, scriptRef_plutusScript, toBytes)
+import Cardano.Serialization.Lib
+  ( fromBytes
+  , scriptRef_nativeScript
+  , scriptRef_newNativeScript
+  , scriptRef_newPlutusScript
+  , scriptRef_plutusScript
+  , toBytes
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.NativeScript (NativeScript)

@@ -3,7 +3,48 @@ module Cardano.Types.TransactionBody where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.Serialization.Lib (packListContainer, packMapContainer, transactionBody_auxiliaryDataHash, transactionBody_certs, transactionBody_collateral, transactionBody_collateralReturn, transactionBody_fee, transactionBody_inputs, transactionBody_mint, transactionBody_networkId, transactionBody_newTxBody, transactionBody_outputs, transactionBody_referenceInputs, transactionBody_requiredSigners, transactionBody_scriptDataHash, transactionBody_setAuxiliaryDataHash, transactionBody_setCerts, transactionBody_setCollateral, transactionBody_setCollateralReturn, transactionBody_setMint, transactionBody_setNetworkId, transactionBody_setReferenceInputs, transactionBody_setRequiredSigners, transactionBody_setScriptDataHash, transactionBody_setTotalCollateral, transactionBody_setTtl, transactionBody_setUpdate, transactionBody_setValidityStartIntervalBignum, transactionBody_setVotingProcedures, transactionBody_setVotingProposals, transactionBody_setWithdrawals, transactionBody_totalCollateral, transactionBody_ttlBignum, transactionBody_update, transactionBody_validityStartIntervalBignum, transactionBody_votingProcedures, transactionBody_votingProposals, transactionBody_withdrawals, unpackListContainer, unpackMapContainerToMapWith)
+import Cardano.Serialization.Lib
+  ( packListContainer
+  , packMapContainer
+  , transactionBody_auxiliaryDataHash
+  , transactionBody_certs
+  , transactionBody_collateral
+  , transactionBody_collateralReturn
+  , transactionBody_fee
+  , transactionBody_inputs
+  , transactionBody_mint
+  , transactionBody_networkId
+  , transactionBody_newTxBody
+  , transactionBody_outputs
+  , transactionBody_referenceInputs
+  , transactionBody_requiredSigners
+  , transactionBody_scriptDataHash
+  , transactionBody_setAuxiliaryDataHash
+  , transactionBody_setCerts
+  , transactionBody_setCollateral
+  , transactionBody_setCollateralReturn
+  , transactionBody_setMint
+  , transactionBody_setNetworkId
+  , transactionBody_setReferenceInputs
+  , transactionBody_setRequiredSigners
+  , transactionBody_setScriptDataHash
+  , transactionBody_setTotalCollateral
+  , transactionBody_setTtl
+  , transactionBody_setUpdate
+  , transactionBody_setValidityStartIntervalBignum
+  , transactionBody_setVotingProcedures
+  , transactionBody_setVotingProposals
+  , transactionBody_setWithdrawals
+  , transactionBody_totalCollateral
+  , transactionBody_ttlBignum
+  , transactionBody_update
+  , transactionBody_validityStartIntervalBignum
+  , transactionBody_votingProcedures
+  , transactionBody_votingProposals
+  , transactionBody_withdrawals
+  , unpackListContainer
+  , unpackMapContainerToMapWith
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.Certificate (Certificate)

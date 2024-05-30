@@ -24,7 +24,6 @@ import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
-
 import Data.Show.Generic (genericShow)
 
 newtype PoolMetadataHash = PoolMetadataHash Csl.PoolMetadataHash

@@ -12,11 +12,11 @@ import Cardano.Serialization.Lib
   , rewardAddress_toAddress
   )
 import Cardano.Serialization.Lib as Csl
+import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Credential as Credential
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId
 import Cardano.Types.StakeCredential (StakeCredential)
-import Cardano.Types.Bech32String (Bech32String)
 import Data.Int as Int
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (unwrap, wrap)

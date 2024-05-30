@@ -57,11 +57,11 @@ import Cardano.Serialization.Lib
   , unpackMapContainerToMapWith
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.CostModel (CostModel)
 import Cardano.Types.CostModel as CostModel
 import Cardano.Types.CostModel as CostModels
+import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.ExUnitPrices (ExUnitPrices)
 import Cardano.Types.ExUnitPrices as ExUnitPrices
 import Cardano.Types.ExUnits (ExUnits)

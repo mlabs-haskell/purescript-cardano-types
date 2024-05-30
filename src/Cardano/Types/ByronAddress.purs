@@ -44,7 +44,8 @@ derive newtype instance EncodeAeson ByronAddress
 derive newtype instance DecodeAeson ByronAddress
 
 instance Arbitrary ByronAddress where
-  arbitrary = pure $ unsafePartial $ fromJust $ fromBase58 "37btjrVyb4KDXBNC4haBVPCrro8AQPHwvCMp3RFhhSVWwfFmZ6wwzSK6JK1hY6wHNmtrpTf1kdbva8TCneM2YsiXT7mrzT21EacHnPpz5YyUdj64na"
+  arbitrary = pure $ unsafePartial $ fromJust $ fromBase58
+    "37btjrVyb4KDXBNC4haBVPCrro8AQPHwvCMp3RFhhSVWwfFmZ6wwzSK6JK1hY6wHNmtrpTf1kdbva8TCneM2YsiXT7mrzT21EacHnPpz5YyUdj64na"
 
 fromBase58 :: Base58String -> Maybe ByronAddress
 fromBase58 = map wrap <<< toMaybe <<< byronAddress_fromBase58

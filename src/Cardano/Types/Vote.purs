@@ -6,8 +6,15 @@ module Cardano.Types.Vote
 
 import Prelude
 
-import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(UnexpectedValue), decodeAeson, encodeAeson, fromString, toStringifiedNumbersJson)
-import Cardano.AsCbor (class AsCbor)
+import Aeson
+  ( class DecodeAeson
+  , class EncodeAeson
+  , JsonDecodeError(UnexpectedValue)
+  , decodeAeson
+  , encodeAeson
+  , fromString
+  , toStringifiedNumbersJson
+  )
 import Cardano.Serialization.Lib as Csl
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)

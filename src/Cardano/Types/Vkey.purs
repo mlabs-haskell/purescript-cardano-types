@@ -7,7 +7,7 @@ import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.PublicKey (PublicKey(PublicKey))
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype, wrap, unwrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
 newtype Vkey = Vkey PublicKey
