@@ -11,9 +11,15 @@ import Cardano.Serialization.Lib
   ( packMapContainer
   , protocolParamUpdate_adaPerUtxoByte
   , protocolParamUpdate_collateralPercentage
+  , protocolParamUpdate_committeeTermLimit
   , protocolParamUpdate_costModels
+  , protocolParamUpdate_drepDeposit
+  , protocolParamUpdate_drepInactivityPeriod
+  , protocolParamUpdate_drepVotingThresholds
   , protocolParamUpdate_executionCosts
   , protocolParamUpdate_expansionRate
+  , protocolParamUpdate_governanceActionDeposit
+  , protocolParamUpdate_governanceActionValidityPeriod
   , protocolParamUpdate_keyDeposit
   , protocolParamUpdate_maxBlockBodySize
   , protocolParamUpdate_maxBlockExUnits
@@ -23,6 +29,7 @@ import Cardano.Serialization.Lib
   , protocolParamUpdate_maxTxExUnits
   , protocolParamUpdate_maxTxSize
   , protocolParamUpdate_maxValueSize
+  , protocolParamUpdate_minCommitteeSize
   , protocolParamUpdate_minPoolCost
   , protocolParamUpdate_minfeeA
   , protocolParamUpdate_minfeeB
@@ -30,12 +37,20 @@ import Cardano.Serialization.Lib
   , protocolParamUpdate_new
   , protocolParamUpdate_poolDeposit
   , protocolParamUpdate_poolPledgeInfluence
+  , protocolParamUpdate_poolVotingThresholds
   , protocolParamUpdate_protocolVersion
+  , protocolParamUpdate_refScriptCoinsPerByte
   , protocolParamUpdate_setAdaPerUtxoByte
   , protocolParamUpdate_setCollateralPercentage
+  , protocolParamUpdate_setCommitteeTermLimit
   , protocolParamUpdate_setCostModels
+  , protocolParamUpdate_setDrepDeposit
+  , protocolParamUpdate_setDrepInactivityPeriod
+  , protocolParamUpdate_setDrepVotingThresholds
   , protocolParamUpdate_setExecutionCosts
   , protocolParamUpdate_setExpansionRate
+  , protocolParamUpdate_setGovernanceActionDeposit
+  , protocolParamUpdate_setGovernanceActionValidityPeriod
   , protocolParamUpdate_setKeyDeposit
   , protocolParamUpdate_setMaxBlockBodySize
   , protocolParamUpdate_setMaxBlockExUnits
@@ -45,13 +60,16 @@ import Cardano.Serialization.Lib
   , protocolParamUpdate_setMaxTxExUnits
   , protocolParamUpdate_setMaxTxSize
   , protocolParamUpdate_setMaxValueSize
+  , protocolParamUpdate_setMinCommitteeSize
   , protocolParamUpdate_setMinPoolCost
   , protocolParamUpdate_setMinfeeA
   , protocolParamUpdate_setMinfeeB
   , protocolParamUpdate_setNOpt
   , protocolParamUpdate_setPoolDeposit
   , protocolParamUpdate_setPoolPledgeInfluence
+  , protocolParamUpdate_setPoolVotingThresholds
   , protocolParamUpdate_setProtocolVersion
+  , protocolParamUpdate_setRefScriptCoinsPerByte
   , protocolParamUpdate_setTreasuryGrowthRate
   , protocolParamUpdate_treasuryGrowthRate
   , unpackMapContainerToMapWith
@@ -61,6 +79,8 @@ import Cardano.Types.Coin (Coin)
 import Cardano.Types.CostModel (CostModel)
 import Cardano.Types.CostModel as CostModel
 import Cardano.Types.CostModel as CostModels
+import Cardano.Types.DrepVotingThresholds (DrepVotingThresholds)
+import Cardano.Types.DrepVotingThresholds (fromCsl, toCsl) as DrepVotingThresholds
 import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.ExUnitPrices (ExUnitPrices)
 import Cardano.Types.ExUnitPrices as ExUnitPrices
@@ -68,6 +88,8 @@ import Cardano.Types.ExUnits (ExUnits)
 import Cardano.Types.ExUnits as ExUnits
 import Cardano.Types.Language (Language)
 import Cardano.Types.Language as Language
+import Cardano.Types.PoolVotingThresholds (PoolVotingThresholds)
+import Cardano.Types.PoolVotingThresholds (fromCsl, toCsl) as PoolVotingThresholds
 import Cardano.Types.ProtocolVersion (ProtocolVersion)
 import Cardano.Types.ProtocolVersion as ProtocolVersion
 import Cardano.Types.UnitInterval (UnitInterval)
@@ -109,6 +131,15 @@ newtype ProtocolParamUpdate = ProtocolParamUpdate
   , maxValueSize :: Maybe UInt
   , collateralPercentage :: Maybe UInt
   , maxCollateralInputs :: Maybe UInt
+  , poolVotingThresholds :: Maybe PoolVotingThresholds
+  , drepVotingThresholds :: Maybe DrepVotingThresholds
+  , minCommitteeSize :: Maybe UInt
+  , committeeTermLimit :: Maybe Epoch
+  , govActionValidityPeriod :: Maybe Epoch
+  , govActionDeposit :: Maybe Coin
+  , drepDeposit :: Maybe Coin
+  , drepInactivityPeriod :: Maybe Epoch
+  , refScriptCoinsPerByte :: Maybe UnitInterval
   }
 
 derive instance Newtype ProtocolParamUpdate _
@@ -148,6 +179,15 @@ toCsl
       , maxValueSize
       , collateralPercentage
       , maxCollateralInputs
+      , poolVotingThresholds
+      , drepVotingThresholds
+      , minCommitteeSize
+      , committeeTermLimit
+      , govActionValidityPeriod
+      , govActionDeposit
+      , drepDeposit
+      , drepInactivityPeriod
+      , refScriptCoinsPerByte
       }
   ) = unsafePartial $ unsafePerformEffect do
   let pp = protocolParamUpdate_new
@@ -176,6 +216,15 @@ toCsl
   for_ maxValueSize $ protocolParamUpdate_setMaxValueSize pp <<< UInt.toNumber
   for_ collateralPercentage $ protocolParamUpdate_setCollateralPercentage pp <<< UInt.toNumber
   for_ maxCollateralInputs $ protocolParamUpdate_setMaxCollateralInputs pp <<< UInt.toNumber
+  for_ poolVotingThresholds $ protocolParamUpdate_setPoolVotingThresholds pp <<< PoolVotingThresholds.toCsl
+  for_ drepVotingThresholds $ protocolParamUpdate_setDrepVotingThresholds pp <<< DrepVotingThresholds.toCsl
+  for_ minCommitteeSize $ protocolParamUpdate_setMinCommitteeSize pp <<< UInt.toNumber
+  for_ committeeTermLimit $ protocolParamUpdate_setCommitteeTermLimit pp <<< UInt.toNumber <<< unwrap
+  for_ govActionValidityPeriod $ protocolParamUpdate_setGovernanceActionValidityPeriod pp <<< UInt.toNumber <<< unwrap
+  for_ govActionDeposit $ protocolParamUpdate_setGovernanceActionDeposit pp <<< unwrap <<< unwrap
+  for_ drepDeposit $ protocolParamUpdate_setDrepDeposit pp <<< unwrap <<< unwrap
+  for_ drepInactivityPeriod $ protocolParamUpdate_setDrepInactivityPeriod pp <<< UInt.toNumber <<< unwrap
+  for_ refScriptCoinsPerByte $ protocolParamUpdate_setRefScriptCoinsPerByte pp <<< UnitInterval.toCsl
   pure pp
 
 fromCsl :: Csl.ProtocolParamUpdate -> ProtocolParamUpdate
@@ -203,6 +252,15 @@ fromCsl pp =
     , maxValueSize
     , collateralPercentage
     , maxCollateralInputs
+    , poolVotingThresholds
+    , drepVotingThresholds
+    , minCommitteeSize
+    , committeeTermLimit
+    , govActionValidityPeriod
+    , govActionDeposit
+    , drepDeposit
+    , drepInactivityPeriod
+    , refScriptCoinsPerByte
     }
   where
   use :: forall b. (Csl.ProtocolParamUpdate -> Nullable b) -> Maybe b
@@ -233,3 +291,12 @@ fromCsl pp =
   maxValueSize = UInt.fromNumber <$> use protocolParamUpdate_maxValueSize
   collateralPercentage = UInt.fromNumber <$> use protocolParamUpdate_collateralPercentage
   maxCollateralInputs = UInt.fromNumber <$> use protocolParamUpdate_maxCollateralInputs
+  poolVotingThresholds = PoolVotingThresholds.fromCsl <$> use protocolParamUpdate_poolVotingThresholds
+  drepVotingThresholds = DrepVotingThresholds.fromCsl <$> use protocolParamUpdate_drepVotingThresholds
+  minCommitteeSize = UInt.fromNumber <$> use protocolParamUpdate_minCommitteeSize
+  committeeTermLimit = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_committeeTermLimit
+  govActionValidityPeriod = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_governanceActionValidityPeriod
+  govActionDeposit = wrap <<< wrap <$> use protocolParamUpdate_governanceActionDeposit
+  drepDeposit = wrap <<< wrap <$> use protocolParamUpdate_drepDeposit
+  drepInactivityPeriod = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_drepInactivityPeriod
+  refScriptCoinsPerByte = UnitInterval.fromCsl <$> use protocolParamUpdate_refScriptCoinsPerByte

@@ -91,6 +91,7 @@ import Cardano.Types
       )
   , Coin(Coin)
   , Credential(PubKeyHashCredential)
+  , DrepVotingThresholds
   , Ed25519KeyHash
   , Epoch(Epoch)
   , ExUnitPrices(ExUnitPrices)
@@ -110,6 +111,7 @@ import Cardano.Types
   , PoolMetadata(PoolMetadata)
   , PoolParams(PoolParams)
   , PoolPubKeyHash(PoolPubKeyHash)
+  , PoolVotingThresholds
   , ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
   , ProtocolParamUpdate
   , ProtocolVersion(ProtocolVersion)
@@ -139,7 +141,7 @@ import Cardano.Types.Address (Address(BaseAddress))
 import Cardano.Types.AssetName (AssetName, mkAssetName)
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.BigNum (BigNum)
-import Cardano.Types.BigNum (fromInt, one, zero) as BigNum
+import Cardano.Types.BigNum (fromInt, fromStringUnsafe, one, zero) as BigNum
 import Cardano.Types.Ed25519KeyHash as Ed25519KeyHash
 import Cardano.Types.Ed25519Signature as Ed25519Signature
 import Cardano.Types.Int as Int
@@ -281,7 +283,47 @@ protocolParamUpdate1 = wrap
   , maxValueSize: Just $ UInt.fromInt 1
   , collateralPercentage: Just $ UInt.fromInt 140
   , maxCollateralInputs: Just $ UInt.fromInt 10
+  , poolVotingThresholds: Just poolVotingThresholds1
+  , drepVotingThresholds: Just drepVotingThresholds1
+  , minCommitteeSize: Just $ UInt.fromInt 3
+  , committeeTermLimit: Just $ Epoch $ UInt.fromInt 73
+  , govActionValidityPeriod: Just $ Epoch $ UInt.fromInt 8
+  , govActionDeposit: Just $ Coin $ BigNum.fromStringUnsafe "50000000000"
+  , drepDeposit: Just $ Coin $ BigNum.fromInt 500_000_000
+  , drepInactivityPeriod: Just $ Epoch $ UInt.fromInt 20
+  , refScriptCoinsPerByte: Just $ UnitInterval
+      { numerator: BigNum.fromInt 44, denominator: bigNumOne }
   }
+
+poolVotingThresholds1 :: PoolVotingThresholds
+poolVotingThresholds1 = wrap
+  { motionNoConfidence: mkUnitInterval 6 10
+  , committeeNormal: mkUnitInterval 6 10
+  , committeeNoConfidence: mkUnitInterval 51 100
+  , hardForkInitiation: mkUnitInterval 51 100
+  , securityRelevantThreshold: mkUnitInterval 6 10 -- ppSecurityGroup
+  }
+
+drepVotingThresholds1 :: DrepVotingThresholds
+drepVotingThresholds1 = wrap
+  { motionNoConfidence: mkUnitInterval 67 100
+  , committeeNormal: mkUnitInterval 67 100
+  , committeeNoConfidence: mkUnitInterval 6 10
+  , updateConstitution: mkUnitInterval 75 100
+  , hardForkInitiation: mkUnitInterval 6 10
+  , ppNetworkGroup: mkUnitInterval 67 100
+  , ppEconomicGroup: mkUnitInterval 67 100
+  , ppTechnicalGroup: mkUnitInterval 67 100
+  , ppGovernanceGroup: mkUnitInterval 75 100
+  , treasuryWithdrawal: mkUnitInterval 67 100
+  }
+
+mkUnitInterval :: Int -> Int -> UnitInterval
+mkUnitInterval numerator denominator =
+  wrap
+    { numerator: BigNum.fromInt numerator
+    , denominator: BigNum.fromInt denominator
+    }
 
 -- | Extend this for your needs.
 type SampleTxConfig =

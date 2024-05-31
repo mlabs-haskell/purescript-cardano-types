@@ -43,6 +43,7 @@ import Cardano.Types.Constitution (Constitution(Constitution)) as X
 import Cardano.Types.CostModel (CostModel(CostModel)) as X
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential)) as X
 import Cardano.Types.DataHash (DataHash(DataHash)) as X
+import Cardano.Types.DrepVotingThresholds (DrepVotingThresholds(DrepVotingThresholds)) as X
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash(Ed25519KeyHash)) as X
 import Cardano.Types.Ed25519Signature (Ed25519Signature(Ed25519Signature)) as X
 import Cardano.Types.EnterpriseAddress (EnterpriseAddress) as X
@@ -107,6 +108,7 @@ import Cardano.Types.PoolMetadata (PoolMetadata(PoolMetadata)) as X
 import Cardano.Types.PoolMetadataHash (PoolMetadataHash(PoolMetadataHash)) as X
 import Cardano.Types.PoolParams (PoolParams(PoolParams)) as X
 import Cardano.Types.PoolPubKeyHash (PoolPubKeyHash(PoolPubKeyHash)) as X
+import Cardano.Types.PoolVotingThresholds (PoolVotingThresholds(PoolVotingThresholds)) as X
 import Cardano.Types.PrivateKey (PrivateKey(PrivateKey)) as X
 import Cardano.Types.ProposedProtocolParameterUpdates
   ( ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
