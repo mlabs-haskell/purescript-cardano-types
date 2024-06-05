@@ -171,20 +171,26 @@ let additions =
         }
       , cardano-serialization-lib =
         { dependencies =
-          [ "arraybuffer-types"
+          [ "aeson"
+          , "argonaut"
+          , "bifunctors"
+          , "bytearrays"
           , "console"
           , "effect"
           , "either"
+          , "enums"
           , "maybe"
           , "nullable"
+          , "ordered-collections"
           , "partial"
           , "prelude"
-          , "foldable-traversable"
-          , "argonaut-core"
-          ]        
+          , "profunctor"
+          , "tuples"
+          , "unsafe-coerce"
+          ]
         , repo =
             "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib"
-        , version = "4063135a90f544cfa30319ef1351ddcb1a7d3efd"
+        , version = "238bb2f1ab748963d39ae2ad37402b0acc9841f0"
         }
       , cardano-plutus-data-schema =
         { dependencies = [ "prelude" ]

@@ -62,8 +62,6 @@ fromCsl pvt =
         UnitInterval.fromCsl $
           Csl.poolVotingThresholds_hardForkInitiation pvt
     , securityRelevantThreshold:
-        wrap { numerator: BigNum.one, denominator: BigNum.one }
-    -- FIXME: securityRelevantThreshold getter is missing
-    -- Reported in CSL: https://github.com/Emurgo/cardano-serialization-lib/pull/636#issuecomment-2142053178
-    -- Csl.poolVotingThresholds_securityRelevantThreshold pvt
+        UnitInterval.fromCsl $
+          Csl.poolVotingThresholds_securityRelevantThreshold pvt
     }
