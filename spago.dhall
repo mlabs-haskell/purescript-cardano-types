@@ -25,7 +25,6 @@ to generate this file without the comments in this block.
   , "effect"
   , "either"
   , "encoding"
-  , "enums"
   , "exceptions"
   , "foldable-traversable"
   , "foreign-object"

@@ -86,8 +86,6 @@ import Cardano.Types
       , StakeDelegation
       , PoolRegistration
       , PoolRetirement
-      , GenesisKeyDelegation
-      , MoveInstantaneousRewardsCert
       )
   , Coin(Coin)
   , Credential(PubKeyHashCredential)
@@ -99,9 +97,6 @@ import Cardano.Types
   , GeneralTransactionMetadata(GeneralTransactionMetadata)
   , GovernanceAction(ChangePParams)
   , Language(PlutusV2)
-  , MIRPot(Reserves, Treasury)
-  , MIRToStakeCredentials(MIRToStakeCredentials)
-  , MoveInstantaneousReward(ToOtherPot, ToStakeCreds)
   , NativeScript(TimelockExpiry, TimelockStart, ScriptNOfK, ScriptAny, ScriptAll, ScriptPubkey)
   , NetworkId(TestnetId, MainnetId)
   , OutputDatum(OutputDatum)
@@ -651,28 +646,6 @@ txFixture4 =
             , PoolRetirement
                 { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
                 , epoch: Epoch one
-                }
-            , GenesisKeyDelegation
-                { genesisHash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-                    hexToByteArrayUnsafe
-                      "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-                , genesisDelegateHash: unsafePartial $ fromJust $ decodeCbor
-                    $ wrap
-                    $
-                      hexToByteArrayUnsafe
-                        "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-                , vrfKeyhash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-                    hexToByteArrayUnsafe
-                      "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
-                }
-            , MoveInstantaneousRewardsCert $ ToOtherPot
-                { pot: Reserves
-                , amount: wrap bigNumOne
-                }
-            , MoveInstantaneousRewardsCert $ ToStakeCreds
-                { pot: Treasury
-                , amounts: MIRToStakeCredentials $ Map.fromFoldable
-                    [ wrap stake1 /\ Int.newPositive bigNumOne ]
                 }
             ]
         , withdrawals: Map.fromFoldable

@@ -8,11 +8,10 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.BigNum (one) as BigNum
 import Cardano.Types.UnitInterval (UnitInterval)
 import Cardano.Types.UnitInterval (fromCsl, toCsl) as UnitInterval
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype, wrap)
+import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)
 
 newtype PoolVotingThresholds = PoolVotingThresholds

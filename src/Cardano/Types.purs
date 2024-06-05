@@ -33,8 +33,6 @@ import Cardano.Types.Certificate
       , StakeDelegation
       , PoolRegistration
       , PoolRetirement
-      , GenesisKeyDelegation
-      , MoveInstantaneousRewardsCert
       )
   ) as X
 import Cardano.Types.Coin (Coin(Coin)) as X
@@ -51,7 +49,6 @@ import Cardano.Types.Epoch (Epoch(Epoch)) as X
 import Cardano.Types.ExUnitPrices (ExUnitPrices(ExUnitPrices)) as X
 import Cardano.Types.ExUnits (ExUnits(ExUnits)) as X
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata(GeneralTransactionMetadata)) as X
-import Cardano.Types.GenesisDelegateHash (GenesisDelegateHash(GenesisDelegateHash)) as X
 import Cardano.Types.GenesisHash (GenesisHash(GenesisHash)) as X
 import Cardano.Types.GovernanceAction
   ( GovernanceAction
@@ -71,10 +68,7 @@ import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction(HardFork
 import Cardano.Types.Ipv4 (Ipv4(Ipv4)) as X
 import Cardano.Types.Ipv6 (Ipv6(Ipv6)) as X
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3)) as X
-import Cardano.Types.MIRPot (MIRPot(Reserves, Treasury)) as X
-import Cardano.Types.MIRToStakeCredentials (MIRToStakeCredentials(MIRToStakeCredentials)) as X
 import Cardano.Types.Mint (Mint) as X
-import Cardano.Types.MoveInstantaneousReward (MoveInstantaneousReward(ToOtherPot, ToStakeCreds)) as X
 import Cardano.Types.MultiAsset (MultiAsset(MultiAsset)) as X
 import Cardano.Types.NativeScript
   ( NativeScript

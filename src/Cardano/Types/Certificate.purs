@@ -1,30 +1,30 @@
-module Cardano.Types.Certificate where
+module Cardano.Types.Certificate
+  ( Certificate
+      ( StakeRegistration
+      , StakeDeregistration
+      , StakeDelegation
+      , PoolRegistration
+      , PoolRetirement
+      )
+  , fromCsl
+  , toCsl
+  ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
-  ( certificate_asGenesisKeyDelegation
-  , certificate_asMoveInstantaneousRewardsCert
-  , certificate_asPoolRegistration
+  ( certificate_asPoolRegistration
   , certificate_asPoolRetirement
   , certificate_asStakeDelegation
   , certificate_asStakeDeregistration
   , certificate_asStakeRegistration
-  , certificate_newGenesisKeyDelegation
-  , certificate_newMoveInstantaneousRewardsCert
   , certificate_newPoolRegistration
   , certificate_newPoolRetirement
   , certificate_newStakeDelegation
   , certificate_newStakeDeregistration
   , certificate_newStakeRegistration
-  , genesisKeyDelegation_genesisDelegateHash
-  , genesisKeyDelegation_genesishash
-  , genesisKeyDelegation_new
-  , genesisKeyDelegation_vrfKeyhash
-  , moveInstantaneousRewardsCert_moveInstantaneousReward
-  , moveInstantaneousRewardsCert_new
   , poolRegistration_new
   , poolRegistration_poolParams
   , poolRetirement_epoch
@@ -41,16 +41,10 @@ import Cardano.Serialization.Lib
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Credential as Credential
 import Cardano.Types.Epoch (Epoch)
-import Cardano.Types.GenesisDelegateHash (GenesisDelegateHash)
-import Cardano.Types.GenesisHash (GenesisHash)
-import Cardano.Types.MoveInstantaneousReward (MoveInstantaneousReward)
-import Cardano.Types.MoveInstantaneousReward as MoveInstantaneousReward
-import Cardano.Types.MoveInstantaneousReward as MoveInstantaneousRewards
 import Cardano.Types.PoolParams (PoolParams)
 import Cardano.Types.PoolParams as PoolParams
 import Cardano.Types.PoolPubKeyHash (PoolPubKeyHash)
 import Cardano.Types.StakeCredential (StakeCredential)
-import Cardano.Types.VRFKeyHash (VRFKeyHash)
 import Control.Alt ((<|>))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromJust)
@@ -69,12 +63,6 @@ data Certificate
       { poolKeyHash :: PoolPubKeyHash
       , epoch :: Epoch
       }
-  | GenesisKeyDelegation
-      { genesisHash :: GenesisHash
-      , genesisDelegateHash :: GenesisDelegateHash
-      , vrfKeyhash :: VRFKeyHash
-      }
-  | MoveInstantaneousRewardsCert MoveInstantaneousReward
 
 derive instance Eq Certificate
 derive instance Ord Certificate
@@ -112,12 +100,6 @@ toCsl = case _ of
   PoolRetirement { poolKeyHash, epoch } -> certificate_newPoolRetirement $ poolRetirement_new
     (unwrap $ unwrap poolKeyHash)
     (UInt.toNumber $ unwrap epoch)
-  GenesisKeyDelegation { genesisHash, genesisDelegateHash, vrfKeyhash } ->
-    certificate_newGenesisKeyDelegation $
-      genesisKeyDelegation_new (unwrap genesisHash) (unwrap genesisDelegateHash) (unwrap vrfKeyhash)
-  MoveInstantaneousRewardsCert mir -> certificate_newMoveInstantaneousRewardsCert
-    $ moveInstantaneousRewardsCert_new
-    $ MoveInstantaneousReward.toCsl mir
 
 fromCsl :: Csl.Certificate -> Certificate
 fromCsl csl = unsafePartial $ fromJust $
@@ -126,8 +108,6 @@ fromCsl csl = unsafePartial $ fromJust $
     <|> stakeDelegation
     <|> poolRegistration
     <|> poolRetirement
-    <|> genesisKeyDelegation
-    <|> moveInstantaneousRewardsCert
   where
   stakeRegistration = toMaybe (certificate_asStakeRegistration csl) <#>
     stakeRegistration_stakeCredential >>> Credential.fromCsl
@@ -148,12 +128,3 @@ fromCsl csl = unsafePartial $ fromJust $
       { poolKeyHash: wrap $ wrap $ poolRetirement_poolKeyhash pr
       , epoch: wrap $ UInt.fromNumber $ poolRetirement_epoch pr
       }
-  genesisKeyDelegation = toMaybe (certificate_asGenesisKeyDelegation csl) <#> \gkd ->
-    GenesisKeyDelegation
-      { genesisHash: wrap $ genesisKeyDelegation_genesishash gkd
-      , genesisDelegateHash: wrap $ genesisKeyDelegation_genesisDelegateHash gkd
-      , vrfKeyhash: wrap $ genesisKeyDelegation_vrfKeyhash gkd
-      }
-  moveInstantaneousRewardsCert = toMaybe (certificate_asMoveInstantaneousRewardsCert csl) <#>
-    MoveInstantaneousRewardsCert <<< MoveInstantaneousRewards.fromCsl <<<
-      moveInstantaneousRewardsCert_moveInstantaneousReward
