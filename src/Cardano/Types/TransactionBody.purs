@@ -34,14 +34,12 @@ import Cardano.Serialization.Lib
   , transactionBody_setScriptDataHash
   , transactionBody_setTotalCollateral
   , transactionBody_setTtl
-  , transactionBody_setUpdate
   , transactionBody_setValidityStartIntervalBignum
   , transactionBody_setVotingProcedures
   , transactionBody_setVotingProposals
   , transactionBody_setWithdrawals
   , transactionBody_totalCollateral
   , transactionBody_ttlBignum
-  , transactionBody_update
   , transactionBody_validityStartIntervalBignum
   , transactionBody_votingProcedures
   , transactionBody_votingProposals

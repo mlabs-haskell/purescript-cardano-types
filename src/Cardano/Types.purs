@@ -33,6 +33,16 @@ import Cardano.Types.Certificate
       , StakeDelegation
       , PoolRegistration
       , PoolRetirement
+      , VoteDelegCert
+      , StakeVoteDelegCert
+      , StakeRegDelegCert
+      , VoteRegDelegCert
+      , StakeVoteRegDelegCert
+      , AuthCommitteeHotCert
+      , ResignCommitteeColdCert
+      , RegDrepCert
+      , UnregDrepCert
+      , UpdateDrepCert
       )
   ) as X
 import Cardano.Types.Coin (Coin(Coin)) as X
@@ -40,6 +50,7 @@ import Cardano.Types.Committee (Committee(Committee)) as X
 import Cardano.Types.Constitution (Constitution(Constitution)) as X
 import Cardano.Types.CostModel (CostModel(CostModel)) as X
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential)) as X
+import Cardano.Types.DRep (DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)) as X
 import Cardano.Types.DataHash (DataHash(DataHash)) as X
 import Cardano.Types.DrepVotingThresholds (DrepVotingThresholds(DrepVotingThresholds)) as X
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash(Ed25519KeyHash)) as X
