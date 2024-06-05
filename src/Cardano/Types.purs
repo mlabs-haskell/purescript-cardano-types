@@ -104,9 +104,6 @@ import Cardano.Types.PoolParams (PoolParams(PoolParams)) as X
 import Cardano.Types.PoolPubKeyHash (PoolPubKeyHash(PoolPubKeyHash)) as X
 import Cardano.Types.PoolVotingThresholds (PoolVotingThresholds(PoolVotingThresholds)) as X
 import Cardano.Types.PrivateKey (PrivateKey(PrivateKey)) as X
-import Cardano.Types.ProposedProtocolParameterUpdates
-  ( ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
-  ) as X
 import Cardano.Types.ProtocolParamUpdate (ProtocolParamUpdate(ProtocolParamUpdate)) as X
 import Cardano.Types.ProtocolVersion (ProtocolVersion(ProtocolVersion)) as X
 import Cardano.Types.PublicKey (PublicKey(PublicKey)) as X
@@ -141,7 +138,6 @@ import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet(TransactionWit
 import Cardano.Types.TreasuryWithdrawalsAction (TreasuryWithdrawalsAction(TreasuryWithdrawalsAction)) as X
 import Cardano.Types.URL (URL(URL)) as X
 import Cardano.Types.UnitInterval (UnitInterval(UnitInterval)) as X
-import Cardano.Types.Update (Update(Update)) as X
 import Cardano.Types.UpdateCommitteeAction (UpdateCommitteeAction(UpdateCommitteeAction)) as X
 import Cardano.Types.UtxoMap (UtxoMap) as X
 import Cardano.Types.VRFKeyHash (VRFKeyHash(VRFKeyHash)) as X

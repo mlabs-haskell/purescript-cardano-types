@@ -69,8 +69,6 @@ import Cardano.Types.TransactionInput (TransactionInput)
 import Cardano.Types.TransactionInput as TransactionInput
 import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
-import Cardano.Types.Update (Update)
-import Cardano.Types.Update as Update
 import Cardano.Types.VotingProcedures (VotingProcedures)
 import Cardano.Types.VotingProcedures (empty, fromCsl, toCsl) as VotingProcedures
 import Cardano.Types.VotingProposal (VotingProposal)
@@ -94,7 +92,6 @@ newtype TransactionBody = TransactionBody
   , ttl :: Maybe Slot
   , certs :: Array Certificate
   , withdrawals :: Map RewardAddress Coin
-  , update :: Maybe Update
   , auxiliaryDataHash :: Maybe AuxiliaryDataHash
   , validityStartInterval :: Maybe Slot
   , mint :: Maybe Mint
@@ -123,7 +120,6 @@ empty = TransactionBody
   , ttl: Nothing
   , certs: []
   , withdrawals: Map.empty
-  , update: Nothing
   , auxiliaryDataHash: Nothing
   , validityStartInterval: Nothing
   , mint: Nothing
@@ -161,7 +157,6 @@ toCsl
       , ttl
       , certs
       , withdrawals
-      , update
       , auxiliaryDataHash
       , validityStartInterval
       , mint
@@ -191,8 +186,6 @@ toCsl
   -- withdrawals
   transactionBody_setWithdrawals tb $ packMapContainer $
     (RewardAddress.toCsl *** unwrap <<< unwrap) <$> Map.toUnfoldable withdrawals
-  -- update
-  for_ update $ transactionBody_setUpdate tb <<< Update.toCsl
   -- auxiliaryDataHash
   for_ auxiliaryDataHash $ transactionBody_setAuxiliaryDataHash tb <<< unwrap
   -- validityStartInterval
@@ -238,7 +231,6 @@ fromCsl tb =
     , ttl
     , certs
     , withdrawals
-    , update
     , auxiliaryDataHash
     , validityStartInterval
     , mint
@@ -268,8 +260,6 @@ fromCsl tb =
     $ map (unpackMapContainerToMapWith RewardAddress.fromCsl (wrap <<< wrap))
     $ toMaybe
     $ transactionBody_withdrawals tb
-  update = Update.fromCsl <$>
-    toMaybe (transactionBody_update tb)
   auxiliaryDataHash = wrap <$>
     toMaybe (transactionBody_auxiliaryDataHash tb)
   validityStartInterval = wrap <<< wrap <$>

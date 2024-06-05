@@ -107,7 +107,6 @@ import Cardano.Types
   , PoolParams(PoolParams)
   , PoolPubKeyHash(PoolPubKeyHash)
   , PoolVotingThresholds
-  , ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
   , ProtocolParamUpdate
   , ProtocolVersion(ProtocolVersion)
   , Redeemer(Redeemer)
@@ -125,7 +124,6 @@ import Cardano.Types
   , TransactionWitnessSet(TransactionWitnessSet)
   , URL(URL)
   , UnitInterval(UnitInterval)
-  , Update(Update)
   , UtxoMap
   , Value(Value)
   , Vkey(Vkey)
@@ -235,14 +233,6 @@ bigNumOne = BigNum.fromInt 1
 rewardAddress1 :: RewardAddress
 rewardAddress1 = { networkId: TestnetId, stakeCredential: wrap stake1 }
 
-proposedProtocolParameterUpdates1 :: ProposedProtocolParameterUpdates
-proposedProtocolParameterUpdates1 = ProposedProtocolParameterUpdates $
-  Map.fromFoldable
-    [ ( unsafePartial $ fromJust $ decodeCbor $ wrap $ hexToByteArrayUnsafe
-          "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-      ) /\ protocolParamUpdate1
-    ]
-
 protocolParamUpdate1 :: ProtocolParamUpdate
 protocolParamUpdate1 = wrap
   { minfeeA: Just $ Coin $ BigNum.fromInt 1
@@ -348,7 +338,6 @@ mkSampleTx startTx changes =
             , ttl
             , certs
             , withdrawals
-            , update
             , auxiliaryDataHash
             , validityStartInterval
             , mint
@@ -378,7 +367,6 @@ mkSampleTx startTx changes =
             , ttl
             , certs
             , withdrawals
-            , update
             , auxiliaryDataHash
             , validityStartInterval
             , mint
@@ -432,7 +420,6 @@ txFixture1 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -470,7 +457,6 @@ txFixture2 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -526,7 +512,6 @@ txFixture3 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , referenceInputs: [ txInputFixture1 ]
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
@@ -650,11 +635,6 @@ txFixture4 =
             ]
         , withdrawals: Map.fromFoldable
             [ rewardAddress1 /\ Coin BigNum.one ]
-        , update: Just $ Update
-            { proposedProtocolParameterUpdates:
-                proposedProtocolParameterUpdates1
-            , epoch: Epoch zero
-            }
         , auxiliaryDataHash: decodeCbor $ wrap
             $ byteArrayFromIntArrayUnsafe
             $ Array.replicate 32 0
@@ -732,7 +712,6 @@ txFixture5 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -770,7 +749,6 @@ txFixture6 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -815,7 +793,6 @@ txFixture7 =
         , ttl: Just $ Slot $ BigNum.fromInt 123
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing -- Just $ Slot $ BigNum.one
         , mint: Nothing
