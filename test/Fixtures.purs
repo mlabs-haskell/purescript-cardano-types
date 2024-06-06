@@ -144,7 +144,6 @@ import Cardano.Types.PlutusScript (plutusV1Script, plutusV2Script)
 import Cardano.Types.PublicKey as PublicKey
 import Cardano.Types.ScriptRef (ScriptRef(PlutusScriptRef))
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum(Text))
-import Cardano.Types.VotingProcedures (empty) as VotingProcedures
 import Data.Array as Array
 import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, hexToByteArray, hexToByteArrayUnsafe)
 import Data.Either (hush)
@@ -431,7 +430,7 @@ txFixture1 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }
@@ -468,7 +467,7 @@ txFixture2 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }
@@ -523,7 +522,7 @@ txFixture3 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }
@@ -652,7 +651,7 @@ txFixture4 =
         , collateralReturn: Just txOutputFixture1
         , totalCollateral: Just $ Coin $ BigNum.fromInt 5_000_000
         , votingProposals: [ votingProposalFixture1 ]
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }
@@ -723,7 +722,7 @@ txFixture5 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }
@@ -760,7 +759,7 @@ txFixture6 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }
@@ -804,7 +803,7 @@ txFixture7 =
         , collateralReturn: Nothing
         , totalCollateral: Nothing
         , votingProposals: []
-        , votingProcedures: VotingProcedures.empty
+        , votingProcedures: mempty
         , currentTreasuryValue: Nothing
         , donation: Nothing
         }

@@ -68,7 +68,7 @@ import Cardano.Types.TransactionInput as TransactionInput
 import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.VotingProcedures (VotingProcedures)
-import Cardano.Types.VotingProcedures (empty, fromCsl, toCsl) as VotingProcedures
+import Cardano.Types.VotingProcedures (fromCsl, toCsl) as VotingProcedures
 import Cardano.Types.VotingProposal (VotingProposal)
 import Cardano.Types.VotingProposal as VotingProposal
 import Data.Function (on)
@@ -129,7 +129,7 @@ empty = TransactionBody
   , totalCollateral: Nothing
   , referenceInputs: []
   , votingProposals: []
-  , votingProcedures: VotingProcedures.empty
+  , votingProcedures: mempty
   , currentTreasuryValue: Nothing
   , donation: Nothing
   }
@@ -212,7 +212,7 @@ toCsl
   withNonEmptyArray (VotingProposal.toCsl <$> votingProposals) $
     transactionBody_setVotingProposals tb
   -- votingProcedures
-  when (votingProcedures /= VotingProcedures.empty) do
+  when (votingProcedures /= mempty) do
     transactionBody_setVotingProcedures tb $ VotingProcedures.toCsl votingProcedures
   -- currentTreasuryValue
   for_ currentTreasuryValue $ transactionBody_setCurrentTreasuryValue tb <<< unwrap <<< unwrap
@@ -279,7 +279,7 @@ fromCsl tb =
     toMaybe (transactionBody_referenceInputs tb)
   votingProposals = map VotingProposal.fromCsl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_votingProposals tb)
-  votingProcedures = maybe VotingProcedures.empty VotingProcedures.fromCsl $
+  votingProcedures = maybe mempty VotingProcedures.fromCsl $
     toMaybe (transactionBody_votingProcedures tb)
   currentTreasuryValue = wrap <<< wrap <$>
     toMaybe (transactionBody_currentTreasuryValue tb)

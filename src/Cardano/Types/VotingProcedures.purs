@@ -1,6 +1,5 @@
 module Cardano.Types.VotingProcedures
   ( VotingProcedures(VotingProcedures)
-  , empty
   , fromCsl
   , toCsl
   ) where
@@ -21,9 +20,9 @@ import Data.Array (concat) as Array
 import Data.Foldable (foldM)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
-import Data.Map (empty, insertWith, singleton, union) as Map
+import Data.Map (empty, insertWith, singleton, union, unionWith) as Map
 import Data.Maybe (maybe)
-import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Newtype (class Newtype, over2, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for, traverse)
@@ -49,8 +48,11 @@ instance DecodeAeson VotingProcedures where
 instance Show VotingProcedures where
   show = genericShow
 
-empty :: VotingProcedures
-empty = wrap Map.empty
+instance Semigroup VotingProcedures where
+  append = over2 wrap (Map.unionWith (Map.unionWith (\_ rhs -> rhs)))
+
+instance Monoid VotingProcedures where
+  mempty = wrap Map.empty
 
 toCsl :: VotingProcedures -> Csl.VotingProcedures
 toCsl (VotingProcedures mp) =
