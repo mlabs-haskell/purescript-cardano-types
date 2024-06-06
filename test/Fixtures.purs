@@ -79,23 +79,36 @@ import Prelude
 import Aeson (decodeAeson, fromString)
 import Cardano.AsCbor (decodeCbor)
 import Cardano.Types
-  ( AuxiliaryData(AuxiliaryData)
+  ( Anchor
+  , AuxiliaryData(AuxiliaryData)
   , Certificate
       ( StakeRegistration
       , StakeDeregistration
       , StakeDelegation
       , PoolRegistration
       , PoolRetirement
+      , VoteDelegCert
+      , StakeVoteDelegCert
+      , StakeRegDelegCert
+      , VoteRegDelegCert
+      , StakeVoteRegDelegCert
+      , AuthCommitteeHotCert
+      , ResignCommitteeColdCert
+      , RegDrepCert
+      , UnregDrepCert
+      , UpdateDrepCert
       )
   , Coin(Coin)
-  , Credential(PubKeyHashCredential)
+  , Credential(PubKeyHashCredential, ScriptHashCredential)
+  , DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)
   , DrepVotingThresholds
   , Ed25519KeyHash
   , Epoch(Epoch)
   , ExUnitPrices(ExUnitPrices)
   , ExUnits(ExUnits)
   , GeneralTransactionMetadata(GeneralTransactionMetadata)
-  , GovernanceAction(ChangePParams)
+  , GovernanceAction(ChangePParams, TriggerHF, TreasuryWdrl, NoConfidence, NewCommittee, NewConstitution, Info)
+  , GovernanceActionId
   , Language(PlutusV2)
   , NativeScript(TimelockExpiry, TimelockStart, ScriptNOfK, ScriptAny, ScriptAll, ScriptPubkey)
   , NetworkId(TestnetId, MainnetId)
@@ -128,6 +141,9 @@ import Cardano.Types
   , Value(Value)
   , Vkey(Vkey)
   , Vkeywitness(Vkeywitness)
+  , Vote(VoteNo, VoteYes, VoteAbstain)
+  , Voter(Cc, Drep, Spo)
+  , VotingProcedures
   , VotingProposal
   )
 import Cardano.Types.Address (Address(BaseAddress))
@@ -222,6 +238,9 @@ pkhBech32 = "addr_vkh1zuctrdcq6ctd29242w8g84nlz0q38t2lnv3zzfcrfqktx0c9tzp"
 stake1 :: Credential
 stake1 = unsafePartial $ fromJust do
   PubKeyHashCredential <$> Ed25519KeyHash.fromBech32 pkhBech32
+
+stake2 :: Credential
+stake2 = ScriptHashCredential currencySymbol1
 
 ed25519KeyHash1 :: Ed25519KeyHash
 ed25519KeyHash1 = unsafePartial $ fromJust $ Ed25519KeyHash.fromBech32 pkhBech32
@@ -631,6 +650,19 @@ txFixture4 =
                 { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
                 , epoch: Epoch one
                 }
+            , VoteDelegCert (wrap stake1) (DrepCred stake1)
+            , StakeVoteDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) AlwaysAbstain
+            , StakeRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (Coin BigNum.one)
+            , VoteRegDelegCert (wrap stake1) AlwaysNoConfidence (Coin BigNum.one)
+            , StakeVoteRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (DrepCred stake1) (Coin BigNum.one)
+            , AuthCommitteeHotCert { coldCred: stake1, hotCred: stake2 }
+            , ResignCommitteeColdCert stake1 (Just anchor1)
+            , ResignCommitteeColdCert stake2 Nothing
+            , RegDrepCert stake1 (Coin BigNum.one) (Just anchor1)
+            , RegDrepCert stake2 (Coin BigNum.one) Nothing
+            , UnregDrepCert stake1 (Coin BigNum.one)
+            , UpdateDrepCert stake1 (Just anchor1)
+            , UpdateDrepCert stake2 Nothing
             ]
         , withdrawals: Map.fromFoldable
             [ rewardAddress1 /\ Coin BigNum.one ]
@@ -650,10 +682,26 @@ txFixture4 =
         , networkId: Just MainnetId
         , collateralReturn: Just txOutputFixture1
         , totalCollateral: Just $ Coin $ BigNum.fromInt 5_000_000
-        , votingProposals: [ votingProposalFixture1 ]
-        , votingProcedures: mempty
-        , currentTreasuryValue: Nothing
-        , donation: Nothing
+        , votingProposals:
+            [ proposalChangePParams1
+            , proposalChangePParams2
+            , proposalChangePParams3
+            , proposalChangePParams4
+            , proposalTriggerHF1
+            , proposalTriggerHF2
+            , proposalTreasuryWdrl1
+            , proposalTreasuryWdrl2
+            , proposalNoConfidence1
+            , proposalNoConfidence2
+            , proposalNewCommittee1
+            , proposalNewCommittee2
+            , proposalNewConstitution1
+            , proposalNewConstitution2
+            , proposalInfo1
+            ]
+        , votingProcedures: votingProcedures1
+        , currentTreasuryValue: Just $ Coin $ BigNum.fromInt 6_000_000
+        , donation: Just $ Coin $ BigNum.fromInt 7_000_000
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -667,25 +715,177 @@ txFixture4 =
     , auxiliaryData: mempty
     }
 
-votingProposalFixture1 :: VotingProposal
-votingProposalFixture1 = wrap
-  { govAction:
-      ChangePParams $ wrap
-        { pparamsUpdate: protocolParamUpdate1
-        , actionId: Just $ wrap $ unwrap txInputFixture1
-        , policyHash: Just $ currencySymbol1
-        }
-  , anchor:
-      wrap
-        { url: URL "https://example.com/"
-        , dataHash:
-            unsafePartial $ fromJust $ decodeCbor $ wrap $
-              hexToByteArrayUnsafe
-                "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
-        }
+mkVotingProposal :: GovernanceAction -> VotingProposal
+mkVotingProposal govAction = wrap
+  { govAction
+  , anchor: anchor1
   , deposit: BigNum.fromInt 5_000_000
   , returnAddr: rewardAddress1
   }
+
+proposalChangePParams1 :: VotingProposal
+proposalChangePParams1 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Just govActionId1
+    , policyHash: Just currencySymbol1
+    }
+
+proposalChangePParams2 :: VotingProposal
+proposalChangePParams2 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Just govActionId1
+    , policyHash: Nothing
+    }
+
+proposalChangePParams3 :: VotingProposal
+proposalChangePParams3 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Nothing
+    , policyHash: Just currencySymbol1
+    }
+
+proposalChangePParams4 :: VotingProposal
+proposalChangePParams4 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Nothing
+    , policyHash: Nothing
+    }
+
+proposalTriggerHF1 :: VotingProposal
+proposalTriggerHF1 =
+  mkVotingProposal $ TriggerHF $ wrap
+    { protocolVersion: ProtocolVersion { major: 1, minor: 1 }
+    , actionId: Just govActionId1
+    }
+
+proposalTriggerHF2 :: VotingProposal
+proposalTriggerHF2 =
+  mkVotingProposal $ TriggerHF $ wrap
+    { protocolVersion: ProtocolVersion { major: 1, minor: 1 }
+    , actionId: Nothing
+    }
+
+proposalTreasuryWdrl1 :: VotingProposal
+proposalTreasuryWdrl1 =
+  mkVotingProposal $ TreasuryWdrl $ wrap
+    { withdrawals: Map.fromFoldable [ rewardAddress1 /\ Coin BigNum.one ]
+    , policyHash: Just currencySymbol1
+    }
+
+proposalTreasuryWdrl2 :: VotingProposal
+proposalTreasuryWdrl2 =
+  mkVotingProposal $ TreasuryWdrl $ wrap
+    { withdrawals: Map.fromFoldable [ rewardAddress1 /\ Coin BigNum.one ]
+    , policyHash: Nothing
+    }
+
+proposalNoConfidence1 :: VotingProposal
+proposalNoConfidence1 =
+  mkVotingProposal $ NoConfidence $ wrap
+    { actionId: Just govActionId1
+    }
+
+proposalNoConfidence2 :: VotingProposal
+proposalNoConfidence2 =
+  mkVotingProposal $ NoConfidence $ wrap
+    { actionId: Nothing
+    }
+
+proposalNewCommittee1 :: VotingProposal
+proposalNewCommittee1 =
+  mkVotingProposal $ NewCommittee $ wrap
+    { committee: wrap
+        { quorumThreshold: mkUnitInterval 3 5
+        , members: [ stake1 /\ Epoch one ]
+        }
+    , membersToRemove: [ stake1, stake2 ]
+    , actionId: Just govActionId1
+    }
+
+proposalNewCommittee2 :: VotingProposal
+proposalNewCommittee2 =
+  mkVotingProposal $ NewCommittee $ wrap
+    { committee: wrap
+        { quorumThreshold: mkUnitInterval 3 5
+        , members: mempty
+        }
+    , membersToRemove: mempty
+    , actionId: Nothing
+    }
+
+proposalNewConstitution1 :: VotingProposal
+proposalNewConstitution1 =
+  mkVotingProposal $ NewConstitution $ wrap
+    { constitution: wrap
+        { anchor: anchor1
+        , scriptHash: Just currencySymbol1
+        }
+    , actionId: Just govActionId1
+    }
+
+proposalNewConstitution2 :: VotingProposal
+proposalNewConstitution2 =
+  mkVotingProposal $ NewConstitution $ wrap
+    { constitution: wrap
+        { anchor: anchor1
+        , scriptHash: Nothing
+        }
+    , actionId: Nothing
+    }
+
+proposalInfo1 :: VotingProposal
+proposalInfo1 = mkVotingProposal Info
+
+votingProcedures1 :: VotingProcedures
+votingProcedures1 =
+  wrap $
+    Map.fromFoldable
+      [ Cc stake1 /\ Map.fromFoldable
+          [ govActionId1 /\ wrap
+              { vote: VoteNo
+              , anchor: Just anchor1
+              }
+          , govActionId2 /\ wrap
+              { vote: VoteYes
+              , anchor: Nothing
+              }
+          ]
+      , Drep stake2 /\ Map.fromFoldable
+          [ govActionId1 /\ wrap
+              { vote: VoteAbstain
+              , anchor: Just anchor1
+              }
+          ]
+      , Spo ed25519KeyHash1 /\ Map.fromFoldable -- Note: fails for Map.empty
+          [ govActionId2 /\ wrap
+              { vote: VoteAbstain
+              , anchor: Nothing
+              }
+          ]
+      ]
+
+govActionId1 :: GovernanceActionId
+govActionId1 = wrap $ unwrap txInputFixture1
+
+govActionId2 :: GovernanceActionId
+govActionId2 = wrap $ unwrap $ mkTxInput
+  { txId: "6d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65ad959996"
+  , ix: 1
+  }
+
+anchor1 :: Anchor
+anchor1 =
+  wrap
+    { url: URL "https://example.com/"
+    , dataHash:
+        unsafePartial $ fromJust $ decodeCbor $ wrap $
+          hexToByteArrayUnsafe
+            "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
+    }
 
 txFixture5 :: Transaction
 txFixture5 =
