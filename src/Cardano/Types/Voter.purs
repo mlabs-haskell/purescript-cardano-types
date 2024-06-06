@@ -7,6 +7,7 @@ module Cardano.Types.Voter
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, (.:))
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Credential (Credential)
 import Cardano.Types.Credential (fromCsl, toCsl) as Credential
@@ -50,6 +51,10 @@ instance DecodeAeson Voter where
       "Drep" -> Drep <$> aesonContents
       "Spo" -> Spo <$> aesonContents
       _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
+
+instance AsCbor Voter where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: Voter -> Csl.Voter
 toCsl = case _ of

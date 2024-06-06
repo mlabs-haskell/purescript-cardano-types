@@ -7,6 +7,7 @@ module Cardano.Types.HardForkInitiationAction
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
@@ -14,7 +15,7 @@ import Cardano.Types.ProtocolVersion (ProtocolVersion)
 import Cardano.Types.ProtocolVersion (fromCsl, toCsl) as ProtocolVersion
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 
@@ -36,6 +37,10 @@ derive newtype instance DecodeAeson HardForkInitiationAction
 
 instance Show HardForkInitiationAction where
   show = genericShow
+
+instance AsCbor HardForkInitiationAction where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: HardForkInitiationAction -> Csl.HardForkInitiationAction
 toCsl (HardForkInitiationAction rec) =

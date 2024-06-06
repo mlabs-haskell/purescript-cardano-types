@@ -7,6 +7,7 @@ module Cardano.Types.VotingProcedure
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Anchor (Anchor)
 import Cardano.Types.Anchor (fromCsl, toCsl) as Anchor
@@ -14,7 +15,7 @@ import Cardano.Types.Vote (Vote)
 import Cardano.Types.Vote (fromCsl, toCsl) as Vote
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, maybe)
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 
@@ -32,6 +33,10 @@ derive newtype instance DecodeAeson VotingProcedure
 
 instance Show VotingProcedure where
   show = genericShow
+
+instance AsCbor VotingProcedure where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: VotingProcedure -> Csl.VotingProcedure
 toCsl (VotingProcedure rec) =

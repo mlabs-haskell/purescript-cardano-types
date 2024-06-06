@@ -7,6 +7,7 @@ module Cardano.Types.Committee
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (unpackListContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Credential (Credential)
@@ -41,6 +42,10 @@ derive newtype instance DecodeAeson Committee
 
 instance Show Committee where
   show = genericShow
+
+instance AsCbor Committee where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: Committee -> Csl.Committee
 toCsl (Committee rec) =

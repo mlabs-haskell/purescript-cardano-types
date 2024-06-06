@@ -7,6 +7,7 @@ module Cardano.Types.VotingProposal
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Anchor (Anchor)
 import Cardano.Types.Anchor (fromCsl, toCsl) as Anchor
@@ -39,6 +40,10 @@ derive newtype instance DecodeAeson VotingProposal
 
 instance Show VotingProposal where
   show = genericShow
+
+instance AsCbor VotingProposal where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: VotingProposal -> Csl.VotingProposal
 toCsl (VotingProposal rec) =

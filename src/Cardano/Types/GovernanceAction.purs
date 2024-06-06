@@ -15,6 +15,7 @@ module Cardano.Types.GovernanceAction
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction)
 import Cardano.Types.HardForkInitiationAction (fromCsl, toCsl) as HardForkInitiationAction
@@ -33,6 +34,7 @@ import Control.Alt ((<|>))
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromJust)
+import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Partial.Unsafe (unsafePartial)
@@ -49,6 +51,13 @@ data GovernanceAction
 derive instance Generic GovernanceAction _
 derive instance Eq GovernanceAction
 derive instance Ord GovernanceAction
+
+instance Show GovernanceAction where
+  show = genericShow
+
+instance AsCbor GovernanceAction where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 instance EncodeAeson GovernanceAction where
   encodeAeson = case _ of
@@ -75,9 +84,6 @@ instance DecodeAeson GovernanceAction where
       "NewConstitution" -> NewConstitution <$> aesonContents
       "Info" -> pure Info
       _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
-
-instance Show GovernanceAction where
-  show = genericShow
 
 toCsl :: GovernanceAction -> Csl.GovernanceAction
 toCsl = case _ of

@@ -7,6 +7,7 @@ module Cardano.Types.TreasuryWithdrawalsAction
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.RewardAddress (RewardAddress)
@@ -35,6 +36,10 @@ derive newtype instance DecodeAeson TreasuryWithdrawalsAction
 
 instance Show TreasuryWithdrawalsAction where
   show = genericShow
+
+instance AsCbor TreasuryWithdrawalsAction where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: TreasuryWithdrawalsAction -> Csl.TreasuryWithdrawalsAction
 toCsl (TreasuryWithdrawalsAction rec) =

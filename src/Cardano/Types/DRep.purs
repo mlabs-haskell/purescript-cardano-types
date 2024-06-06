@@ -7,6 +7,7 @@ module Cardano.Types.DRep
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential))
 import Cardano.Types.Internal.Helpers (encodeTagged')
@@ -44,6 +45,10 @@ instance DecodeAeson DRep where
       "AlwaysAbstain" -> pure AlwaysAbstain
       "AlwaysNoConfidence" -> pure AlwaysNoConfidence
       _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
+
+instance AsCbor DRep where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: DRep -> Csl.DRep
 toCsl = case _ of

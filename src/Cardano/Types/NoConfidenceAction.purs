@@ -7,12 +7,13 @@ module Cardano.Types.NoConfidenceAction
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, maybe)
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 
@@ -29,6 +30,10 @@ derive newtype instance DecodeAeson NoConfidenceAction
 
 instance Show NoConfidenceAction where
   show = genericShow
+
+instance AsCbor NoConfidenceAction where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: NoConfidenceAction -> Csl.NoConfidenceAction
 toCsl (NoConfidenceAction { actionId }) =

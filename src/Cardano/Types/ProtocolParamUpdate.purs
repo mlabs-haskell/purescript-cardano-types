@@ -7,6 +7,7 @@ module Cardano.Types.ProtocolParamUpdate
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( packMapContainer
   , protocolParamUpdate_adaPerUtxoByte
@@ -153,6 +154,10 @@ derive instance Generic ProtocolParamUpdate _
 
 instance Show ProtocolParamUpdate where
   show = genericShow
+
+instance AsCbor ProtocolParamUpdate where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: ProtocolParamUpdate -> Csl.ProtocolParamUpdate
 toCsl

@@ -7,11 +7,12 @@ module Cardano.Types.DrepVotingThresholds
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.UnitInterval (UnitInterval)
 import Cardano.Types.UnitInterval (fromCsl, toCsl) as UnitInterval
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
 newtype DrepVotingThresholds = DrepVotingThresholds
@@ -36,6 +37,10 @@ derive newtype instance DecodeAeson DrepVotingThresholds
 
 instance Show DrepVotingThresholds where
   show = genericShow
+
+instance AsCbor DrepVotingThresholds where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: DrepVotingThresholds -> Csl.DrepVotingThresholds
 toCsl (DrepVotingThresholds rec) =

@@ -7,6 +7,7 @@ module Cardano.Types.ParameterChangeAction
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
@@ -39,6 +40,10 @@ derive newtype instance DecodeAeson ParameterChangeAction
 
 instance Show ParameterChangeAction where
   show = genericShow
+
+instance AsCbor ParameterChangeAction where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: ParameterChangeAction -> Csl.ParameterChangeAction
 toCsl (ParameterChangeAction rec) =

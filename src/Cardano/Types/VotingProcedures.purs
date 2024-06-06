@@ -7,6 +7,7 @@ module Cardano.Types.VotingProcedures
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (unpackListContainer)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
@@ -39,14 +40,18 @@ derive instance Newtype VotingProcedures _
 derive instance Eq VotingProcedures
 derive instance Ord VotingProcedures
 
+instance Show VotingProcedures where
+  show = genericShow
+
 instance EncodeAeson VotingProcedures where
   encodeAeson = encodeMap <<< map encodeMap <<< unwrap
 
 instance DecodeAeson VotingProcedures where
   decodeAeson = map wrap <<< traverse decodeMap <=< decodeMap
 
-instance Show VotingProcedures where
-  show = genericShow
+instance AsCbor VotingProcedures where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 instance Semigroup VotingProcedures where
   append = over2 wrap (Map.unionWith (Map.unionWith (\_ rhs -> rhs)))

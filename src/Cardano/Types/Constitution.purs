@@ -7,6 +7,7 @@ module Cardano.Types.Constitution
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Anchor (Anchor)
 import Cardano.Types.Anchor (fromCsl, toCsl) as Anchor
@@ -31,6 +32,10 @@ derive newtype instance DecodeAeson Constitution
 
 instance Show Constitution where
   show = genericShow
+
+instance AsCbor Constitution where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: Constitution -> Csl.Constitution
 toCsl (Constitution rec) =

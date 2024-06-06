@@ -7,6 +7,7 @@ module Cardano.Types.GovernanceActionId
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.TransactionHash (TransactionHash)
 import Data.Generic.Rep (class Generic)
@@ -34,6 +35,10 @@ instance Show GovernanceActionId where
       <> ", index: UInt.fromInt "
       <> show (UInt.toInt rec.index)
       <> " })"
+
+instance AsCbor GovernanceActionId where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: GovernanceActionId -> Csl.GovernanceActionId
 toCsl (GovernanceActionId rec) =

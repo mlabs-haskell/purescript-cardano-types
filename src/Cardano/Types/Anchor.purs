@@ -7,6 +7,7 @@ module Cardano.Types.Anchor
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AnchorDataHash (AnchorDataHash)
 import Cardano.Types.URL (URL)
@@ -29,6 +30,10 @@ derive newtype instance DecodeAeson Anchor
 
 instance Show Anchor where
   show = genericShow
+
+instance AsCbor Anchor where
+  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
+  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
 toCsl :: Anchor -> Csl.Anchor
 toCsl (Anchor { url, dataHash }) = Csl.anchor_new (URL.toCsl url) (unwrap dataHash)
