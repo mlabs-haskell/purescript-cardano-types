@@ -1,13 +1,20 @@
-# v1.0.2
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and we follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+# v2.0.0
+
+## Changed
+
+- Moved to `Conway` era and `@mlabs-haskell/cardano-serialization-lib-gc` version `v12.0.0-alpha.31`.
+- `datum` field of a `Redeemer`: use `RedeemerDatum` instead of `PlutusData`
 
 ## Added
 
 - `RedeemerDatum` type (a tagged newtype over `PlutusData`)
 - Field access lenses for main domain types (`Transaction`, `TransactionOutput`, `TransactionInput`)
-
-## Changed
-
-- `datum` field of a `Redeemer`: use `RedeemerDatum` instead of `PlutusData`
 
 # v1.0.1
 
