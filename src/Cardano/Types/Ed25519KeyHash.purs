@@ -97,7 +97,7 @@ instance Arbitrary Ed25519KeyHash where
 -- | Convert ed25519KeyHash to Bech32 representation with given prefix.
 -- | Will crash if prefix is invalid (length, mixed-case, etc)
 -- | More on prefixes: https://cips.cardano.org/cips/cip5
-toBech32Unsafe ∷ Partial => String -> Ed25519KeyHash -> Bech32String
+toBech32Unsafe :: Partial => String -> Ed25519KeyHash -> Bech32String
 toBech32Unsafe prefix kh = ed25519KeyHash_toBech32 (unwrap kh)
   prefix
 

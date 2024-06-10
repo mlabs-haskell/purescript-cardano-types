@@ -18,7 +18,7 @@ module Cardano.Types.Int
   , zero
   ) where
 
-import Prelude hiding (zero, sub)
+import Prelude hiding (sub, zero)
 
 import Aeson
   ( class DecodeAeson

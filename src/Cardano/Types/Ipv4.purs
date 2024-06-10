@@ -2,13 +2,13 @@ module Cardano.Types.Ipv4 where
 
 import Prelude
 
-import Data.Newtype (class Newtype, unwrap, wrap)
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib (fromBytes, toBytes)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
 import Data.Generic.Rep (class Generic)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Safe.Coerce (coerce)
 

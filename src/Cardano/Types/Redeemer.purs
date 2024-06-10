@@ -8,11 +8,10 @@ import Cardano.Serialization.Lib as Csl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.ExUnits (ExUnits)
 import Cardano.Types.ExUnits as ExUnits
-import Cardano.Types.PlutusData (PlutusData)
 import Cardano.Types.PlutusData as PlutusData
+import Cardano.Types.RedeemerDatum (RedeemerDatum)
 import Cardano.Types.RedeemerTag (RedeemerTag)
 import Cardano.Types.RedeemerTag as RedeemerTag
-import Cardano.Types.RedeemerDatum
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)

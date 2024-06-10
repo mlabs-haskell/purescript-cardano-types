@@ -20,15 +20,15 @@ module Cardano.Types.BigNum
   , abs
   ) where
 
-import Prelude hiding (sub, add, one, zero, max)
+import Prelude hiding (add, max, one, sub, zero)
 
-import Aeson (JsonDecodeError(TypeMismatch)) as Aeson
 import Aeson
   ( class DecodeAeson
   , class EncodeAeson
   , decodeAeson
   , encodeAeson
   )
+import Aeson (JsonDecodeError(TypeMismatch)) as Aeson
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( bigNum_checkedAdd

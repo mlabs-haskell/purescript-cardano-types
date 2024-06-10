@@ -175,18 +175,22 @@ let additions =
           , "argonaut"
           , "bifunctors"
           , "bytearrays"
+          , "console"
           , "effect"
           , "either"
+          , "enums"
           , "maybe"
           , "nullable"
           , "ordered-collections"
+          , "partial"
           , "prelude"
           , "profunctor"
           , "tuples"
+          , "unsafe-coerce"
           ]
         , repo =
             "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib"
-        , version = "c66afbb9c572db096690ec1dd786c9ec96105c0d"
+        , version = "238bb2f1ab748963d39ae2ad37402b0acc9841f0"
         }
       , cardano-plutus-data-schema =
         { dependencies = [ "prelude" ]

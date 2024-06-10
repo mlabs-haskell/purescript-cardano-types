@@ -1,6 +1,6 @@
 module Cardano.Types.Value where
 
-import Prelude hiding (join, zero, one, add)
+import Prelude hiding (add, join, one, zero)
 
 import Aeson
   ( class DecodeAeson
@@ -180,7 +180,8 @@ lt l r = not (isZero l && isZero r) && checkBinRel (<) l r
 -- inequality is redundant. So we use strict equality instead.
 -- | Checks if every asset has positive quantity
 isPositive :: Value -> Boolean
-isPositive val = (all (\(_ /\ _ /\ a) -> a > BigNum.zero) $ MultiAsset.flatten $ getMultiAsset val) && valueOf AdaAsset val > BigNum.zero
+isPositive val = (all (\(_ /\ _ /\ a) -> a > BigNum.zero) $ MultiAsset.flatten $ getMultiAsset val) &&
+  valueOf AdaAsset val > BigNum.zero
 
 -- From https://playground.plutus.iohkdev.io/doc/haddock/plutus-ledger-api/html/src/Plutus.V1.Ledger.Value.html#isZero
 -- | Check whether a `Value` is zero.
