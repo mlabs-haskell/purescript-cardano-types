@@ -8,7 +8,13 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (bootstrapWitness_attributes, bootstrapWitness_chainCode, bootstrapWitness_new, bootstrapWitness_signature, bootstrapWitness_vkey)
+import Cardano.Serialization.Lib
+  ( bootstrapWitness_attributes
+  , bootstrapWitness_chainCode
+  , bootstrapWitness_new
+  , bootstrapWitness_signature
+  , bootstrapWitness_vkey
+  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Vkey (Vkey)

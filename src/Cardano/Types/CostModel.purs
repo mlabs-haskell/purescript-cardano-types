@@ -2,7 +2,7 @@ module Cardano.Types.CostModel where
 
 import Prelude
 
-import Aeson (class EncodeAeson, class DecodeAeson)
+import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.Serialization.Lib
   ( costModel_get
   , costModel_len

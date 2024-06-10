@@ -19,15 +19,15 @@ module Cardano.FromData
 
 import Prelude
 
+import Cardano.Plutus.DataSchema (class HasPlutusSchema, class ValidPlutusSchema)
+import Cardano.Plutus.DataSchema.Indexed (class GetIndexWithLabel, class GetWithLabel)
+import Cardano.Plutus.DataSchema.Nat (class KnownNat, natVal)
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
-import Cardano.Types.PlutusData (PlutusData(Bytes, Constr, List, Integer))
-import Control.Alternative ((<|>))
-import Cardano.Plutus.DataSchema (class HasPlutusSchema, class ValidPlutusSchema)
-import Cardano.Plutus.DataSchema.Nat (class KnownNat, natVal)
-import Cardano.Plutus.DataSchema.Indexed (class GetIndexWithLabel, class GetWithLabel)
 import Cardano.Types.CborBytes (CborBytes)
+import Cardano.Types.PlutusData (PlutusData(Bytes, Constr, List, Integer))
 import Cardano.Types.RawBytes (RawBytes)
+import Control.Alternative ((<|>))
 import Data.Array (uncons)
 import Data.Array as Array
 import Data.ArrayBuffer.Types (Uint8Array)

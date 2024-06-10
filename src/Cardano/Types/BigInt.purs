@@ -14,8 +14,37 @@ import Cardano.Serialization.Lib as Csl
 import Data.Maybe (fromJust)
 import Data.Nullable (toMaybe)
 import JS.BigInt (BigInt)
+import JS.BigInt
+  ( BigInt
+  , Parity(Even, Odd)
+  , Radix
+  , and
+  , asIntN
+  , asUintN
+  , binary
+  , decimal
+  , even
+  , fromInt
+  , fromNumber
+  , fromString
+  , fromStringAs
+  , fromTLInt
+  , hexadecimal
+  , not
+  , octal
+  , odd
+  , or
+  , parity
+  , pow
+  , shl
+  , shr
+  , toInt
+  , toNumber
+  , toString
+  , toStringAs
+  , xor
+  ) as X
 import JS.BigInt as BigInt
-import JS.BigInt (BigInt, Parity(Even, Odd), Radix, and, asIntN, asUintN, binary, decimal, even, fromInt, fromNumber, fromString, fromStringAs, fromTLInt, hexadecimal, not, octal, odd, or, parity, pow, shl, shr, toInt, toNumber, toString, toStringAs, xor) as X
 import Partial.Unsafe (unsafePartial)
 
 toCsl :: BigInt -> Csl.BigInt

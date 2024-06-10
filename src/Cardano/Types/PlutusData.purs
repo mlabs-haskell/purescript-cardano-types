@@ -23,6 +23,7 @@ import Aeson
   , toStringifiedNumbersJson
   , (.:)
   )
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
   ( constrPlutusData_alternative
   , constrPlutusData_data
@@ -40,7 +41,6 @@ import Cardano.Serialization.Lib
   , plutusData_newMap
   , unpackMapContainer
   )
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Serialization.Lib.Internal (packListContainer, unpackListContainer)
 import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt

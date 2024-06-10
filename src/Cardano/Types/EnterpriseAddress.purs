@@ -35,4 +35,5 @@ fromCsl addr =
   }
   where
   networkId :: NetworkId
-  networkId = unsafePartial $ fromJust $ NetworkId.fromInt $ fromJust $ Int.fromNumber $ address_networkId $ enterpriseAddress_toAddress addr
+  networkId = unsafePartial $ fromJust $ NetworkId.fromInt $ fromJust $ Int.fromNumber $ address_networkId $
+    enterpriseAddress_toAddress addr

@@ -79,19 +79,37 @@ import Prelude
 import Aeson (decodeAeson, fromString)
 import Cardano.AsCbor (decodeCbor)
 import Cardano.Types
-  ( AuxiliaryData(AuxiliaryData)
-  , Certificate(StakeRegistration, StakeDeregistration, StakeDelegation, PoolRegistration, PoolRetirement, GenesisKeyDelegation, MoveInstantaneousRewardsCert)
+  ( Anchor
+  , AuxiliaryData(AuxiliaryData)
+  , Certificate
+      ( StakeRegistration
+      , StakeDeregistration
+      , StakeDelegation
+      , PoolRegistration
+      , PoolRetirement
+      , VoteDelegCert
+      , StakeVoteDelegCert
+      , StakeRegDelegCert
+      , VoteRegDelegCert
+      , StakeVoteRegDelegCert
+      , AuthCommitteeHotCert
+      , ResignCommitteeColdCert
+      , RegDrepCert
+      , UnregDrepCert
+      , UpdateDrepCert
+      )
   , Coin(Coin)
-  , Credential(PubKeyHashCredential)
+  , Credential(PubKeyHashCredential, ScriptHashCredential)
+  , DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)
+  , DrepVotingThresholds
   , Ed25519KeyHash
   , Epoch(Epoch)
   , ExUnitPrices(ExUnitPrices)
   , ExUnits(ExUnits)
   , GeneralTransactionMetadata(GeneralTransactionMetadata)
+  , GovernanceAction(ChangePParams, TriggerHF, TreasuryWdrl, NoConfidence, NewCommittee, NewConstitution, Info)
+  , GovernanceActionId
   , Language(PlutusV2)
-  , MIRPot(Reserves, Treasury)
-  , MIRToStakeCredentials(MIRToStakeCredentials)
-  , MoveInstantaneousReward(ToOtherPot, ToStakeCreds)
   , NativeScript(TimelockExpiry, TimelockStart, ScriptNOfK, ScriptAny, ScriptAll, ScriptPubkey)
   , NetworkId(TestnetId, MainnetId)
   , OutputDatum(OutputDatum)
@@ -101,8 +119,8 @@ import Cardano.Types
   , PoolMetadata(PoolMetadata)
   , PoolParams(PoolParams)
   , PoolPubKeyHash(PoolPubKeyHash)
-  , ProposedProtocolParameterUpdates(ProposedProtocolParameterUpdates)
-  , ProtocolParamUpdate(ProtocolParamUpdate)
+  , PoolVotingThresholds
+  , ProtocolParamUpdate
   , ProtocolVersion(ProtocolVersion)
   , Redeemer(Redeemer)
   , RedeemerTag(Spend)
@@ -119,17 +137,20 @@ import Cardano.Types
   , TransactionWitnessSet(TransactionWitnessSet)
   , URL(URL)
   , UnitInterval(UnitInterval)
-  , Update(Update)
   , UtxoMap
   , Value(Value)
   , Vkey(Vkey)
   , Vkeywitness(Vkeywitness)
+  , Vote(VoteNo, VoteYes, VoteAbstain)
+  , Voter(Cc, Drep, Spo)
+  , VotingProcedures
+  , VotingProposal
   )
 import Cardano.Types.Address (Address(BaseAddress))
 import Cardano.Types.AssetName (AssetName, mkAssetName)
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.BigNum (BigNum)
-import Cardano.Types.BigNum (fromInt, one, zero) as BigNum
+import Cardano.Types.BigNum (fromInt, fromStringUnsafe, one, zero) as BigNum
 import Cardano.Types.Ed25519KeyHash as Ed25519KeyHash
 import Cardano.Types.Ed25519Signature as Ed25519Signature
 import Cardano.Types.Int as Int
@@ -140,16 +161,11 @@ import Cardano.Types.PublicKey as PublicKey
 import Cardano.Types.ScriptRef (ScriptRef(PlutusScriptRef))
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum(Text))
 import Data.Array as Array
-import Data.ByteArray
-  ( ByteArray
-  , byteArrayFromIntArrayUnsafe
-  , hexToByteArray
-  , hexToByteArrayUnsafe
-  )
+import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, hexToByteArray, hexToByteArrayUnsafe)
 import Data.Either (hush)
 import Data.Map as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
-import Data.Newtype (wrap)
+import Data.Newtype (unwrap, wrap)
 import Data.Tuple (Tuple(Tuple))
 import Data.Tuple.Nested ((/\))
 import Data.UInt as UInt
@@ -223,6 +239,9 @@ stake1 :: Credential
 stake1 = unsafePartial $ fromJust do
   PubKeyHashCredential <$> Ed25519KeyHash.fromBech32 pkhBech32
 
+stake2 :: Credential
+stake2 = ScriptHashCredential currencySymbol1
+
 ed25519KeyHash1 :: Ed25519KeyHash
 ed25519KeyHash1 = unsafePartial $ fromJust $ Ed25519KeyHash.fromBech32 pkhBech32
 
@@ -232,48 +251,82 @@ bigNumOne = BigNum.fromInt 1
 rewardAddress1 :: RewardAddress
 rewardAddress1 = { networkId: TestnetId, stakeCredential: wrap stake1 }
 
-proposedProtocolParameterUpdates1 :: ProposedProtocolParameterUpdates
-proposedProtocolParameterUpdates1 = ProposedProtocolParameterUpdates $
-  Map.fromFoldable
-    [ ( unsafePartial $ fromJust $ decodeCbor $ wrap $ hexToByteArrayUnsafe
-          "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-      ) /\
-        ProtocolParamUpdate
-          { minfeeA: Just $ Coin $ BigNum.fromInt 1
-          , minfeeB: Just $ Coin $ BigNum.fromInt 1
-          , maxBlockBodySize: Just $ UInt.fromInt 10000
-          , maxTxSize: Just $ UInt.fromInt 10000
-          , maxBlockHeaderSize: Just $ UInt.fromInt 1000
-          , keyDeposit: Just $ Coin $ BigNum.fromInt 1
-          , poolDeposit: Just $ Coin $ BigNum.fromInt 1
-          , maxEpoch: Just $ Epoch one
-          , nOpt: Just $ UInt.fromInt 1
-          , poolPledgeInfluence: Just $ UnitInterval
-              { numerator: bigNumOne, denominator: bigNumOne }
-          , expansionRate: Just $ UnitInterval
-              { numerator: bigNumOne, denominator: bigNumOne }
-          , treasuryGrowthRate: Just $ UnitInterval
-              { numerator: bigNumOne, denominator: bigNumOne }
-          , protocolVersion: Just $ ProtocolVersion
-              { major: 1, minor: 1 }
-          , minPoolCost: Just $ wrap bigNumOne
-          , adaPerUtxoByte: Just $ wrap bigNumOne
-          , costModels: Just costModelsFixture1
-          , executionCosts: Just $ ExUnitPrices
-              { memPrice: UnitInterval
-                  { numerator: bigNumOne, denominator: bigNumOne }
-              , stepPrice: UnitInterval
-                  { numerator: bigNumOne, denominator: bigNumOne }
-              }
-          , maxTxExUnits: Just $ ExUnits
-              { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
-          , maxBlockExUnits: Just $ ExUnits
-              { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
-          , maxValueSize: Just $ UInt.fromInt 1
-          , collateralPercentage: Just $ UInt.fromInt 140
-          , maxCollateralInputs: Just $ UInt.fromInt 10
-          }
-    ]
+protocolParamUpdate1 :: ProtocolParamUpdate
+protocolParamUpdate1 = wrap
+  { minfeeA: Just $ Coin $ BigNum.fromInt 1
+  , minfeeB: Just $ Coin $ BigNum.fromInt 1
+  , maxBlockBodySize: Just $ UInt.fromInt 10000
+  , maxTxSize: Just $ UInt.fromInt 10000
+  , maxBlockHeaderSize: Just $ UInt.fromInt 1000
+  , keyDeposit: Just $ Coin $ BigNum.fromInt 1
+  , poolDeposit: Just $ Coin $ BigNum.fromInt 1
+  , maxEpoch: Just $ Epoch one
+  , nOpt: Just $ UInt.fromInt 1
+  , poolPledgeInfluence: Just $ UnitInterval
+      { numerator: bigNumOne, denominator: bigNumOne }
+  , expansionRate: Just $ UnitInterval
+      { numerator: bigNumOne, denominator: bigNumOne }
+  , treasuryGrowthRate: Just $ UnitInterval
+      { numerator: bigNumOne, denominator: bigNumOne }
+  , protocolVersion: Just $ ProtocolVersion
+      { major: 1, minor: 1 }
+  , minPoolCost: Just $ wrap bigNumOne
+  , adaPerUtxoByte: Just $ wrap bigNumOne
+  , costModels: Just costModelsFixture1
+  , executionCosts: Just $ ExUnitPrices
+      { memPrice: UnitInterval
+          { numerator: bigNumOne, denominator: bigNumOne }
+      , stepPrice: UnitInterval
+          { numerator: bigNumOne, denominator: bigNumOne }
+      }
+  , maxTxExUnits: Just $ ExUnits
+      { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
+  , maxBlockExUnits: Just $ ExUnits
+      { mem: BigNum.fromInt 1, steps: BigNum.fromInt 1 }
+  , maxValueSize: Just $ UInt.fromInt 1
+  , collateralPercentage: Just $ UInt.fromInt 140
+  , maxCollateralInputs: Just $ UInt.fromInt 10
+  , poolVotingThresholds: Just poolVotingThresholds1
+  , drepVotingThresholds: Just drepVotingThresholds1
+  , minCommitteeSize: Just $ UInt.fromInt 3
+  , committeeTermLimit: Just $ Epoch $ UInt.fromInt 73
+  , govActionValidityPeriod: Just $ Epoch $ UInt.fromInt 8
+  , govActionDeposit: Just $ Coin $ BigNum.fromStringUnsafe "50000000000"
+  , drepDeposit: Just $ Coin $ BigNum.fromInt 500_000_000
+  , drepInactivityPeriod: Just $ Epoch $ UInt.fromInt 20
+  , refScriptCoinsPerByte: Just $ UnitInterval
+      { numerator: BigNum.fromInt 44, denominator: bigNumOne }
+  }
+
+poolVotingThresholds1 :: PoolVotingThresholds
+poolVotingThresholds1 = wrap
+  { motionNoConfidence: mkUnitInterval 6 10
+  , committeeNormal: mkUnitInterval 6 10
+  , committeeNoConfidence: mkUnitInterval 51 100
+  , hardForkInitiation: mkUnitInterval 51 100
+  , securityRelevantThreshold: mkUnitInterval 6 10 -- ppSecurityGroup
+  }
+
+drepVotingThresholds1 :: DrepVotingThresholds
+drepVotingThresholds1 = wrap
+  { motionNoConfidence: mkUnitInterval 67 100
+  , committeeNormal: mkUnitInterval 67 100
+  , committeeNoConfidence: mkUnitInterval 6 10
+  , updateConstitution: mkUnitInterval 75 100
+  , hardForkInitiation: mkUnitInterval 6 10
+  , ppNetworkGroup: mkUnitInterval 67 100
+  , ppEconomicGroup: mkUnitInterval 67 100
+  , ppTechnicalGroup: mkUnitInterval 67 100
+  , ppGovernanceGroup: mkUnitInterval 75 100
+  , treasuryWithdrawal: mkUnitInterval 67 100
+  }
+
+mkUnitInterval :: Int -> Int -> UnitInterval
+mkUnitInterval numerator denominator =
+  wrap
+    { numerator: BigNum.fromInt numerator
+    , denominator: BigNum.fromInt denominator
+    }
 
 -- | Extend this for your needs.
 type SampleTxConfig =
@@ -303,7 +356,6 @@ mkSampleTx startTx changes =
             , ttl
             , certs
             , withdrawals
-            , update
             , auxiliaryDataHash
             , validityStartInterval
             , mint
@@ -314,6 +366,10 @@ mkSampleTx startTx changes =
             , networkId
             , collateralReturn
             , totalCollateral
+            , votingProposals
+            , votingProcedures
+            , currentTreasuryValue
+            , donation
             }
         , witnessSet
         , isValid
@@ -329,7 +385,6 @@ mkSampleTx startTx changes =
             , ttl
             , certs
             , withdrawals
-            , update
             , auxiliaryDataHash
             , validityStartInterval
             , mint
@@ -340,6 +395,10 @@ mkSampleTx startTx changes =
             , networkId
             , collateralReturn
             , totalCollateral
+            , votingProposals
+            , votingProcedures
+            , currentTreasuryValue
+            , donation
             }
         , witnessSet
         , isValid
@@ -359,7 +418,15 @@ plutusScriptFixture2 = unsafePartial $ fromJust $ map plutusV2Script $ hush
   $ fromString "4d010000deadbeef33222220051200120011"
 
 plutusScriptFixture3 :: PlutusScript
-plutusScriptFixture3 = (PlutusScript (Tuple (hexToByteArrayUnsafe "59088501000032332232323233223232323232323232323322323232323232322223232533532325335001101b13357389211d556e657870656374656420646174756d206174206f776e20696e7075740001a323253335002153335001101c2101c2101c2153335002101c21333573466ebc00800407807484074854ccd400840708407484ccd5cd19b8f00200101e01d323500122220023235001220013553353500222350022222222222223333500d2501e2501e2501e233355302d12001321233001225335002210031001002501e2350012253355335333573466e3cd400888008d4010880080b40b04ccd5cd19b873500222001350042200102d02c102c1350220031502100d21123001002162001300a0053333573466e1cd55cea80124000466442466002006004646464646464646464646464646666ae68cdc39aab9d500c480008cccccccccccc88888888888848cccccccccccc00403403002c02802402001c01801401000c008cd4054058d5d0a80619a80a80b1aba1500b33501501735742a014666aa034eb94064d5d0a804999aa80d3ae501935742a01066a02a0426ae85401cccd54068089d69aba150063232323333573466e1cd55cea801240004664424660020060046464646666ae68cdc39aab9d5002480008cc8848cc00400c008cd40b1d69aba15002302d357426ae8940088c98c80bccd5ce01901881689aab9e5001137540026ae854008c8c8c8cccd5cd19b8735573aa004900011991091980080180119a8163ad35742a004605a6ae84d5d1280111931901799ab9c03203102d135573ca00226ea8004d5d09aba2500223263202b33573805c05a05226aae7940044dd50009aba1500533501575c6ae854010ccd540680788004d5d0a801999aa80d3ae200135742a00460406ae84d5d1280111931901399ab9c02a029025135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d55cf280089baa00135742a00460206ae84d5d1280111931900c99ab9c01c01b017101a132632018335738921035054350001a135573ca00226ea800448c88c008dd6000990009aa80d111999aab9f0012501c233501b30043574200460066ae8800805c8c8c8cccd5cd19b8735573aa004900011991091980080180118069aba150023005357426ae8940088c98c8054cd5ce00c00b80989aab9e5001137540024646464646666ae68cdc39aab9d5004480008cccc888848cccc00401401000c008c8c8c8cccd5cd19b8735573aa0049000119910919800801801180b1aba1500233500e015357426ae8940088c98c8068cd5ce00e80e00c09aab9e5001137540026ae854010ccd54025d728041aba150033232323333573466e1d400520042300b357426aae79400c8cccd5cd19b875002480088c84888c004010dd71aba135573ca00846666ae68cdc3a801a400042444006464c6403866ae7007c0780680640604d55cea80089baa00135742a00466a014eb8d5d09aba2500223263201633573803203002826ae8940044d5d1280089aab9e500113754002424446004008266aa002eb9d6889119118011bab00132001355016223233335573e0044a032466a03066442466002006004600c6aae754008c014d55cf280118021aba200301413574200224464646666ae68cdc3a800a400046a00e600a6ae84d55cf280191999ab9a3370ea00490011280391931900919ab9c01501401000f135573aa00226ea800448488c00800c44880048c8c8cccd5cd19b875001480188c848888c010014c01cd5d09aab9e500323333573466e1d400920042321222230020053009357426aae7940108cccd5cd19b875003480088c848888c004014c01cd5d09aab9e500523333573466e1d40112000232122223003005375c6ae84d55cf280311931900819ab9c01301200e00d00c00b135573aa00226ea80048c8c8cccd5cd19b8735573aa004900011991091980080180118029aba15002375a6ae84d5d1280111931900619ab9c00f00e00a135573ca00226ea80048c8cccd5cd19b8735573aa002900011bae357426aae7940088c98c8028cd5ce00680600409baa001232323232323333573466e1d4005200c21222222200323333573466e1d4009200a21222222200423333573466e1d400d2008233221222222233001009008375c6ae854014dd69aba135744a00a46666ae68cdc3a8022400c4664424444444660040120106eb8d5d0a8039bae357426ae89401c8cccd5cd19b875005480108cc8848888888cc018024020c030d5d0a8049bae357426ae8940248cccd5cd19b875006480088c848888888c01c020c034d5d09aab9e500b23333573466e1d401d2000232122222223005008300e357426aae7940308c98c804ccd5ce00b00a80880800780700680600589aab9d5004135573ca00626aae7940084d55cf280089baa0012323232323333573466e1d400520022333222122333001005004003375a6ae854010dd69aba15003375a6ae84d5d1280191999ab9a3370ea0049000119091180100198041aba135573ca00c464c6401866ae7003c0380280244d55cea80189aba25001135573ca00226ea80048c8c8cccd5cd19b875001480088c8488c00400cdd71aba135573ca00646666ae68cdc3a8012400046424460040066eb8d5d09aab9e500423263200933573801801600e00c26aae7540044dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6401466ae7003403002001c0184d55cea80089baa0012323333573466e1d40052002200623333573466e1d40092000200623263200633573801201000800626aae74dd5000a4c24400424400224002920103505431003200135500322112225335001135003220012213335005220023004002333553007120010050040011122002122122330010040031123230010012233003300200200101") PlutusV2))
+plutusScriptFixture3 =
+  ( PlutusScript
+      ( Tuple
+          ( hexToByteArrayUnsafe
+              "59088501000032332232323233223232323232323232323322323232323232322223232533532325335001101b13357389211d556e657870656374656420646174756d206174206f776e20696e7075740001a323253335002153335001101c2101c2101c2153335002101c21333573466ebc00800407807484074854ccd400840708407484ccd5cd19b8f00200101e01d323500122220023235001220013553353500222350022222222222223333500d2501e2501e2501e233355302d12001321233001225335002210031001002501e2350012253355335333573466e3cd400888008d4010880080b40b04ccd5cd19b873500222001350042200102d02c102c1350220031502100d21123001002162001300a0053333573466e1cd55cea80124000466442466002006004646464646464646464646464646666ae68cdc39aab9d500c480008cccccccccccc88888888888848cccccccccccc00403403002c02802402001c01801401000c008cd4054058d5d0a80619a80a80b1aba1500b33501501735742a014666aa034eb94064d5d0a804999aa80d3ae501935742a01066a02a0426ae85401cccd54068089d69aba150063232323333573466e1cd55cea801240004664424660020060046464646666ae68cdc39aab9d5002480008cc8848cc00400c008cd40b1d69aba15002302d357426ae8940088c98c80bccd5ce01901881689aab9e5001137540026ae854008c8c8c8cccd5cd19b8735573aa004900011991091980080180119a8163ad35742a004605a6ae84d5d1280111931901799ab9c03203102d135573ca00226ea8004d5d09aba2500223263202b33573805c05a05226aae7940044dd50009aba1500533501575c6ae854010ccd540680788004d5d0a801999aa80d3ae200135742a00460406ae84d5d1280111931901399ab9c02a029025135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d55cf280089baa00135742a00460206ae84d5d1280111931900c99ab9c01c01b017101a132632018335738921035054350001a135573ca00226ea800448c88c008dd6000990009aa80d111999aab9f0012501c233501b30043574200460066ae8800805c8c8c8cccd5cd19b8735573aa004900011991091980080180118069aba150023005357426ae8940088c98c8054cd5ce00c00b80989aab9e5001137540024646464646666ae68cdc39aab9d5004480008cccc888848cccc00401401000c008c8c8c8cccd5cd19b8735573aa0049000119910919800801801180b1aba1500233500e015357426ae8940088c98c8068cd5ce00e80e00c09aab9e5001137540026ae854010ccd54025d728041aba150033232323333573466e1d400520042300b357426aae79400c8cccd5cd19b875002480088c84888c004010dd71aba135573ca00846666ae68cdc3a801a400042444006464c6403866ae7007c0780680640604d55cea80089baa00135742a00466a014eb8d5d09aba2500223263201633573803203002826ae8940044d5d1280089aab9e500113754002424446004008266aa002eb9d6889119118011bab00132001355016223233335573e0044a032466a03066442466002006004600c6aae754008c014d55cf280118021aba200301413574200224464646666ae68cdc3a800a400046a00e600a6ae84d55cf280191999ab9a3370ea00490011280391931900919ab9c01501401000f135573aa00226ea800448488c00800c44880048c8c8cccd5cd19b875001480188c848888c010014c01cd5d09aab9e500323333573466e1d400920042321222230020053009357426aae7940108cccd5cd19b875003480088c848888c004014c01cd5d09aab9e500523333573466e1d40112000232122223003005375c6ae84d55cf280311931900819ab9c01301200e00d00c00b135573aa00226ea80048c8c8cccd5cd19b8735573aa004900011991091980080180118029aba15002375a6ae84d5d1280111931900619ab9c00f00e00a135573ca00226ea80048c8cccd5cd19b8735573aa002900011bae357426aae7940088c98c8028cd5ce00680600409baa001232323232323333573466e1d4005200c21222222200323333573466e1d4009200a21222222200423333573466e1d400d2008233221222222233001009008375c6ae854014dd69aba135744a00a46666ae68cdc3a8022400c4664424444444660040120106eb8d5d0a8039bae357426ae89401c8cccd5cd19b875005480108cc8848888888cc018024020c030d5d0a8049bae357426ae8940248cccd5cd19b875006480088c848888888c01c020c034d5d09aab9e500b23333573466e1d401d2000232122222223005008300e357426aae7940308c98c804ccd5ce00b00a80880800780700680600589aab9d5004135573ca00626aae7940084d55cf280089baa0012323232323333573466e1d400520022333222122333001005004003375a6ae854010dd69aba15003375a6ae84d5d1280191999ab9a3370ea0049000119091180100198041aba135573ca00c464c6401866ae7003c0380280244d55cea80189aba25001135573ca00226ea80048c8c8cccd5cd19b875001480088c8488c00400cdd71aba135573ca00646666ae68cdc3a8012400046424460040066eb8d5d09aab9e500423263200933573801801600e00c26aae7540044dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6401466ae7003403002001c0184d55cea80089baa0012323333573466e1d40052002200623333573466e1d40092000200623263200633573801201000800626aae74dd5000a4c24400424400224002920103505431003200135500322112225335001135003220012213335005220023004002333553007120010050040011122002122122330010040031123230010012233003300200200101"
+          )
+          PlutusV2
+      )
+  )
 
 txFixture1 :: Transaction
 txFixture1 =
@@ -371,7 +438,6 @@ txFixture1 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -382,6 +448,10 @@ txFixture1 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
+        , votingProcedures: mempty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -405,7 +475,6 @@ txFixture2 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -416,6 +485,10 @@ txFixture2 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
+        , votingProcedures: mempty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: witnessSetFixture3Value
     , isValid: true
@@ -457,7 +530,6 @@ txFixture3 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , referenceInputs: [ txInputFixture1 ]
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
@@ -468,6 +540,10 @@ txFixture3 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
+        , votingProcedures: mempty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -574,36 +650,22 @@ txFixture4 =
                 { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
                 , epoch: Epoch one
                 }
-            , GenesisKeyDelegation
-                { genesisHash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-                    hexToByteArrayUnsafe
-                      "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-                , genesisDelegateHash: unsafePartial $ fromJust $ decodeCbor
-                    $ wrap
-                    $
-                      hexToByteArrayUnsafe
-                        "5d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65"
-                , vrfKeyhash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-                    hexToByteArrayUnsafe
-                      "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
-                }
-            , MoveInstantaneousRewardsCert $ ToOtherPot
-                { pot: Reserves
-                , amount: wrap bigNumOne
-                }
-            , MoveInstantaneousRewardsCert $ ToStakeCreds
-                { pot: Treasury
-                , amounts: MIRToStakeCredentials $ Map.fromFoldable
-                    [ wrap stake1 /\ Int.newPositive bigNumOne ]
-                }
+            , VoteDelegCert (wrap stake1) (DrepCred stake1)
+            , StakeVoteDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) AlwaysAbstain
+            , StakeRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (Coin BigNum.one)
+            , VoteRegDelegCert (wrap stake1) AlwaysNoConfidence (Coin BigNum.one)
+            , StakeVoteRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (DrepCred stake1) (Coin BigNum.one)
+            , AuthCommitteeHotCert { coldCred: stake1, hotCred: stake2 }
+            , ResignCommitteeColdCert stake1 (Just anchor1)
+            , ResignCommitteeColdCert stake2 Nothing
+            , RegDrepCert stake1 (Coin BigNum.one) (Just anchor1)
+            , RegDrepCert stake2 (Coin BigNum.one) Nothing
+            , UnregDrepCert stake1 (Coin BigNum.one)
+            , UpdateDrepCert stake1 (Just anchor1)
+            , UpdateDrepCert stake2 Nothing
             ]
         , withdrawals: Map.fromFoldable
             [ rewardAddress1 /\ Coin BigNum.one ]
-        , update: Just $ Update
-            { proposedProtocolParameterUpdates:
-                proposedProtocolParameterUpdates1
-            , epoch: Epoch zero
-            }
         , auxiliaryDataHash: decodeCbor $ wrap
             $ byteArrayFromIntArrayUnsafe
             $ Array.replicate 32 0
@@ -620,6 +682,26 @@ txFixture4 =
         , networkId: Just MainnetId
         , collateralReturn: Just txOutputFixture1
         , totalCollateral: Just $ Coin $ BigNum.fromInt 5_000_000
+        , votingProposals:
+            [ proposalChangePParams1
+            , proposalChangePParams2
+            , proposalChangePParams3
+            , proposalChangePParams4
+            , proposalTriggerHF1
+            , proposalTriggerHF2
+            , proposalTreasuryWdrl1
+            , proposalTreasuryWdrl2
+            , proposalNoConfidence1
+            , proposalNoConfidence2
+            , proposalNewCommittee1
+            , proposalNewCommittee2
+            , proposalNewConstitution1
+            , proposalNewConstitution2
+            , proposalInfo1
+            ]
+        , votingProcedures: votingProcedures1
+        , currentTreasuryValue: Just $ Coin $ BigNum.fromInt 6_000_000
+        , donation: Just $ Coin $ BigNum.fromInt 7_000_000
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -631,6 +713,178 @@ txFixture4 =
         }
     , isValid: true
     , auxiliaryData: mempty
+    }
+
+mkVotingProposal :: GovernanceAction -> VotingProposal
+mkVotingProposal govAction = wrap
+  { govAction
+  , anchor: anchor1
+  , deposit: BigNum.fromInt 5_000_000
+  , returnAddr: rewardAddress1
+  }
+
+proposalChangePParams1 :: VotingProposal
+proposalChangePParams1 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Just govActionId1
+    , policyHash: Just currencySymbol1
+    }
+
+proposalChangePParams2 :: VotingProposal
+proposalChangePParams2 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Just govActionId1
+    , policyHash: Nothing
+    }
+
+proposalChangePParams3 :: VotingProposal
+proposalChangePParams3 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Nothing
+    , policyHash: Just currencySymbol1
+    }
+
+proposalChangePParams4 :: VotingProposal
+proposalChangePParams4 =
+  mkVotingProposal $ ChangePParams $ wrap
+    { pparamsUpdate: protocolParamUpdate1
+    , actionId: Nothing
+    , policyHash: Nothing
+    }
+
+proposalTriggerHF1 :: VotingProposal
+proposalTriggerHF1 =
+  mkVotingProposal $ TriggerHF $ wrap
+    { protocolVersion: ProtocolVersion { major: 1, minor: 1 }
+    , actionId: Just govActionId1
+    }
+
+proposalTriggerHF2 :: VotingProposal
+proposalTriggerHF2 =
+  mkVotingProposal $ TriggerHF $ wrap
+    { protocolVersion: ProtocolVersion { major: 1, minor: 1 }
+    , actionId: Nothing
+    }
+
+proposalTreasuryWdrl1 :: VotingProposal
+proposalTreasuryWdrl1 =
+  mkVotingProposal $ TreasuryWdrl $ wrap
+    { withdrawals: Map.fromFoldable [ rewardAddress1 /\ Coin BigNum.one ]
+    , policyHash: Just currencySymbol1
+    }
+
+proposalTreasuryWdrl2 :: VotingProposal
+proposalTreasuryWdrl2 =
+  mkVotingProposal $ TreasuryWdrl $ wrap
+    { withdrawals: Map.fromFoldable [ rewardAddress1 /\ Coin BigNum.one ]
+    , policyHash: Nothing
+    }
+
+proposalNoConfidence1 :: VotingProposal
+proposalNoConfidence1 =
+  mkVotingProposal $ NoConfidence $ wrap
+    { actionId: Just govActionId1
+    }
+
+proposalNoConfidence2 :: VotingProposal
+proposalNoConfidence2 =
+  mkVotingProposal $ NoConfidence $ wrap
+    { actionId: Nothing
+    }
+
+proposalNewCommittee1 :: VotingProposal
+proposalNewCommittee1 =
+  mkVotingProposal $ NewCommittee $ wrap
+    { committee: wrap
+        { quorumThreshold: mkUnitInterval 3 5
+        , members: [ stake1 /\ Epoch one ]
+        }
+    , membersToRemove: [ stake1, stake2 ]
+    , actionId: Just govActionId1
+    }
+
+proposalNewCommittee2 :: VotingProposal
+proposalNewCommittee2 =
+  mkVotingProposal $ NewCommittee $ wrap
+    { committee: wrap
+        { quorumThreshold: mkUnitInterval 3 5
+        , members: mempty
+        }
+    , membersToRemove: mempty
+    , actionId: Nothing
+    }
+
+proposalNewConstitution1 :: VotingProposal
+proposalNewConstitution1 =
+  mkVotingProposal $ NewConstitution $ wrap
+    { constitution: wrap
+        { anchor: anchor1
+        , scriptHash: Just currencySymbol1
+        }
+    , actionId: Just govActionId1
+    }
+
+proposalNewConstitution2 :: VotingProposal
+proposalNewConstitution2 =
+  mkVotingProposal $ NewConstitution $ wrap
+    { constitution: wrap
+        { anchor: anchor1
+        , scriptHash: Nothing
+        }
+    , actionId: Nothing
+    }
+
+proposalInfo1 :: VotingProposal
+proposalInfo1 = mkVotingProposal Info
+
+votingProcedures1 :: VotingProcedures
+votingProcedures1 =
+  wrap $
+    Map.fromFoldable
+      [ Cc stake1 /\ Map.fromFoldable
+          [ govActionId1 /\ wrap
+              { vote: VoteNo
+              , anchor: Just anchor1
+              }
+          , govActionId2 /\ wrap
+              { vote: VoteYes
+              , anchor: Nothing
+              }
+          ]
+      , Drep stake2 /\ Map.fromFoldable
+          [ govActionId1 /\ wrap
+              { vote: VoteAbstain
+              , anchor: Just anchor1
+              }
+          ]
+      , Spo ed25519KeyHash1 /\ Map.fromFoldable -- Note: fails for Map.empty
+          [ govActionId2 /\ wrap
+              { vote: VoteAbstain
+              , anchor: Nothing
+              }
+          ]
+      ]
+
+govActionId1 :: GovernanceActionId
+govActionId1 = wrap $ unwrap txInputFixture1
+
+govActionId2 :: GovernanceActionId
+govActionId2 = wrap $ unwrap $ mkTxInput
+  { txId: "6d677265fa5bb21ce6d8c7502aca70b9316d10e958611f3c6b758f65ad959996"
+  , ix: 1
+  }
+
+anchor1 :: Anchor
+anchor1 =
+  wrap
+    { url: URL "https://example.com/"
+    , dataHash:
+        unsafePartial $ fromJust $ decodeCbor $ wrap $
+          hexToByteArrayUnsafe
+            "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
     }
 
 txFixture5 :: Transaction
@@ -657,7 +911,6 @@ txFixture5 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -668,6 +921,10 @@ txFixture5 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
+        , votingProcedures: mempty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -691,7 +948,6 @@ txFixture6 =
         , ttl: Nothing
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing
         , mint: Nothing
@@ -702,6 +958,10 @@ txFixture6 =
         , networkId: Just MainnetId
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
+        , votingProcedures: mempty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -732,7 +992,6 @@ txFixture7 =
         , ttl: Just $ Slot $ BigNum.fromInt 123
         , certs: []
         , withdrawals: Map.empty
-        , update: Nothing
         , auxiliaryDataHash: Nothing
         , validityStartInterval: Nothing -- Just $ Slot $ BigNum.one
         , mint: Nothing
@@ -743,6 +1002,10 @@ txFixture7 =
         , networkId: Nothing
         , collateralReturn: Nothing
         , totalCollateral: Nothing
+        , votingProposals: []
+        , votingProcedures: mempty
+        , currentTreasuryValue: Nothing
+        , donation: Nothing
         }
     , witnessSet: TransactionWitnessSet
         { vkeys: []
@@ -1326,7 +1589,7 @@ redeemerFixture1 :: Redeemer
 redeemerFixture1 = Redeemer
   { tag: Spend
   , index: BigNum.fromInt 0
-  , data: plutusDataFixture7
+  , data: wrap plutusDataFixture7
   , exUnits: ExUnits
       { mem: BigNum.fromInt 1
       , steps: BigNum.fromInt 1

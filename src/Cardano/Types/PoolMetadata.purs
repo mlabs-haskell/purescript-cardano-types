@@ -1,20 +1,20 @@
-module Cardano.Types.PoolMetadata where
+module Cardano.Types.PoolMetadata
+  ( PoolMetadata(PoolMetadata)
+  , fromCsl
+  , toCsl
+  ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
-  ( poolMetadata_new
-  , poolMetadata_poolMetadataHash
-  , poolMetadata_url
-  )
+import Cardano.Serialization.Lib (poolMetadata_new, poolMetadata_poolMetadataHash, poolMetadata_url)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.PoolMetadataHash (PoolMetadataHash)
 import Cardano.Types.URL (URL)
-import Cardano.Types.URL as URL
+import Cardano.Types.URL (fromCsl, toCsl) as URL
 import Data.Generic.Rep (class Generic)
-import Data.Newtype (unwrap, wrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
 newtype PoolMetadata = PoolMetadata
@@ -22,9 +22,10 @@ newtype PoolMetadata = PoolMetadata
   , hash :: PoolMetadataHash
   }
 
+derive instance Generic PoolMetadata _
+derive instance Newtype PoolMetadata _
 derive instance Eq PoolMetadata
 derive instance Ord PoolMetadata
-derive instance Generic PoolMetadata _
 derive newtype instance EncodeAeson PoolMetadata
 derive newtype instance DecodeAeson PoolMetadata
 

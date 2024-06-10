@@ -1,4 +1,10 @@
-module Cardano.Types.Credential where
+module Cardano.Types.Credential
+  ( Credential(PubKeyHashCredential, ScriptHashCredential)
+  , asPubKeyHash
+  , asScriptHash
+  , fromCsl
+  , toCsl
+  ) where
 
 import Prelude
 
@@ -10,14 +16,6 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor)
-import Cardano.Serialization.Lib
-  ( fromBytes
-  , stakeCredential_fromKeyhash
-  , stakeCredential_fromScripthash
-  , stakeCredential_toKeyhash
-  , stakeCredential_toScripthash
-  , toBytes
-  )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
@@ -51,6 +49,9 @@ asScriptHash _ = Nothing
 derive instance Generic Credential _
 derive instance Eq Credential
 derive instance Ord Credential
+
+instance Show Credential where
+  show = genericShow
 
 instance Arbitrary Credential where
   arbitrary = oneOf $
@@ -88,19 +89,18 @@ instance DecodeAeson Credential where
       "ScriptHashCredential" -> ScriptHashCredential <$> aesonContents
       _ -> Left $ TypeMismatch ("Unknown tag: " <> tag)
 
-instance Show Credential where
-  show = genericShow
-
 instance AsCbor Credential where
-  encodeCbor = toCsl >>> toBytes >>> wrap
-  decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
-toCsl :: Credential -> Csl.StakeCredential
+toCsl :: Credential -> Csl.Credential
 toCsl = case _ of
-  PubKeyHashCredential kh -> stakeCredential_fromKeyhash (unwrap kh)
-  ScriptHashCredential sh -> stakeCredential_fromScripthash (unwrap sh)
+  PubKeyHashCredential kh ->
+    Csl.credential_fromKeyhash (unwrap kh)
+  ScriptHashCredential sh ->
+    Csl.credential_fromScripthash (unwrap sh)
 
-fromCsl :: Csl.StakeCredential -> Credential
+fromCsl :: Csl.Credential -> Credential
 fromCsl sc = unsafePartial $ fromJust $
-  (map (PubKeyHashCredential <<< wrap) $ toMaybe $ stakeCredential_toKeyhash sc) <|>
-    (map (ScriptHashCredential <<< wrap) $ toMaybe $ stakeCredential_toScripthash sc)
+  (map (PubKeyHashCredential <<< wrap) $ toMaybe $ Csl.credential_toKeyhash sc) <|>
+    (map (ScriptHashCredential <<< wrap) $ toMaybe $ Csl.credential_toScripthash sc)

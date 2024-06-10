@@ -15,9 +15,9 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (unpackMapContainerToMapWith)
+import Cardano.Serialization.Lib (unpackMapContainerToMapWith, unpackMultiMapContainerToMapWith)
 import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
+import Cardano.Serialization.Lib.Internal (packMapContainerWithClone, packMultiMapContainerWithClone)
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
 import Cardano.Types.Internal.Helpers (clone)
@@ -25,15 +25,16 @@ import Cardano.Types.MultiAsset (MultiAsset)
 import Cardano.Types.MultiAsset as MultiAsset
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array (foldM)
+import Data.Foldable (foldl)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
-import Data.Map as Map
+import Data.Map (empty, filter, isEmpty, singleton, toUnfoldable, unionWith) as Map
 import Data.Maybe (Maybe, fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.These (These(Both, That, This))
 import Data.Traversable (for, traverse)
-import Data.Tuple.Nested ((/\), type (/\))
+import Data.Tuple.Nested (type (/\), (/\))
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafePartial)
@@ -150,12 +151,21 @@ unionNonAda (Mint l) (Mint r) =
 
 toCsl :: Mint -> Csl.Mint
 toCsl mint | Mint mp <- normalizeMint mint =
-  packMapContainerWithClone $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
+  packMultiMapContainerWithClone $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
     unwrap scriptHash /\
       packMapContainerWithClone do
         Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
           unwrap assetName /\ unwrap quantity
 
+-- NOTE: CSL.Mint can store multiple entries for the same policy id.
+-- https://github.com/Emurgo/cardano-serialization-lib/blob/4a35ef11fd5c4931626c03025fe6f67743a6bdf9/rust/src/lib.rs#L3627
 fromCsl :: Csl.Mint -> Mint
-fromCsl = wrap <<< unpackMapContainerToMapWith wrap
-  (clone >>> unpackMapContainerToMapWith wrap wrap)
+fromCsl = wrap <<< unpackMultiMapContainerToMapWith wrap
+  ( foldl (Map.unionWith addTokenQuantities) Map.empty
+      <<< map (unpackMapContainerToMapWith wrap wrap <<< clone)
+  )
+  where
+  addTokenQuantities :: Int.Int -> Int.Int -> Int.Int
+  addTokenQuantities x y =
+    unsafePerformEffect $ maybe (throw "Mint.fromCsl: numeric overflow") pure $
+      Int.add x y

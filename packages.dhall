@@ -167,7 +167,7 @@ let additions =
           , "strings"
           ]
         , repo = "https://github.com/mlabs-haskell/purescript-bytearrays"
-        , version = "e3991d562a04d8825472551d91a06407ad9c9112"
+        , version = "v1.0.0"
         }
       , cardano-serialization-lib =
         { dependencies =
@@ -175,18 +175,22 @@ let additions =
           , "argonaut"
           , "bifunctors"
           , "bytearrays"
+          , "console"
           , "effect"
           , "either"
+          , "enums"
           , "maybe"
           , "nullable"
           , "ordered-collections"
+          , "partial"
           , "prelude"
           , "profunctor"
           , "tuples"
+          , "unsafe-coerce"
           ]
         , repo =
             "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib"
-        , version = "c66afbb9c572db096690ec1dd786c9ec96105c0d"
+        , version = "v1.0.0"
         }
       , cardano-plutus-data-schema =
         { dependencies = [ "prelude" ]
@@ -216,7 +220,7 @@ let additions =
           , "transformers"
           ]
         , repo = "https://github.com/mlabs-haskell/purescript-mote-testplan"
-        , version = "d1c93e08ef09f5427b460f396b89da7255f8af52"
+        , version = "v1.0.0"
         }
       }
 

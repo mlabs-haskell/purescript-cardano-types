@@ -10,6 +10,8 @@ import Cardano.Serialization.Lib
   , transactionBody_certs
   , transactionBody_collateral
   , transactionBody_collateralReturn
+  , transactionBody_currentTreasuryValue
+  , transactionBody_donation
   , transactionBody_fee
   , transactionBody_inputs
   , transactionBody_mint
@@ -23,6 +25,8 @@ import Cardano.Serialization.Lib
   , transactionBody_setCerts
   , transactionBody_setCollateral
   , transactionBody_setCollateralReturn
+  , transactionBody_setCurrentTreasuryValue
+  , transactionBody_setDonation
   , transactionBody_setMint
   , transactionBody_setNetworkId
   , transactionBody_setReferenceInputs
@@ -30,13 +34,15 @@ import Cardano.Serialization.Lib
   , transactionBody_setScriptDataHash
   , transactionBody_setTotalCollateral
   , transactionBody_setTtl
-  , transactionBody_setUpdate
   , transactionBody_setValidityStartIntervalBignum
+  , transactionBody_setVotingProcedures
+  , transactionBody_setVotingProposals
   , transactionBody_setWithdrawals
   , transactionBody_totalCollateral
   , transactionBody_ttlBignum
-  , transactionBody_update
   , transactionBody_validityStartIntervalBignum
+  , transactionBody_votingProcedures
+  , transactionBody_votingProposals
   , transactionBody_withdrawals
   , unpackListContainer
   , unpackMapContainerToMapWith
@@ -61,19 +67,25 @@ import Cardano.Types.TransactionInput (TransactionInput)
 import Cardano.Types.TransactionInput as TransactionInput
 import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
-import Cardano.Types.Update (Update)
-import Cardano.Types.Update as Update
+import Cardano.Types.VotingProcedures (VotingProcedures)
+import Cardano.Types.VotingProcedures (fromCsl, toCsl) as VotingProcedures
+import Cardano.Types.VotingProposal (VotingProposal)
+import Cardano.Types.VotingProposal as VotingProposal
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens')
+import Data.Lens.Iso.Newtype (_Newtype)
+import Data.Lens.Record (prop)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(Nothing), fromMaybe)
+import Data.Maybe (Maybe(Nothing), fromMaybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for_)
 import Effect.Unsafe (unsafePerformEffect)
+import Type.Proxy (Proxy(Proxy))
 
 newtype TransactionBody = TransactionBody
   { inputs :: Array TransactionInput
@@ -82,7 +94,6 @@ newtype TransactionBody = TransactionBody
   , ttl :: Maybe Slot
   , certs :: Array Certificate
   , withdrawals :: Map RewardAddress Coin
-  , update :: Maybe Update
   , auxiliaryDataHash :: Maybe AuxiliaryDataHash
   , validityStartInterval :: Maybe Slot
   , mint :: Maybe Mint
@@ -93,6 +104,10 @@ newtype TransactionBody = TransactionBody
   , collateralReturn :: Maybe TransactionOutput
   , totalCollateral :: Maybe Coin
   , referenceInputs :: Array TransactionInput
+  , votingProposals :: Array VotingProposal
+  , votingProcedures :: VotingProcedures
+  , currentTreasuryValue :: Maybe Coin
+  , donation :: Maybe Coin
   }
 
 derive instance Newtype TransactionBody _
@@ -107,7 +122,6 @@ empty = TransactionBody
   , ttl: Nothing
   , certs: []
   , withdrawals: Map.empty
-  , update: Nothing
   , auxiliaryDataHash: Nothing
   , validityStartInterval: Nothing
   , mint: Nothing
@@ -118,6 +132,10 @@ empty = TransactionBody
   , collateralReturn: Nothing
   , totalCollateral: Nothing
   , referenceInputs: []
+  , votingProposals: []
+  , votingProcedures: mempty
+  , currentTreasuryValue: Nothing
+  , donation: Nothing
   }
 
 instance Ord TransactionBody where
@@ -141,7 +159,6 @@ toCsl
       , ttl
       , certs
       , withdrawals
-      , update
       , auxiliaryDataHash
       , validityStartInterval
       , mint
@@ -152,6 +169,10 @@ toCsl
       , collateralReturn
       , totalCollateral
       , referenceInputs
+      , votingProposals
+      , votingProcedures
+      , currentTreasuryValue
+      , donation
       }
   ) = unsafePerformEffect do
   -- inputs, outputs, fee
@@ -167,8 +188,6 @@ toCsl
   -- withdrawals
   transactionBody_setWithdrawals tb $ packMapContainer $
     (RewardAddress.toCsl *** unwrap <<< unwrap) <$> Map.toUnfoldable withdrawals
-  -- update
-  for_ update $ transactionBody_setUpdate tb <<< Update.toCsl
   -- auxiliaryDataHash
   for_ auxiliaryDataHash $ transactionBody_setAuxiliaryDataHash tb <<< unwrap
   -- validityStartInterval
@@ -193,6 +212,16 @@ toCsl
   -- referenceInputs
   withNonEmptyArray (TransactionInput.toCsl <$> referenceInputs) $
     transactionBody_setReferenceInputs tb
+  -- votingProposals
+  withNonEmptyArray (VotingProposal.toCsl <$> votingProposals) $
+    transactionBody_setVotingProposals tb
+  -- votingProcedures
+  when (votingProcedures /= mempty) do
+    transactionBody_setVotingProcedures tb $ VotingProcedures.toCsl votingProcedures
+  -- currentTreasuryValue
+  for_ currentTreasuryValue $ transactionBody_setCurrentTreasuryValue tb <<< unwrap <<< unwrap
+  -- donation
+  for_ donation $ transactionBody_setDonation tb <<< unwrap <<< unwrap
   pure tb
 
 fromCsl :: Csl.TransactionBody -> TransactionBody
@@ -204,7 +233,6 @@ fromCsl tb =
     , ttl
     , certs
     , withdrawals
-    , update
     , auxiliaryDataHash
     , validityStartInterval
     , mint
@@ -215,6 +243,10 @@ fromCsl tb =
     , collateralReturn
     , totalCollateral
     , referenceInputs
+    , votingProposals
+    , votingProcedures
+    , currentTreasuryValue
+    , donation
     }
   where
   inputs = map TransactionInput.fromCsl $ unpackListContainer $
@@ -230,8 +262,6 @@ fromCsl tb =
     $ map (unpackMapContainerToMapWith RewardAddress.fromCsl (wrap <<< wrap))
     $ toMaybe
     $ transactionBody_withdrawals tb
-  update = Update.fromCsl <$>
-    toMaybe (transactionBody_update tb)
   auxiliaryDataHash = wrap <$>
     toMaybe (transactionBody_auxiliaryDataHash tb)
   validityStartInterval = wrap <<< wrap <$>
@@ -251,3 +281,72 @@ fromCsl tb =
     toMaybe (transactionBody_totalCollateral tb)
   referenceInputs = map TransactionInput.fromCsl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_referenceInputs tb)
+  votingProposals = map VotingProposal.fromCsl $ fromMaybe [] $ unpackListContainer <$>
+    toMaybe (transactionBody_votingProposals tb)
+  votingProcedures = maybe mempty VotingProcedures.fromCsl $
+    toMaybe (transactionBody_votingProcedures tb)
+  currentTreasuryValue = wrap <<< wrap <$>
+    toMaybe (transactionBody_currentTreasuryValue tb)
+  donation = wrap <<< wrap <$>
+    toMaybe (transactionBody_donation tb)
+
+_inputs :: Lens' TransactionBody (Array TransactionInput)
+_inputs = _Newtype <<< prop (Proxy :: Proxy "inputs")
+
+_fee :: Lens' TransactionBody Coin
+_fee = _Newtype <<< prop (Proxy :: Proxy "fee")
+
+_outputs :: Lens' TransactionBody (Array TransactionOutput)
+_outputs = _Newtype <<< prop (Proxy :: Proxy "outputs")
+
+_certs :: Lens' TransactionBody (Array Certificate)
+_certs = _Newtype <<< prop (Proxy :: Proxy "certs")
+
+_networkId :: Lens' TransactionBody (Maybe NetworkId)
+_networkId = _Newtype <<< prop (Proxy :: Proxy "networkId")
+
+_scriptDataHash :: Lens' TransactionBody (Maybe ScriptDataHash)
+_scriptDataHash = _Newtype <<< prop (Proxy :: Proxy "scriptDataHash")
+
+_collateral :: Lens' TransactionBody (Array TransactionInput)
+_collateral = _Newtype <<< prop (Proxy :: Proxy "collateral")
+
+_collateralReturn :: Lens' TransactionBody (Maybe TransactionOutput)
+_collateralReturn = _Newtype <<< prop (Proxy :: Proxy "collateralReturn")
+
+_totalCollateral :: Lens' TransactionBody (Maybe Coin)
+_totalCollateral = _Newtype <<< prop (Proxy :: Proxy "totalCollateral")
+
+_referenceInputs :: Lens' TransactionBody (Array TransactionInput)
+_referenceInputs = _Newtype <<< prop (Proxy :: Proxy "referenceInputs")
+
+_requiredSigners :: Lens' TransactionBody (Array Ed25519KeyHash)
+_requiredSigners = _Newtype <<< prop (Proxy :: Proxy "requiredSigners")
+
+_withdrawals :: Lens' TransactionBody (Map RewardAddress Coin)
+_withdrawals = _Newtype <<< prop (Proxy :: Proxy "withdrawals")
+
+_mint :: Lens' TransactionBody (Maybe Mint)
+_mint = _Newtype <<< prop (Proxy :: Proxy "mint")
+
+_auxiliaryDataHash :: Lens' TransactionBody (Maybe AuxiliaryDataHash)
+_auxiliaryDataHash = _Newtype <<< prop (Proxy :: Proxy "auxiliaryDataHash")
+
+_ttl :: Lens' TransactionBody (Maybe Slot)
+_ttl = _Newtype <<< prop (Proxy :: Proxy "ttl")
+
+_validityStartInterval :: Lens' TransactionBody (Maybe Slot)
+_validityStartInterval = _Newtype <<< prop
+  (Proxy :: Proxy "validityStartInterval")
+
+_votingProposals :: Lens' TransactionBody (Array VotingProposal)
+_votingProposals = _Newtype <<< prop (Proxy :: Proxy "votingProposals")
+
+_votingProcedures :: Lens' TransactionBody (VotingProcedures)
+_votingProcedures = _Newtype <<< prop (Proxy :: Proxy "votingProcedures")
+
+_currentTreasuryValue :: Lens' TransactionBody (Maybe Coin)
+_currentTreasuryValue = _Newtype <<< prop (Proxy :: Proxy "currentTreasuryValue")
+
+_donation :: Lens' TransactionBody (Maybe Coin)
+_donation = _Newtype <<< prop (Proxy :: Proxy "donation")

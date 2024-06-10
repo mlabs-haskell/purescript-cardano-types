@@ -2,6 +2,12 @@ module Cardano.Types.TransactionWitnessSet
   ( TransactionWitnessSet(TransactionWitnessSet)
   , fromCsl
   , toCsl
+  , _redeemers
+  , _plutusData
+  , _plutusScripts
+  , _nativeScripts
+  , _vkeys
+  , _bootstraps
   ) where
 
 import Prelude
@@ -41,11 +47,15 @@ import Cardano.Types.Vkeywitness (Vkeywitness)
 import Cardano.Types.Vkeywitness as Vkeywitness
 import Data.Array (nub)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens')
+import Data.Lens.Iso.Newtype (_Newtype)
+import Data.Lens.Record (prop)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (Nullable, toMaybe)
 import Data.Show.Generic (genericShow)
 import Effect.Unsafe (unsafePerformEffect)
+import Type.Proxy (Proxy(Proxy))
 
 newtype TransactionWitnessSet = TransactionWitnessSet
   { vkeys :: Array Vkeywitness
@@ -123,3 +133,21 @@ toCsl
   withNonEmptyArray (Redeemer.toCsl <$> redeemers) $
     transactionWitnessSet_setRedeemers ws
   pure ws
+
+_redeemers :: Lens' TransactionWitnessSet (Array Redeemer)
+_redeemers = _Newtype <<< prop (Proxy :: Proxy "redeemers")
+
+_plutusData :: Lens' TransactionWitnessSet (Array PlutusData)
+_plutusData = _Newtype <<< prop (Proxy :: Proxy "plutusData")
+
+_plutusScripts :: Lens' TransactionWitnessSet (Array PlutusScript)
+_plutusScripts = _Newtype <<< prop (Proxy :: Proxy "plutusScripts")
+
+_nativeScripts :: Lens' TransactionWitnessSet (Array NativeScript)
+_nativeScripts = _Newtype <<< prop (Proxy :: Proxy "nativeScripts")
+
+_vkeys :: Lens' TransactionWitnessSet (Array Vkeywitness)
+_vkeys = _Newtype <<< prop (Proxy :: Proxy "vkeys")
+
+_bootstraps :: Lens' TransactionWitnessSet (Array BootstrapWitness)
+_bootstraps = _Newtype <<< prop (Proxy :: Proxy "bootstraps")
