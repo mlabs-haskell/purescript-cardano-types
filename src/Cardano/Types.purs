@@ -94,6 +94,7 @@ import Cardano.Types.ProtocolVersion (ProtocolVersion(ProtocolVersion)) as X
 import Cardano.Types.PublicKey (PublicKey(PublicKey)) as X
 import Cardano.Types.RawBytes (RawBytes(RawBytes)) as X
 import Cardano.Types.Redeemer (Redeemer(Redeemer)) as X
+import Cardano.Types.RedeemerDatum (RedeemerDatum(RedeemerDatum)) as X
 import Cardano.Types.RedeemerTag
   ( RedeemerTag
       ( Spend
@@ -131,7 +132,11 @@ import Cardano.Types.TransactionBody
   , _referenceInputs
   ) as X
 import Cardano.Types.TransactionHash (TransactionHash(TransactionHash)) as X
-import Cardano.Types.TransactionInput (TransactionInput(TransactionInput)) as X
+import Cardano.Types.TransactionInput
+  ( TransactionInput(TransactionInput)
+  , _transactionId
+  , _index
+  ) as X
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum) as X -- name conflicts with PlutusData
 import Cardano.Types.TransactionOutput
   ( TransactionOutput(TransactionOutput)

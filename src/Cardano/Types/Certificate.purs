@@ -1,4 +1,18 @@
-module Cardano.Types.Certificate where
+module Cardano.Types.Certificate
+  ( Certificate
+    (StakeRegistration
+    , StakeDeregistration
+    , StakeDelegation
+    , PoolRegistration
+    , PoolRetirement
+    , GenesisKeyDelegation
+    , MoveInstantaneousRewardsCert
+    )
+  , fromCsl
+  , toCsl
+  )
+
+where
 
 import Prelude
 

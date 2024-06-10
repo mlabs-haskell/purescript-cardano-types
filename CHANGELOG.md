@@ -3,6 +3,7 @@
 ## Added
 
 - `RedeemerDatum` type (a tagged newtype over `PlutusData`)
+- Field access lenses for main domain types (`Transaction`, `TransactionOutput`, `TransactionInput`)
 
 ## Changed
 
