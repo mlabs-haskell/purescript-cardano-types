@@ -167,7 +167,7 @@ let additions =
           , "strings"
           ]
         , repo = "https://github.com/mlabs-haskell/purescript-bytearrays"
-        , version = "e3991d562a04d8825472551d91a06407ad9c9112"
+        , version = "v1.0.0"
         }
       , cardano-serialization-lib =
         { dependencies =
@@ -190,7 +190,7 @@ let additions =
           ]
         , repo =
             "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib"
-        , version = "238bb2f1ab748963d39ae2ad37402b0acc9841f0"
+        , version = "v1.0.0"
         }
       , cardano-plutus-data-schema =
         { dependencies = [ "prelude" ]
@@ -220,7 +220,7 @@ let additions =
           , "transformers"
           ]
         , repo = "https://github.com/mlabs-haskell/purescript-mote-testplan"
-        , version = "d1c93e08ef09f5427b460f396b89da7255f8af52"
+        , version = "v1.0.0"
         }
       }
 

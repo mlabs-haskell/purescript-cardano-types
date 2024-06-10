@@ -151,7 +151,7 @@ let
 
     "bytearrays" = pkgs.stdenv.mkDerivation {
         name = "bytearrays";
-        version = "e3991d562a04d8825472551d91a06407ad9c9112";
+        version = "v1.0.0";
         src = pkgs.fetchgit {
           url = "https://github.com/mlabs-haskell/purescript-bytearrays";
           rev = "e3991d562a04d8825472551d91a06407ad9c9112";
@@ -175,11 +175,11 @@ let
 
     "cardano-serialization-lib" = pkgs.stdenv.mkDerivation {
         name = "cardano-serialization-lib";
-        version = "238bb2f1ab748963d39ae2ad37402b0acc9841f0";
+        version = "v1.0.0";
         src = pkgs.fetchgit {
           url = "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib";
-          rev = "238bb2f1ab748963d39ae2ad37402b0acc9841f0";
-          sha256 = "1g43s1dp4pj2bl04m77af2h2j3f818f97n767m9cg9scmbq62c5y";
+          rev = "903bf0adeefedc4d065ad6523ad079433bdd8e32";
+          sha256 = "0jlfxrx037hyd4v0j7l2b16yxlm6nw6qlnr992hj9nzip36vbpfg";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
@@ -607,11 +607,11 @@ let
 
     "mote-testplan" = pkgs.stdenv.mkDerivation {
         name = "mote-testplan";
-        version = "d1c93e08ef09f5427b460f396b89da7255f8af52";
+        version = "v1.0.0";
         src = pkgs.fetchgit {
           url = "https://github.com/mlabs-haskell/purescript-mote-testplan";
-          rev = "d1c93e08ef09f5427b460f396b89da7255f8af52";
-          sha256 = "1317v612hq1hlw3m6vvzjfpg3vzm4pdlpix6z4z221cpgaga4i2r";
+          rev = "3d56986a32134fbd675e42ef6b6f55dc91ad678a";
+          sha256 = "11vivzi1bs9mc8hx4v4zarb9r7x47zm6m6z1xvcn228m7lr69csy";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
