@@ -47,18 +47,20 @@ import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Control.Alt ((<|>))
+import Data.Array (concat, singleton) as Array
 import Data.Array.NonEmpty as NA
 import Data.ByteArray (ByteArray, byteArrayToHex, hexToByteArray)
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
+import Data.Map (fromFoldableWith, toUnfoldable) as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
-import Data.Traversable (for)
+import Data.Traversable (for, sequence)
 import Data.Tuple (Tuple)
 import Data.Tuple.Nested (type (/\), (/\))
 import JS.BigInt (BigInt)
@@ -200,7 +202,10 @@ toCsl = case _ of
 
   convertPlutusMap :: Array (PlutusData /\ PlutusData) -> Csl.PlutusData
   convertPlutusMap mp =
-    plutusData_newMap $ packMapContainer $ map (toCsl *** toCsl) mp
+    plutusData_newMap $ packMapContainer
+      ( (toCsl *** (packListContainer <<< map toCsl)) <$>
+          Map.toUnfoldable (Map.fromFoldableWith (flip append) (map Array.singleton <$> mp))
+      )
 
   convertPlutusInteger :: BigInt -> Csl.PlutusData
   convertPlutusInteger =
@@ -225,7 +230,9 @@ fromCsl pd = unsafePartial $ fromJust $
 
   convertPlutusMap :: Csl.PlutusMap -> PlutusData
   convertPlutusMap pm =
-    Map $ map (fromCsl *** fromCsl) $ unpackMapContainer pm
+    Map $ Array.concat $
+      map (sequence <<< (fromCsl *** (map fromCsl <<< unpackListContainer))) $
+        (unpackMapContainer pm)
 
   convertPlutusList :: Csl.PlutusList -> PlutusData
   convertPlutusList = unpackListContainer >>> map fromCsl >>> List
