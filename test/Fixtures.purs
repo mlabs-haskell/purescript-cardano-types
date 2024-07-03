@@ -37,6 +37,7 @@ module Test.Fixtures
   , plutusDataFixture6
   , plutusDataFixture7
   , plutusDataFixture8
+  , plutusDataFixture9
   , plutusDataFixture8Bytes
   , plutusDataFixture8Bytes'
   , plutusScriptFixture1
@@ -1584,6 +1585,15 @@ plutusDataFixture8Bytes' = hexToByteArrayUnsafe
   \6500581c82325cbfc20b85bd1ca12e5d12b44b83f68662d8395167b45f1ff7fa4d746f6e6573\
   \206f6620736b7920581cda13ed22b9294f1d86bbd530e99b1456884c7364bf16c90edc1ae41e\
   \182d"
+
+-- PlutusData Map with duplicated keys 
+plutusDataFixture9 :: PlutusData
+plutusDataFixture9 = Map
+  [ plutusDataFixture5 /\ plutusDataFixture3
+  , plutusDataFixture5 /\ plutusDataFixture5
+  -- , plutusDataFixture3 /\ plutusDataFixture4
+  -- , plutusDataFixture5 /\ plutusDataFixture3
+  ]
 
 redeemerFixture1 :: Redeemer
 redeemerFixture1 = Redeemer
