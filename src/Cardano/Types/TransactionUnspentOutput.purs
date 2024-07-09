@@ -6,6 +6,8 @@ module Cardano.Types.TransactionUnspentOutput
   , toCsl
   , _input
   , _output
+  , filterUtxos
+  , hasTransactionHash
   ) where
 
 import Prelude
@@ -18,11 +20,13 @@ import Cardano.Serialization.Lib
   , transactionUnspentOutput_output
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.TransactionInput (TransactionInput)
+import Cardano.Types.TransactionHash (TransactionHash)
+import Cardano.Types.TransactionInput (TransactionInput(TransactionInput))
 import Cardano.Types.TransactionInput as TransactionInput
 import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.UtxoMap (UtxoMap)
+import Data.Array as Array
 import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens')
 import Data.Lens.Iso.Newtype (_Newtype)
@@ -61,6 +65,16 @@ fromUtxoMap =
   Map.toUnfoldable >>>
     map \(Tuple input output) ->
       TransactionUnspentOutput { input, output }
+
+filterUtxos :: (TransactionUnspentOutput -> Boolean) -> UtxoMap -> UtxoMap
+filterUtxos f =
+  fromUtxoMap >>> Array.filter f >>> toUtxoMap
+
+hasTransactionHash :: TransactionHash -> TransactionUnspentOutput -> Boolean
+hasTransactionHash
+  hash
+  (TransactionUnspentOutput { input: TransactionInput { transactionId } }) =
+  hash == transactionId
 
 fromCsl
   :: Csl.TransactionUnspentOutput -> TransactionUnspentOutput

@@ -8,6 +8,7 @@ module Cardano.Types.Transaction
   , _isValid
   , _witnessSet
   , _auxiliaryData
+  , findUtxos
   ) where
 
 import Prelude
@@ -18,19 +19,29 @@ import Cardano.Serialization.Lib (transaction_setIsValid)
 import Cardano.Serialization.Lib as Csl
 import Cardano.Types.AuxiliaryData (AuxiliaryData)
 import Cardano.Types.AuxiliaryData as AuxiliaryData
-import Cardano.Types.TransactionBody (TransactionBody)
+import Cardano.Types.TransactionBody (TransactionBody, _outputs)
 import Cardano.Types.TransactionBody as TransactionBody
 import Cardano.Types.TransactionHash (TransactionHash)
+import Cardano.Types.TransactionInput (TransactionInput(TransactionInput))
+import Cardano.Types.TransactionOutput (TransactionOutput)
+import Cardano.Types.TransactionUnspentOutput
+  ( TransactionUnspentOutput(TransactionUnspentOutput)
+  , toUtxoMap
+  )
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet)
 import Cardano.Types.TransactionWitnessSet as TransactionWitnessSet
+import Cardano.Types.UtxoMap (UtxoMap)
+import Data.Array (mapWithIndex)
+import Data.Array as Array
 import Data.Generic.Rep (class Generic)
-import Data.Lens (Lens')
+import Data.Lens (Lens', (^.))
 import Data.Lens.Iso.Newtype (_Newtype)
 import Data.Lens.Record (prop)
 import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
+import Data.UInt as UInt
 import Effect.Unsafe (unsafePerformEffect)
 import Literals.Undefined (undefined)
 import Type.Proxy (Proxy(Proxy))
@@ -72,6 +83,19 @@ hash = unwrap
   >>> TransactionBody.toCsl
   >>> Csl.hashTransaction
   >>> wrap
+
+findUtxos
+  :: (TransactionOutput -> Boolean)
+  -> Transaction
+  -> UtxoMap
+findUtxos pred tx = toUtxoMap $
+  Array.filter pred (tx ^. _body <<< _outputs) #
+    mapWithIndex \ix output -> TransactionUnspentOutput
+      { input: TransactionInput { transactionId, index: UInt.fromInt ix }
+      , output
+      }
+  where
+  transactionId = hash tx
 
 fromCsl :: Csl.Transaction -> Transaction
 fromCsl tx =
