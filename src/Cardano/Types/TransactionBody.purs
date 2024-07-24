@@ -186,8 +186,11 @@ toCsl
   -- certs
   withNonEmptyArray (Certificate.toCsl <$> certs) $ transactionBody_setCerts tb
   -- withdrawals
-  transactionBody_setWithdrawals tb $ packMapContainer $
-    (RewardAddress.toCsl *** unwrap <<< unwrap) <$> Map.toUnfoldable withdrawals
+  unless (Map.isEmpty withdrawals)
+    $ transactionBody_setWithdrawals tb
+    $ packMapContainer
+    $ map (RewardAddress.toCsl *** unwrap <<< unwrap)
+    $ Map.toUnfoldable withdrawals
   -- auxiliaryDataHash
   for_ auxiliaryDataHash $ transactionBody_setAuxiliaryDataHash tb <<< unwrap
   -- validityStartInterval
