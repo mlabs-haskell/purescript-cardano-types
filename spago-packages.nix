@@ -163,11 +163,11 @@ let
 
     "cardano-plutus-data-schema" = pkgs.stdenv.mkDerivation {
         name = "cardano-plutus-data-schema";
-        version = "eb0bb78927c50c4bee364e932c9fa8cf94546191";
+        version = "110ba00261b1480895f8412016c639ea655412f6";
         src = pkgs.fetchgit {
           url = "https://github.com/mlabs-haskell/purescript-cardano-plutus-data-schema";
-          rev = "eb0bb78927c50c4bee364e932c9fa8cf94546191";
-          sha256 = "118i6dlfqk7q0va3bd4vplsv9i6sh83cr51gshas6jjwc5qbriks";
+          rev = "110ba00261b1480895f8412016c639ea655412f6";
+          sha256 = "1zy3qrbbfq7ghvbkxa0cdm6jbsn4hw4w93ffmlv7bi6kpg36lz1m";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
