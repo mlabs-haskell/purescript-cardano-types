@@ -1,5 +1,5 @@
-module Cardano.Types.DrepVotingThresholds
-  ( DrepVotingThresholds(DrepVotingThresholds)
+module Cardano.Types.DRepVotingThresholds
+  ( DRepVotingThresholds(DRepVotingThresholds)
   , fromCsl
   , toCsl
   ) where
@@ -15,7 +15,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
-newtype DrepVotingThresholds = DrepVotingThresholds
+newtype DRepVotingThresholds = DRepVotingThresholds
   { motionNoConfidence :: UnitInterval
   , committeeNormal :: UnitInterval
   , committeeNoConfidence :: UnitInterval
@@ -28,23 +28,23 @@ newtype DrepVotingThresholds = DrepVotingThresholds
   , treasuryWithdrawal :: UnitInterval
   }
 
-derive instance Generic DrepVotingThresholds _
-derive instance Newtype DrepVotingThresholds _
-derive instance Eq DrepVotingThresholds
-derive instance Ord DrepVotingThresholds
-derive newtype instance EncodeAeson DrepVotingThresholds
-derive newtype instance DecodeAeson DrepVotingThresholds
+derive instance Generic DRepVotingThresholds _
+derive instance Newtype DRepVotingThresholds _
+derive instance Eq DRepVotingThresholds
+derive instance Ord DRepVotingThresholds
+derive newtype instance EncodeAeson DRepVotingThresholds
+derive newtype instance DecodeAeson DRepVotingThresholds
 
-instance Show DrepVotingThresholds where
+instance Show DRepVotingThresholds where
   show = genericShow
 
-instance AsCbor DrepVotingThresholds where
+instance AsCbor DRepVotingThresholds where
   encodeCbor = wrap <<< Csl.toBytes <<< toCsl
   decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
 
-toCsl :: DrepVotingThresholds -> Csl.DrepVotingThresholds
-toCsl (DrepVotingThresholds rec) =
-  Csl.drepVotingThresholds_new
+toCsl :: DRepVotingThresholds -> Csl.DRepVotingThresholds
+toCsl (DRepVotingThresholds rec) =
+  Csl.dRepVotingThresholds_new
     (UnitInterval.toCsl rec.motionNoConfidence)
     (UnitInterval.toCsl rec.committeeNormal)
     (UnitInterval.toCsl rec.committeeNoConfidence)
@@ -56,37 +56,37 @@ toCsl (DrepVotingThresholds rec) =
     (UnitInterval.toCsl rec.ppGovernanceGroup)
     (UnitInterval.toCsl rec.treasuryWithdrawal)
 
-fromCsl :: Csl.DrepVotingThresholds -> DrepVotingThresholds
+fromCsl :: Csl.DRepVotingThresholds -> DRepVotingThresholds
 fromCsl dvt =
-  DrepVotingThresholds
+  DRepVotingThresholds
     { motionNoConfidence:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_motionNoConfidence dvt
+          Csl.dRepVotingThresholds_motionNoConfidence dvt
     , committeeNormal:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_committeeNormal dvt
+          Csl.dRepVotingThresholds_committeeNormal dvt
     , committeeNoConfidence:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_committeeNoConfidence dvt
+          Csl.dRepVotingThresholds_committeeNoConfidence dvt
     , updateConstitution:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_updateConstitution dvt
+          Csl.dRepVotingThresholds_updateConstitution dvt
     , hardForkInitiation:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_hardForkInitiation dvt
+          Csl.dRepVotingThresholds_hardForkInitiation dvt
     , ppNetworkGroup:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_ppNetworkGroup dvt
+          Csl.dRepVotingThresholds_ppNetworkGroup dvt
     , ppEconomicGroup:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_ppEconomicGroup dvt
+          Csl.dRepVotingThresholds_ppEconomicGroup dvt
     , ppTechnicalGroup:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_ppTechnicalGroup dvt
+          Csl.dRepVotingThresholds_ppTechnicalGroup dvt
     , ppGovernanceGroup:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_ppGovernanceGroup dvt
+          Csl.dRepVotingThresholds_ppGovernanceGroup dvt
     , treasuryWithdrawal:
         UnitInterval.fromCsl $
-          Csl.drepVotingThresholds_treasuryWithdrawal dvt
+          Csl.dRepVotingThresholds_treasuryWithdrawal dvt
     }

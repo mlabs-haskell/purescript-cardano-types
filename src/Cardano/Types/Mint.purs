@@ -15,22 +15,26 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (unpackMapContainerToMapWith, unpackMultiMapContainerToMapWith)
+import Cardano.Serialization.Lib
+  ( unpackListContainer
+  , unpackMapContainer
+  , unpackMapContainerToMapWith
+  )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packMapContainerWithClone, packMultiMapContainerWithClone)
+import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
-import Cardano.Types.Internal.Helpers (clone)
 import Cardano.Types.MultiAsset (MultiAsset)
 import Cardano.Types.MultiAsset as MultiAsset
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array (foldM)
-import Data.Foldable (foldl)
+import Data.Foldable (foldr)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map (empty, filter, isEmpty, singleton, toUnfoldable, unionWith) as Map
 import Data.Maybe (Maybe, fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 import Data.These (These(Both, That, This))
 import Data.Traversable (for, traverse)
@@ -38,6 +42,7 @@ import Data.Tuple.Nested (type (/\), (/\))
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafePartial)
+import Unsafe.Coerce (unsafeCoerce)
 
 newtype Mint = Mint (Map ScriptHash (Map AssetName Int.Int))
 
@@ -151,20 +156,50 @@ unionNonAda (Mint l) (Mint r) =
 
 toCsl :: Mint -> Csl.Mint
 toCsl mint | Mint mp <- normalizeMint mint =
-  packMultiMapContainerWithClone $ Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
-    unwrap scriptHash /\
-      packMapContainerWithClone do
-        Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
-          unwrap assetName /\ unwrap quantity
+  do
+    packMapContainerWithClone $
+      -- TODO: why is a clone needed?
+      -- because some values are not cloned.
+      -- replace packMapContainerWithClone with
+      -- packMapContainer when these problems are addressed:
+      -- https://github.com/Emurgo/cardano-serialization-lib/blob/672f3b394b6b8c4a8f7cccc8752c5cb8e9a09cd4/rust/src/lib.rs#L1556
+      -- https://github.com/Emurgo/cardano-serialization-lib/blob/672f3b394b6b8c4a8f7cccc8752c5cb8e9a09cd4/rust/src/lib.rs#L1544
+      Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
+        unwrap scriptHash /\
+          coerceToMints
+            ( packMapContainerWithClone -- TODO: why is a clone needed
+                ( Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
+                    unwrap assetName /\ unwrap quantity
+                )
+            )
+  where
+  coerceToMints :: Csl.MintAssets -> Csl.MintsAssets
+  coerceToMints = unsafeCoerce
 
 -- NOTE: CSL.Mint can store multiple entries for the same policy id.
+-- We should probably change the representation to match CSL
 -- https://github.com/Emurgo/cardano-serialization-lib/blob/4a35ef11fd5c4931626c03025fe6f67743a6bdf9/rust/src/lib.rs#L3627
 fromCsl :: Csl.Mint -> Mint
-fromCsl = wrap <<< unpackMultiMapContainerToMapWith wrap
-  ( foldl (Map.unionWith addTokenQuantities) Map.empty
-      <<< map (unpackMapContainerToMapWith wrap wrap <<< clone)
-  )
+fromCsl = unpackMapContainer
+  >>> map (wrap *** unpackMintsAssets)
+  >>> foldMints
+  >>> wrap
   where
+
+  foldMints :: Array (ScriptHash /\ Map AssetName Int.Int) -> Map ScriptHash (Map AssetName Int.Int)
+  foldMints = foldr
+    ( \(scriptHash /\ mint) acc ->
+        Map.unionWith (Map.unionWith addTokenQuantities) acc
+          (Map.singleton scriptHash mint)
+    )
+    Map.empty
+
+  unpackMintsAssets :: Csl.MintsAssets -> Map AssetName Int.Int
+  unpackMintsAssets =
+    unpackListContainer
+      >>> map (unpackMapContainerToMapWith (wrap :: _ -> AssetName) wrap)
+      >>> foldr (Map.unionWith addTokenQuantities) Map.empty
+
   addTokenQuantities :: Int.Int -> Int.Int -> Int.Int
   addTokenQuantities x y =
     unsafePerformEffect $ maybe (throw "Mint.fromCsl: numeric overflow") pure $

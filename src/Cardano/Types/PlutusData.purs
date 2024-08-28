@@ -28,7 +28,7 @@ import Cardano.Serialization.Lib
   ( constrPlutusData_alternative
   , constrPlutusData_data
   , constrPlutusData_new
-  , packMapContainer
+  , packMultiMapContainer
   , plutusData_asBytes
   , plutusData_asConstrPlutusData
   , plutusData_asInteger
@@ -39,7 +39,7 @@ import Cardano.Serialization.Lib
   , plutusData_newInteger
   , plutusData_newList
   , plutusData_newMap
-  , unpackMapContainer
+  , unpackMultiMapContainer
   )
 import Cardano.Serialization.Lib as Csl
 import Cardano.Serialization.Lib.Internal (packListContainer, unpackListContainer)
@@ -58,10 +58,10 @@ import Data.Map (fromFoldableWith, toUnfoldable) as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
-import Data.Profunctor.Strong ((***))
+import Data.Profunctor.Strong (second, (***))
 import Data.Show.Generic (genericShow)
-import Data.Traversable (for, sequence)
-import Data.Tuple (Tuple)
+import Data.Traversable (for)
+import Data.Tuple (Tuple(Tuple))
 import Data.Tuple.Nested (type (/\), (/\))
 import JS.BigInt (BigInt)
 import JS.BigInt (toString) as BigInt
@@ -202,10 +202,11 @@ toCsl = case _ of
 
   convertPlutusMap :: Array (PlutusData /\ PlutusData) -> Csl.PlutusData
   convertPlutusMap mp =
-    plutusData_newMap $ packMapContainer
-      ( (toCsl *** (packListContainer <<< map toCsl)) <$>
-          Map.toUnfoldable (Map.fromFoldableWith (flip append) (map Array.singleton <$> mp))
-      )
+    plutusData_newMap $ packMultiMapContainer
+      $ map (toCsl *** (packListContainer <<< map toCsl))
+      $ Map.toUnfoldable -- group by key
+      $ Map.fromFoldableWith (flip append)
+      $ second Array.singleton <$> mp
 
   convertPlutusInteger :: BigInt -> Csl.PlutusData
   convertPlutusInteger =
@@ -218,8 +219,7 @@ fromCsl pd = unsafePartial $ fromJust $
     <|> (convertPlutusMap <$> toMaybe (plutusData_asMap pd))
     <|> (convertPlutusList <$> toMaybe (plutusData_asList pd))
     <|> (convertPlutusInteger <$> toMaybe (plutusData_asInteger pd))
-    <|>
-      (Bytes <$> toMaybe (plutusData_asBytes pd))
+    <|> (Bytes <$> toMaybe (plutusData_asBytes pd))
   where
   convertPlutusConstr :: Csl.ConstrPlutusData -> PlutusData
   convertPlutusConstr constr = do
@@ -230,9 +230,11 @@ fromCsl pd = unsafePartial $ fromJust $
 
   convertPlutusMap :: Csl.PlutusMap -> PlutusData
   convertPlutusMap pm =
-    Map $ Array.concat $
-      map (sequence <<< (fromCsl *** (map fromCsl <<< unpackListContainer))) $
-        (unpackMapContainer pm)
+    Map $ unpackMultiMapContainer pm >>= \(k /\ vs) ->
+      let
+        cslK = fromCsl k
+      in
+        unpackListContainer vs >>= fromCsl >>> Tuple cslK >>> pure
 
   convertPlutusList :: Csl.PlutusList -> PlutusData
   convertPlutusList = unpackListContainer >>> map fromCsl >>> List

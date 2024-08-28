@@ -51,8 +51,8 @@ import Cardano.Types.Constitution (Constitution(Constitution)) as X
 import Cardano.Types.CostModel (CostModel(CostModel)) as X
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential)) as X
 import Cardano.Types.DRep (DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)) as X
+import Cardano.Types.DRepVotingThresholds (DRepVotingThresholds(DRepVotingThresholds)) as X
 import Cardano.Types.DataHash (DataHash(DataHash)) as X
-import Cardano.Types.DrepVotingThresholds (DrepVotingThresholds(DrepVotingThresholds)) as X
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash(Ed25519KeyHash)) as X
 import Cardano.Types.Ed25519Signature (Ed25519Signature(Ed25519Signature)) as X
 import Cardano.Types.EnterpriseAddress (EnterpriseAddress) as X

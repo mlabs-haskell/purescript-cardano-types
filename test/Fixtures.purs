@@ -38,6 +38,7 @@ module Test.Fixtures
   , plutusDataFixture7
   , plutusDataFixture8
   , plutusDataFixture9
+  , plutusDataFixture10
   , plutusDataFixture8Bytes
   , plutusDataFixture8Bytes'
   , plutusScriptFixture1
@@ -102,7 +103,7 @@ import Cardano.Types
   , Coin(Coin)
   , Credential(PubKeyHashCredential, ScriptHashCredential)
   , DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)
-  , DrepVotingThresholds
+  , DRepVotingThresholds
   , Ed25519KeyHash
   , Epoch(Epoch)
   , ExUnitPrices(ExUnitPrices)
@@ -308,7 +309,7 @@ poolVotingThresholds1 = wrap
   , securityRelevantThreshold: mkUnitInterval 6 10 -- ppSecurityGroup
   }
 
-drepVotingThresholds1 :: DrepVotingThresholds
+drepVotingThresholds1 :: DRepVotingThresholds
 drepVotingThresholds1 = wrap
   { motionNoConfidence: mkUnitInterval 67 100
   , committeeNormal: mkUnitInterval 67 100
@@ -1586,13 +1587,19 @@ plutusDataFixture8Bytes' = hexToByteArrayUnsafe
   \206f6620736b7920581cda13ed22b9294f1d86bbd530e99b1456884c7364bf16c90edc1ae41e\
   \182d"
 
--- PlutusData Map with duplicated keys 
+-- PlutusData Map with duplicated keys
 plutusDataFixture9 :: PlutusData
 plutusDataFixture9 = Map
   [ plutusDataFixture5 /\ plutusDataFixture3
   , plutusDataFixture5 /\ plutusDataFixture5
-  -- , plutusDataFixture3 /\ plutusDataFixture4
-  -- , plutusDataFixture5 /\ plutusDataFixture3
+  ]
+
+-- PlutusData Map with duplicated keys
+plutusDataFixture10 :: PlutusData
+plutusDataFixture10 = Map
+  [ plutusDataFixture5 /\ plutusDataFixture5
+  , plutusDataFixture5 /\ plutusDataFixture2
+  , plutusDataFixture5 /\ plutusDataFixture3
   ]
 
 redeemerFixture1 :: Redeemer

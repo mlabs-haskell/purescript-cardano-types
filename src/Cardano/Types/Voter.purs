@@ -58,21 +58,21 @@ instance AsCbor Voter where
 
 toCsl :: Voter -> Csl.Voter
 toCsl = case _ of
-  Cc cred -> Csl.voter_newConstitutionalCommitteeHotKey $ Credential.toCsl cred
-  Drep cred -> Csl.voter_newDrep $ Credential.toCsl cred
-  Spo keyHash -> Csl.voter_newStakingPool $ unwrap keyHash
+  Cc cred -> Csl.voter_newConstitutionalCommitteeHotCredential $ Credential.toCsl cred
+  Drep cred -> Csl.voter_newDrepCredential $ Credential.toCsl cred
+  Spo keyHash -> Csl.voter_newStakePoolKeyHash $ unwrap keyHash
 
 fromCsl :: Csl.Voter -> Voter
 fromCsl voter =
   unsafePartial fromJust $
     ( Cc <<< Credential.fromCsl <$>
-        toMaybe (Csl.voter_toConstitutionalCommitteeHotCred voter)
+        toMaybe (Csl.voter_toConstitutionalCommitteeHotCredential voter)
     )
       <|>
         ( Drep <<< Credential.fromCsl <$>
-            toMaybe (Csl.voter_toDrepCred voter)
+            toMaybe (Csl.voter_toDrepCredential voter)
         )
       <|>
         ( Spo <<< wrap <$>
-            toMaybe (Csl.voter_toStakingPoolKeyHash voter)
+            toMaybe (Csl.voter_toStakePoolKeyHash voter)
         )

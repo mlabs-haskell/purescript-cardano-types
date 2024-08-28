@@ -190,7 +190,7 @@ let additions =
           ]
         , repo =
             "https://github.com/mlabs-haskell/purescript-cardano-serialization-lib"
-        , version = "e0aba835966329b6c3949b9d837bcec1e3770a30"
+        , version = "0062d27a87b2d27ddd87f2bf4aaf34e6413e5e7c"
         }
       , cardano-plutus-data-schema =
         { dependencies = [ "prelude" ]
