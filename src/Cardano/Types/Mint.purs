@@ -115,23 +115,32 @@ filterMint p (Mint mp) =
 toCsl :: Mint -> Csl.Mint
 toCsl mint | Mint mp <- normalizeMint mint =
   do
-    packMapContainerWithClone $
+    coerceToMintsAssets $
       -- TODO: why is a clone needed?
       -- because some values are not cloned.
       -- replace packMapContainerWithClone with
       -- packMapContainer when these problems are addressed:
       -- https://github.com/Emurgo/cardano-serialization-lib/blob/672f3b394b6b8c4a8f7cccc8752c5cb8e9a09cd4/rust/src/lib.rs#L1556
       -- https://github.com/Emurgo/cardano-serialization-lib/blob/672f3b394b6b8c4a8f7cccc8752c5cb8e9a09cd4/rust/src/lib.rs#L1544
-      Map.toUnfoldable mp <#> \(scriptHash /\ mintsAssets) ->
-        unwrap scriptHash /\
-          packListContainer
-            ( mintsAssets <#> \mintAssets ->
+      Map.toUnfoldable mp >>= \(scriptHash /\ mintsAssets) ->
+        mintsAssets >>=
+          ( \mintAssets ->
+              pure $ unwrap scriptHash /\
                 ( packMapContainerWithClone -- TODO: why is a clone needed
                     ( Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
                         unwrap assetName /\ unwrap quantity
                     )
                 )
-            )
+          )
+  where
+  -- This is a dirty hack to overcome a deficiency of ps-csl codegen:
+  -- https://github.com/mlabs-haskell/purescript-cardano-serialization-lib/issues/11
+  coerceToMintsAssets :: Array (Csl.ScriptHash /\ Csl.MintAssets) -> Csl.Mint
+  coerceToMintsAssets =
+    ( unsafeCoerce
+        ( packMapContainerWithClone :: Array (Csl.ScriptHash /\ Csl.MintsAssets) -> Csl.Mint
+        )
+    )
 
 fromCsl :: Csl.Mint -> Mint
 fromCsl = unpackMapContainer
