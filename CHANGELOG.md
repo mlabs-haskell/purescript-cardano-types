@@ -10,6 +10,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - Synchronized with `@mlabs-haskell/cardano-serialization-lib-gc` version `v12.0.0`.
 
+# v2.0.1
+
+## Added
+
+More utils for end users:
+
+- `Cardano.Types.Transaction`: `findUtxos`
+- `Cardano.Types.TransactionInput`: `pprintTransactionInput`
+- `Cardano.Types.TransactionUnspentOutput`: `filterUtxos`, `hasTransactionHash`
+
+## Fixed
+
+- Do not add empty Withdrawals map to serialized TransactionBody ([#11](https://github.com/mlabs-haskell/purescript-cardano-types/pull/11))
+
 # v2.0.0
 
 ## Changed

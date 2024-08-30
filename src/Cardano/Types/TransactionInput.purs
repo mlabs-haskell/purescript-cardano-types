@@ -4,12 +4,13 @@ module Cardano.Types.TransactionInput
   , toCsl
   , _transactionId
   , _index
+  , pprintTransactionInput
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.AsCbor (class AsCbor)
+import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.FromData (class FromData, fromData)
 import Cardano.Serialization.Lib
   ( transactionInput_index
@@ -21,10 +22,12 @@ import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum (zero) as BigNum
 import Cardano.Types.PlutusData (PlutusData(Constr))
 import Cardano.Types.TransactionHash (TransactionHash(TransactionHash))
+import Data.ByteArray (byteArrayToHex)
 import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens')
 import Data.Lens.Iso.Newtype (_Newtype)
 import Data.Lens.Record (prop)
+import Data.Log.Tag (TagSet, tag)
 import Data.Maybe (Maybe(Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.UInt (UInt, toInt)
@@ -109,3 +112,10 @@ _transactionId = _Newtype <<< prop (Proxy :: Proxy "transactionId")
 
 _index :: Lens' TransactionInput UInt
 _index = _Newtype <<< prop (Proxy :: Proxy "index")
+
+pprintTransactionInput :: TransactionInput -> TagSet
+pprintTransactionInput (TransactionInput { transactionId, index }) =
+  "TransactionInput" `tag`
+    ( byteArrayToHex (unwrap (encodeCbor transactionId)) <> "#" <>
+        show (UInt.toInt index)
+    )

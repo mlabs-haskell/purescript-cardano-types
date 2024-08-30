@@ -18,7 +18,7 @@ import Cardano.Serialization.Lib
   , toBytes
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.Language (Language(PlutusV1, PlutusV2))
+import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
 import Cardano.Types.Language as Language
 import Cardano.Types.RawBytes (RawBytes)
 import Cardano.Types.ScriptHash (ScriptHash)
@@ -65,6 +65,10 @@ plutusV1Script ba = do
 plutusV2Script :: RawBytes -> PlutusScript
 plutusV2Script ba =
   PlutusScript $ unwrap ba /\ PlutusV2
+
+plutusV3Script :: RawBytes -> PlutusScript
+plutusV3Script ba =
+  PlutusScript $ unwrap ba /\ PlutusV3
 
 instance AsCbor PlutusScript where
   encodeCbor = toCsl >>> toBytes >>> wrap

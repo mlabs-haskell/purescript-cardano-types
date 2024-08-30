@@ -6,6 +6,9 @@ module Cardano.Types.TransactionUnspentOutput
   , toCsl
   , _input
   , _output
+  , filterUtxos
+  , hasTransactionHash
+  , pprintTransactionUnspentOutput
   ) where
 
 import Prelude
@@ -18,15 +21,25 @@ import Cardano.Serialization.Lib
   , transactionUnspentOutput_output
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Types.TransactionInput (TransactionInput)
+import Cardano.Types.TransactionHash (TransactionHash)
+import Cardano.Types.TransactionInput
+  ( TransactionInput(TransactionInput)
+  , pprintTransactionInput
+  )
 import Cardano.Types.TransactionInput as TransactionInput
-import Cardano.Types.TransactionOutput (TransactionOutput)
+import Cardano.Types.TransactionOutput
+  ( TransactionOutput
+  , pprintTransactionOutput
+  )
 import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.UtxoMap (UtxoMap)
+import Data.Array as Array
 import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens')
 import Data.Lens.Iso.Newtype (_Newtype)
 import Data.Lens.Record (prop)
+import Data.Log.Tag (TagSet, tagSetTag)
+import Data.Log.Tag as Tag
 import Data.Map as Map
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -62,6 +75,16 @@ fromUtxoMap =
     map \(Tuple input output) ->
       TransactionUnspentOutput { input, output }
 
+filterUtxos :: (TransactionUnspentOutput -> Boolean) -> UtxoMap -> UtxoMap
+filterUtxos f =
+  fromUtxoMap >>> Array.filter f >>> toUtxoMap
+
+hasTransactionHash :: TransactionHash -> TransactionUnspentOutput -> Boolean
+hasTransactionHash
+  hash
+  (TransactionUnspentOutput { input: TransactionInput { transactionId } }) =
+  hash == transactionId
+
 fromCsl
   :: Csl.TransactionUnspentOutput -> TransactionUnspentOutput
 fromCsl tuo = do
@@ -79,3 +102,10 @@ _output = _Newtype <<< prop (Proxy :: Proxy "output")
 
 _input :: Lens' TransactionUnspentOutput TransactionInput
 _input = _Newtype <<< prop (Proxy :: Proxy "input")
+
+pprintTransactionUnspentOutput :: TransactionUnspentOutput -> TagSet
+pprintTransactionUnspentOutput (TransactionUnspentOutput { input, output }) =
+  Tag.fromArray $
+    [ "input" `tagSetTag` pprintTransactionInput input
+    , "output" `tagSetTag` pprintTransactionOutput output
+    ]
