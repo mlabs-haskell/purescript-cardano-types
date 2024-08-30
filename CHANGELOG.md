@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Changed
 
+- Changed the representation of the `Mint` type  to allow duplicate `ScriptHash` keys: `newtype Mint = Mint (Map ScriptHash (Array (Map AssetName Int.Int)))` (in line with CSL). `Semigroup` and `Monoid` instances for `Mint` don't have a `Partial` constraint anymore.
 - Synchronized with `@mlabs-haskell/cardano-serialization-lib-gc` version `v12.0.0`.
 
 # v2.0.1

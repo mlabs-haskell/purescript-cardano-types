@@ -561,15 +561,19 @@ txFixture3 =
 
 mint1 :: Mint
 mint1 = Mint $ Map.fromFoldable
-  [ currencySymbol1 /\ Map.fromFoldable
-      [ tokenName2 /\ Int.newPositive BigNum.one
+  [ currencySymbol1 /\
+      [ Map.fromFoldable
+          [ tokenName2 /\ Int.newPositive BigNum.one
+          ]
       ]
   ]
 
 mint0 :: Mint
 mint0 = Mint $ Map.fromFoldable
-  [ currencySymbol1 /\ Map.fromFoldable
-      [ tokenName2 /\ Int.newPositive BigNum.zero
+  [ currencySymbol1 /\
+      [ Map.fromFoldable
+          [ tokenName2 /\ Int.newPositive BigNum.zero
+          ]
       ]
   ]
 
@@ -673,8 +677,10 @@ txFixture4 =
             $ Array.replicate 32 0
         , validityStartInterval: Nothing -- Just $ Slot $ BigNum.one
         , mint: Just $ Mint $ Map.fromFoldable
-            [ currencySymbol1 /\ Map.fromFoldable
-                [ tokenName2 /\ Int.newPositive BigNum.one
+            [ currencySymbol1 /\
+                [ Map.fromFoldable
+                    [ tokenName2 /\ Int.newPositive BigNum.one
+                    ]
                 ]
             ]
         , referenceInputs: mempty
