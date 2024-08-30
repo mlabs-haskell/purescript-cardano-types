@@ -16,13 +16,14 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Serialization.Lib
-  ( packListContainer
-  , unpackListContainer
+  ( unpackListContainer
   , unpackMapContainer
   , unpackMapContainerToMapWith
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
+import Cardano.Serialization.Lib.Internal
+  ( packMapContainerWithClone
+  )
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
 import Cardano.Types.MultiAsset (MultiAsset)
@@ -42,6 +43,7 @@ import Data.Traversable (for)
 import Data.Tuple.Nested (type (/\), (/\))
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
+import Unsafe.Coerce (unsafeCoerce)
 
 newtype Mint = Mint (Map ScriptHash (Array (Map AssetName Int.Int)))
 
@@ -108,7 +110,7 @@ normalizeMint = filterMint (notEq Int.zero)
 
 filterMint :: (Int.Int -> Boolean) -> Mint -> Mint
 filterMint p (Mint mp) =
-  Mint $ Map.filter Array.null $ map (Map.filter p) <$> mp
+  Mint $ Map.filter (not <<< Array.null) $ map (Map.filter p) <$> mp
 
 toCsl :: Mint -> Csl.Mint
 toCsl mint | Mint mp <- normalizeMint mint =
