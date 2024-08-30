@@ -47,7 +47,7 @@ import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Control.Alt ((<|>))
-import Data.Array (concat, singleton) as Array
+import Data.Array (singleton) as Array
 import Data.Array.NonEmpty as NA
 import Data.ByteArray (ByteArray, byteArrayToHex, hexToByteArray)
 import Data.Either (Either(Left))
