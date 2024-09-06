@@ -14,6 +14,7 @@ import Mote (group, test)
 import Mote.TestPlanM (TestPlanM, interpretWithConfig)
 import Test.Fixtures
   ( int1
+  , mint0
   , mint1
   , nativeScriptFixture1
   , nativeScriptFixture2
@@ -98,6 +99,7 @@ suite = do
       roundtripTest "int0" int1
     group "Mint" do
       roundtripTest "mint1" mint1
+      roundtripTest "mint0" mint0
     group "TransactionOutput" do
       roundtripTest "txOutputFixture1" txOutputFixture1
     group "TransactionWitnessSet" do

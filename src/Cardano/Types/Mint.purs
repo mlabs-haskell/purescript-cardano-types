@@ -21,31 +21,30 @@ import Cardano.Serialization.Lib
   , unpackMapContainerToMapWith
   )
 import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal
-  ( packMapContainerWithClone
-  )
+import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
 import Cardano.Types.MultiAsset (MultiAsset)
 import Cardano.Types.MultiAsset as MultiAsset
 import Cardano.Types.ScriptHash (ScriptHash)
-import Data.Array as Array
+import Data.Array (foldM)
 import Data.Foldable (foldr)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
-import Data.Map (empty, filter, singleton, toUnfoldable, unionWith) as Map
-import Data.Maybe (Maybe, maybe)
+import Data.Map (empty, filter, isEmpty, singleton, toUnfoldable, unionWith) as Map
+import Data.Maybe (Maybe, fromJust, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
-import Data.These (these)
-import Data.Traversable (for)
+import Data.These (These(Both, That, This))
+import Data.Traversable (for, traverse)
 import Data.Tuple.Nested (type (/\), (/\))
 import Effect.Exception (throw)
 import Effect.Unsafe (unsafePerformEffect)
+import Partial.Unsafe (unsafePartial)
 import Unsafe.Coerce (unsafeCoerce)
 
-newtype Mint = Mint (Map ScriptHash (Array (Map AssetName Int.Int)))
+newtype Mint = Mint (Map ScriptHash (Map AssetName Int.Int))
 
 derive instance Generic Mint _
 
@@ -64,10 +63,12 @@ instance EncodeAeson Mint where
 instance DecodeAeson Mint where
   decodeAeson = map fromCsl <<< decodeAeson
 
-instance Semigroup Mint where
-  append = union
+instance Partial => Semigroup Mint where
+  append x y =
+    unsafePerformEffect $ maybe (throw "Mint.append: numeric overflow") pure $
+      unionWithNonAda Int.add x y
 
-instance Monoid Mint where
+instance Partial => Monoid Mint where
   mempty = empty
 
 instance AsCbor Mint where
@@ -85,63 +86,99 @@ toMultiAsset mint = MultiAsset.unflatten =<<
 
 fromMultiAsset :: MultiAsset -> Mint
 fromMultiAsset ma =
-  unflatten $ MultiAsset.flatten ma <#>
-    \(sh /\ an /\ bi) -> sh /\ an /\ Int.newPositive bi
+  unsafePartial $ fromJust
+    $ unflatten
+    $ MultiAsset.flatten ma <#>
+        \(sh /\ an /\ bi) -> sh /\ an /\ Int.newPositive bi
 
 singleton :: ScriptHash -> AssetName -> Int.Int -> Mint
-singleton sh an n = Mint (Map.singleton sh [ Map.singleton an n ])
+singleton sh an n = normalizeMint $ Mint (Map.singleton sh (Map.singleton an n))
 
 flatten :: Mint -> Array (ScriptHash /\ AssetName /\ Int.Int)
 flatten (Mint mp) =
-  Map.toUnfoldable mp >>= \(sh /\ arr) -> arr >>= \mp' -> do
+  Map.toUnfoldable mp >>= \(sh /\ mp') -> do
     Map.toUnfoldable mp' >>= \(tn /\ amount) -> pure (sh /\ tn /\ amount)
 
-unflatten :: Array (ScriptHash /\ AssetName /\ Int.Int) -> Mint
-unflatten = normalizeMint <<< foldr (flip accumulate) empty
+unflatten :: Array (ScriptHash /\ AssetName /\ Int.Int) -> Maybe Mint
+unflatten = map normalizeMint <<< foldM accumulate empty
   where
   uncurry2 f (a /\ b /\ c) = f a b c
   accumulate ma = union ma <<< uncurry2 singleton
 
-union :: Mint -> Mint -> Mint
-union a b = Mint $ these identity identity append <$> MultiAsset.union (unwrap a) (unwrap b)
+union :: Mint -> Mint -> Maybe Mint
+union = unionWithNonAda Int.add
+
+unionWithNonAda
+  :: (Int.Int -> Int.Int -> Maybe Int.Int)
+  -> Mint
+  -> Mint
+  -> Maybe Mint
+unionWithNonAda f ls rs =
+  let
+    combined :: Map ScriptHash (Map AssetName (These Int.Int Int.Int))
+    combined = unionNonAda ls rs
+
+    unBoth :: These Int.Int Int.Int -> Maybe Int.Int
+    unBoth k' = case k' of
+      This a -> f a Int.zero
+      That b -> f Int.zero b
+      Both a b -> f a b
+  in
+    normalizeMint <<< Mint <$> traverse (traverse unBoth) combined
 
 normalizeMint :: Mint -> Mint
 normalizeMint = filterMint (notEq Int.zero)
 
 filterMint :: (Int.Int -> Boolean) -> Mint -> Mint
 filterMint p (Mint mp) =
-  Mint $ Map.filter (not <<< Array.null) $ map (Map.filter p) <$> mp
+  Mint $ Map.filter (not Map.isEmpty) $ Map.filter p <$> mp
+
+unionNonAda
+  :: Mint
+  -> Mint
+  -> Map ScriptHash (Map AssetName (These Int.Int Int.Int))
+unionNonAda (Mint l) (Mint r) =
+  let
+    combined
+      :: Map ScriptHash
+           (These (Map AssetName Int.Int) (Map AssetName Int.Int))
+    combined = MultiAsset.union l r
+
+    unBoth
+      :: These (Map AssetName Int.Int) (Map AssetName Int.Int)
+      -> Map AssetName (These Int.Int Int.Int)
+    unBoth k = case k of
+      This a -> This <$> a
+      That b -> That <$> b
+      Both a b -> MultiAsset.union a b
+  in
+    unBoth <$> combined
 
 toCsl :: Mint -> Csl.Mint
 toCsl mint | Mint mp <- normalizeMint mint =
   do
-    coerceToMintsAssets $
+    packMapContainerWithClone $
       -- TODO: why is a clone needed?
       -- because some values are not cloned.
       -- replace packMapContainerWithClone with
       -- packMapContainer when these problems are addressed:
       -- https://github.com/Emurgo/cardano-serialization-lib/blob/672f3b394b6b8c4a8f7cccc8752c5cb8e9a09cd4/rust/src/lib.rs#L1556
       -- https://github.com/Emurgo/cardano-serialization-lib/blob/672f3b394b6b8c4a8f7cccc8752c5cb8e9a09cd4/rust/src/lib.rs#L1544
-      Map.toUnfoldable mp >>= \(scriptHash /\ mintsAssets) ->
-        mintsAssets >>=
-          ( \mintAssets ->
-              pure $ unwrap scriptHash /\
-                ( packMapContainerWithClone -- TODO: why is a clone needed
-                    ( Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
-                        unwrap assetName /\ unwrap quantity
-                    )
+      Map.toUnfoldable mp <#> \(scriptHash /\ mintAssets) ->
+        unwrap scriptHash /\
+          coerceToMints
+            ( packMapContainerWithClone -- TODO: why is a clone needed
+                ( Map.toUnfoldable mintAssets <#> \(assetName /\ quantity) -> do
+                    unwrap assetName /\ unwrap quantity
                 )
-          )
+            )
   where
-  -- This is a dirty hack to overcome a deficiency of ps-csl codegen:
-  -- https://github.com/mlabs-haskell/purescript-cardano-serialization-lib/issues/11
-  coerceToMintsAssets :: Array (Csl.ScriptHash /\ Csl.MintAssets) -> Csl.Mint
-  coerceToMintsAssets =
-    ( unsafeCoerce
-        ( packMapContainerWithClone :: Array (Csl.ScriptHash /\ Csl.MintsAssets) -> Csl.Mint
-        )
-    )
+  coerceToMints :: Csl.MintAssets -> Csl.MintsAssets
+  coerceToMints = unsafeCoerce
 
+-- NOTE: CSL.Mint can store multiple entries for the same policy id.
+-- We should probably change the representation to match CSL
+-- https://github.com/Emurgo/cardano-serialization-lib/blob/4a35ef11fd5c4931626c03025fe6f67743a6bdf9/rust/src/lib.rs#L3627
 fromCsl :: Csl.Mint -> Mint
 fromCsl = unpackMapContainer
   >>> map (wrap *** unpackMintsAssets)
@@ -149,11 +186,11 @@ fromCsl = unpackMapContainer
   >>> wrap
   where
 
-  foldMints :: Array (ScriptHash /\ Map AssetName Int.Int) -> Map ScriptHash (Array (Map AssetName Int.Int))
+  foldMints :: Array (ScriptHash /\ Map AssetName Int.Int) -> Map ScriptHash (Map AssetName Int.Int)
   foldMints = foldr
     ( \(scriptHash /\ mint) acc ->
-        Map.unionWith append acc
-          (Map.singleton scriptHash [ mint ])
+        Map.unionWith (Map.unionWith addTokenQuantities) acc
+          (Map.singleton scriptHash mint)
     )
     Map.empty
 
