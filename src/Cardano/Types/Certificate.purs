@@ -158,21 +158,21 @@ toCsl = case _ of
       Csl.certificate_newDrepRegistration $
         case mbAnchor of
           Nothing ->
-            Csl.drepRegistration_new drepCredCsl depositCsl
+            Csl.dRepRegistration_new drepCredCsl depositCsl
           Just anchor ->
-            Csl.drepRegistration_newWithAnchor drepCredCsl depositCsl (Anchor.toCsl anchor)
+            Csl.dRepRegistration_newWithAnchor drepCredCsl depositCsl (Anchor.toCsl anchor)
 
   UnregDrepCert drepCred coin ->
     Csl.certificate_newDrepDeregistration $
-      Csl.drepDeregistration_new (Credential.toCsl drepCred) (unwrap $ unwrap coin)
+      Csl.dRepDeregistration_new (Credential.toCsl drepCred) (unwrap $ unwrap coin)
 
   UpdateDrepCert drepCred mbAnchor ->
     let
       drepCredCsl = Credential.toCsl drepCred
     in
       Csl.certificate_newDrepUpdate $
-        maybe (Csl.drepUpdate_new drepCredCsl)
-          (Csl.drepUpdate_newWithAnchor drepCredCsl <<< Anchor.toCsl)
+        maybe (Csl.dRepUpdate_new drepCredCsl)
+          (Csl.dRepUpdate_newWithAnchor drepCredCsl <<< Anchor.toCsl)
           mbAnchor
 
 fromCsl :: Csl.Certificate -> Certificate
@@ -260,31 +260,31 @@ fromCsl csl = unsafePartial $ fromJust $
   authCommitteeHotCert =
     toMaybe (Csl.certificate_asCommitteeHotAuth csl) <#> \x ->
       AuthCommitteeHotCert
-        { coldCred: Credential.fromCsl $ Csl.committeeHotAuth_committeeColdKey x
-        , hotCred: Credential.fromCsl $ Csl.committeeHotAuth_committeeHotKey x
+        { coldCred: Credential.fromCsl $ Csl.committeeHotAuth_committeeColdCredential x
+        , hotCred: Credential.fromCsl $ Csl.committeeHotAuth_committeeHotCredential x
         }
 
   resignCommitteeColdCert =
     toMaybe (Csl.certificate_asCommitteeColdResign csl) <#> \x ->
       ResignCommitteeColdCert
-        (Credential.fromCsl $ Csl.committeeColdResign_committeeColdKey x)
+        (Credential.fromCsl $ Csl.committeeColdResign_committeeColdCredential x)
         (Anchor.fromCsl <$> toMaybe (Csl.committeeColdResign_anchor x))
 
   regDrepCert =
     toMaybe (Csl.certificate_asDrepRegistration csl) <#> \x ->
       RegDrepCert
-        (Credential.fromCsl $ Csl.drepRegistration_votingCredential x)
-        (wrap $ wrap $ Csl.drepRegistration_coin x)
-        (Anchor.fromCsl <$> toMaybe (Csl.drepRegistration_anchor x))
+        (Credential.fromCsl $ Csl.dRepRegistration_votingCredential x)
+        (wrap $ wrap $ Csl.dRepRegistration_coin x)
+        (Anchor.fromCsl <$> toMaybe (Csl.dRepRegistration_anchor x))
 
   unregDrepCert =
     toMaybe (Csl.certificate_asDrepDeregistration csl) <#> \x ->
       UnregDrepCert
-        (Credential.fromCsl $ Csl.drepDeregistration_votingCredential x)
-        (wrap $ wrap $ Csl.drepDeregistration_coin x)
+        (Credential.fromCsl $ Csl.dRepDeregistration_votingCredential x)
+        (wrap $ wrap $ Csl.dRepDeregistration_coin x)
 
   updateDrepCert =
     toMaybe (Csl.certificate_asDrepUpdate csl) <#> \x ->
       UpdateDrepCert
-        (Credential.fromCsl $ Csl.drepUpdate_votingCredential x)
-        (Anchor.fromCsl <$> toMaybe (Csl.drepUpdate_anchor x))
+        (Credential.fromCsl $ Csl.dRepUpdate_votingCredential x)
+        (Anchor.fromCsl <$> toMaybe (Csl.dRepUpdate_anchor x))

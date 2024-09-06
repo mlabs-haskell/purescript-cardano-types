@@ -24,6 +24,7 @@ import Test.Fixtures
   , nativeScriptFixture6
   , nativeScriptFixture7
   , plutusDataFixture1
+  , plutusDataFixture10
   , plutusDataFixture2
   , plutusDataFixture3
   , plutusDataFixture4
@@ -31,6 +32,7 @@ import Test.Fixtures
   , plutusDataFixture6
   , plutusDataFixture7
   , plutusDataFixture8
+  , plutusDataFixture9
   , plutusScriptFixture1
   , txFixture1
   , txFixture2
@@ -81,6 +83,8 @@ suite = do
       roundtripTest "plutusDataFixture6" plutusDataFixture6
       roundtripTest "plutusDataFixture7" plutusDataFixture7
       roundtripTest "plutusDataFixture8" plutusDataFixture8
+      roundtripTest "plutusDataFixture9" plutusDataFixture9
+      roundtripTest "plutusDataFixture10" plutusDataFixture10
     group "Transaction" do
       roundtripTest "txFixture1" txFixture1
       roundtripTest "txFixture2" txFixture2

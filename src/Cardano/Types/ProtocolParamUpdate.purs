@@ -80,8 +80,8 @@ import Cardano.Types.Coin (Coin)
 import Cardano.Types.CostModel (CostModel)
 import Cardano.Types.CostModel as CostModel
 import Cardano.Types.CostModel as CostModels
-import Cardano.Types.DrepVotingThresholds (DrepVotingThresholds)
-import Cardano.Types.DrepVotingThresholds (fromCsl, toCsl) as DrepVotingThresholds
+import Cardano.Types.DRepVotingThresholds (DRepVotingThresholds)
+import Cardano.Types.DRepVotingThresholds (fromCsl, toCsl) as DRepVotingThresholds
 import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.ExUnitPrices (ExUnitPrices)
 import Cardano.Types.ExUnitPrices as ExUnitPrices
@@ -133,7 +133,7 @@ newtype ProtocolParamUpdate = ProtocolParamUpdate
   , collateralPercentage :: Maybe UInt
   , maxCollateralInputs :: Maybe UInt
   , poolVotingThresholds :: Maybe PoolVotingThresholds
-  , drepVotingThresholds :: Maybe DrepVotingThresholds
+  , drepVotingThresholds :: Maybe DRepVotingThresholds
   , minCommitteeSize :: Maybe UInt
   , committeeTermLimit :: Maybe Epoch
   , govActionValidityPeriod :: Maybe Epoch
@@ -222,7 +222,7 @@ toCsl
   for_ collateralPercentage $ protocolParamUpdate_setCollateralPercentage pp <<< UInt.toNumber
   for_ maxCollateralInputs $ protocolParamUpdate_setMaxCollateralInputs pp <<< UInt.toNumber
   for_ poolVotingThresholds $ protocolParamUpdate_setPoolVotingThresholds pp <<< PoolVotingThresholds.toCsl
-  for_ drepVotingThresholds $ protocolParamUpdate_setDrepVotingThresholds pp <<< DrepVotingThresholds.toCsl
+  for_ drepVotingThresholds $ protocolParamUpdate_setDrepVotingThresholds pp <<< DRepVotingThresholds.toCsl
   for_ minCommitteeSize $ protocolParamUpdate_setMinCommitteeSize pp <<< UInt.toNumber
   for_ committeeTermLimit $ protocolParamUpdate_setCommitteeTermLimit pp <<< UInt.toNumber <<< unwrap
   for_ govActionValidityPeriod $ protocolParamUpdate_setGovernanceActionValidityPeriod pp <<< UInt.toNumber <<< unwrap
@@ -297,7 +297,7 @@ fromCsl pp =
   collateralPercentage = UInt.fromNumber <$> use protocolParamUpdate_collateralPercentage
   maxCollateralInputs = UInt.fromNumber <$> use protocolParamUpdate_maxCollateralInputs
   poolVotingThresholds = PoolVotingThresholds.fromCsl <$> use protocolParamUpdate_poolVotingThresholds
-  drepVotingThresholds = DrepVotingThresholds.fromCsl <$> use protocolParamUpdate_drepVotingThresholds
+  drepVotingThresholds = DRepVotingThresholds.fromCsl <$> use protocolParamUpdate_drepVotingThresholds
   minCommitteeSize = UInt.fromNumber <$> use protocolParamUpdate_minCommitteeSize
   committeeTermLimit = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_committeeTermLimit
   govActionValidityPeriod = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_governanceActionValidityPeriod
