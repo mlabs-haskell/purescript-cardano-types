@@ -57,11 +57,11 @@ import Data.List (fromFoldable, uncons) as List
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
 import Data.Map (Map)
-import Data.Map (empty, fromFoldableWith, insert, lookup, toUnfoldable) as Map
+import Data.Map (empty, insert, lookup) as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
-import Data.Profunctor.Strong (second, (***))
+import Data.Profunctor.Strong ((***))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for)
 import Data.Tuple (Tuple(Tuple))
