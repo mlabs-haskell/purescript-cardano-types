@@ -47,14 +47,17 @@ import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Control.Alt ((<|>))
-import Data.Array (singleton) as Array
+import Data.Array (modifyAtIndices, singleton, snoc) as Array
 import Data.Array.NonEmpty as NA
 import Data.ByteArray (ByteArray, byteArrayToHex, hexToByteArray)
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
+import Data.List (List)
+import Data.List (fromFoldable, uncons) as List
 import Data.Log.Tag (TagSet, tag, tagSetTag)
 import Data.Log.Tag as TagSet
-import Data.Map (fromFoldableWith, toUnfoldable) as Map
+import Data.Map (Map)
+import Data.Map (empty, fromFoldableWith, insert, lookup, toUnfoldable) as Map
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
@@ -204,9 +207,29 @@ toCsl = case _ of
   convertPlutusMap mp =
     plutusData_newMap $ packMultiMapContainer
       $ map (toCsl *** (packListContainer <<< map toCsl))
-      $ Map.toUnfoldable -- group by key
-      $ Map.fromFoldableWith (flip append)
-      $ second Array.singleton <$> mp
+      $ flip (groupValues Map.empty zero) mempty
+      $ List.fromFoldable mp
+    where
+    -- Group by key while preserving key order. Note that the serialization
+    -- roundtrip property is broken in presence of duplicate keys; however,
+    -- the order of values corresponding to each key is maintained.
+    groupValues
+      :: Map PlutusData Int
+      -> Int
+      -> List (PlutusData /\ PlutusData)
+      -> Array (PlutusData /\ Array PlutusData)
+      -> Array (PlutusData /\ Array PlutusData)
+    groupValues idxMap i l acc =
+      case List.uncons l of
+        Just { head: key /\ value, tail: xs } ->
+          case Map.lookup key idxMap of
+            Just idx ->
+              groupValues idxMap i xs $
+                Array.modifyAtIndices [ idx ] (map (flip Array.snoc value)) acc
+            Nothing ->
+              groupValues (Map.insert key i idxMap) (i + one) xs $
+                Array.snoc acc (key /\ Array.singleton value)
+        Nothing -> acc
 
   convertPlutusInteger :: BigInt -> Csl.PlutusData
   convertPlutusInteger =
