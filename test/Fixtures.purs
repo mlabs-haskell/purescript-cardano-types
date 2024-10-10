@@ -39,6 +39,7 @@ module Test.Fixtures
   , plutusDataFixture8
   , plutusDataFixture9
   , plutusDataFixture10
+  , plutusDataFixture11
   , plutusDataFixture8Bytes
   , plutusDataFixture8Bytes'
   , plutusScriptFixture1
@@ -1600,6 +1601,13 @@ plutusDataFixture10 = Map
   [ plutusDataFixture5 /\ plutusDataFixture5
   , plutusDataFixture5 /\ plutusDataFixture2
   , plutusDataFixture5 /\ plutusDataFixture3
+  ]
+
+plutusDataFixture11 :: PlutusData
+plutusDataFixture11 = Map
+  [ Integer (BigInt.fromInt 3) /\ Integer (BigInt.fromInt 10)
+  , Integer (BigInt.fromInt 1) /\ Integer (BigInt.fromInt 12)
+  , Integer (BigInt.fromInt 2) /\ Integer (BigInt.fromInt 10)
   ]
 
 redeemerFixture1 :: Redeemer
