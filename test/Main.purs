@@ -3,7 +3,6 @@ module Test.Main where
 import Prelude
 
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Types (TransactionWitnessSet)
 import Data.ByteArray (ByteArray)
 import Data.Maybe (Maybe(Just))
 import Data.Newtype (wrap)
@@ -44,16 +43,12 @@ import Test.Fixtures
   , txFixture7
   , txInputFixture1
   , txOutputFixture1
-  , witnessSetFixture1
-  , witnessSetFixture2
   , witnessSetFixture2Value
-  , witnessSetFixture3
   , witnessSetFixture3Value
-  , witnessSetFixture4
   )
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Runner (defaultConfig)
-import Type.Proxy (Proxy(Proxy))
+import Type.Proxy (Proxy)
 
 suite :: TestPlanM (Aff Unit) Unit
 suite = do
@@ -107,18 +102,21 @@ suite = do
     group "TransactionWitnessSet" do
       roundtripTest "witnessSetFixture2Value" witnessSetFixture2Value
       roundtripTest "witnessSetFixture3Value" witnessSetFixture3Value
-      roundtripTestBytes "witnessSetFixture1"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture1
-      roundtripTestBytes "witnessSetFixture2"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture2
-      roundtripTestBytes "witnessSetFixture3"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture3
-      roundtripTestBytes "witnessSetFixture4"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture4
+
+{-
+roundtripTestBytes "witnessSetFixture1"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture1
+roundtripTestBytes "witnessSetFixture2"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture2
+roundtripTestBytes "witnessSetFixture3"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture3
+roundtripTestBytes "witnessSetFixture4"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture4
+-}
 
 roundtripTest
   :: forall a

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and we follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v4.0.0
+
+## Changed
+
+- Synchronized with `@mlabs-haskell/cardano-serialization-lib-gc` version `v13.2.0`.
+- `Transaction.hash` now internally converts a `Transaction` to `FixedTransaction` under the hood. Context: The previously used `hash_transaction` function has been removed from CSL as it could not guarantee the correctness of a transaction hash for transactions created by third-party tools.
+
 # v3.0.0
 
 ## Changed
