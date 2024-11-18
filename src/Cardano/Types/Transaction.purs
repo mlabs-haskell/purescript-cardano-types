@@ -24,10 +24,7 @@ import Cardano.Types.TransactionBody as TransactionBody
 import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionInput (TransactionInput(TransactionInput))
 import Cardano.Types.TransactionOutput (TransactionOutput)
-import Cardano.Types.TransactionUnspentOutput
-  ( TransactionUnspentOutput(TransactionUnspentOutput)
-  , toUtxoMap
-  )
+import Cardano.Types.TransactionUnspentOutput (TransactionUnspentOutput(TransactionUnspentOutput), toUtxoMap)
 import Cardano.Types.TransactionWitnessSet (TransactionWitnessSet)
 import Cardano.Types.TransactionWitnessSet as TransactionWitnessSet
 import Cardano.Types.UtxoMap (UtxoMap)
@@ -37,13 +34,14 @@ import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens', (^.))
 import Data.Lens.Iso.Newtype (_Newtype)
 import Data.Lens.Record (prop)
-import Data.Maybe (Maybe, fromMaybe)
+import Data.Maybe (Maybe, fromJust, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
 import Data.UInt as UInt
 import Effect.Unsafe (unsafePerformEffect)
 import Literals.Undefined (undefined)
+import Partial.Unsafe (unsafePartial)
 import Type.Proxy (Proxy(Proxy))
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -78,11 +76,14 @@ empty = Transaction
   }
 
 hash :: Transaction -> TransactionHash
-hash = unwrap
-  >>> _.body
-  >>> TransactionBody.toCsl
-  >>> Csl.hashTransaction
-  >>> wrap
+hash =
+  wrap
+    <<< Csl.fixedTransaction_transactionHash
+    -- assuming every Transaction can be converted to FixedTransaction
+    <<< unsafePartial fromJust
+    <<< Csl.fromBytes
+    <<< Csl.toBytes
+    <<< toCsl
 
 findUtxos
   :: (TransactionOutput -> Boolean)
