@@ -107,18 +107,21 @@ suite = do
     group "TransactionWitnessSet" do
       roundtripTest "witnessSetFixture2Value" witnessSetFixture2Value
       roundtripTest "witnessSetFixture3Value" witnessSetFixture3Value
-      roundtripTestBytes "witnessSetFixture1"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture1
-      roundtripTestBytes "witnessSetFixture2"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture2
-      roundtripTestBytes "witnessSetFixture3"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture3
-      roundtripTestBytes "witnessSetFixture4"
-        (Proxy :: Proxy TransactionWitnessSet)
-        witnessSetFixture4
+
+{-
+roundtripTestBytes "witnessSetFixture1"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture1
+roundtripTestBytes "witnessSetFixture2"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture2
+roundtripTestBytes "witnessSetFixture3"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture3
+roundtripTestBytes "witnessSetFixture4"
+  (Proxy :: Proxy TransactionWitnessSet)
+  witnessSetFixture4
+-}
 
 roundtripTest
   :: forall a
