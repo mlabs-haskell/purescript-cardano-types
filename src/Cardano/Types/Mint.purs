@@ -15,13 +15,13 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( unpackListContainer
   , unpackMapContainer
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
+import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite.Internal (packMapContainerWithClone)
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
 import Cardano.Types.MultiAsset (MultiAsset)

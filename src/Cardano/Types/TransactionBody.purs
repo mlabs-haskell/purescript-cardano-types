@@ -3,7 +3,7 @@ module Cardano.Types.TransactionBody where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( packListContainer
   , packMapContainer
   , transactionBody_auxiliaryDataHash
@@ -47,7 +47,7 @@ import Cardano.Serialization.Lib
   , unpackListContainer
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.Certificate (Certificate)
 import Cardano.Types.Certificate as Certificate

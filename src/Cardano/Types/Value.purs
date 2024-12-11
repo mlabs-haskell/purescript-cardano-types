@@ -10,12 +10,12 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( value_coin
   , value_multiasset
   , value_newWithAssets
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Asset (Asset(Asset, AdaAsset))
 import Cardano.Types.AssetClass (AssetClass(AssetClass))
 import Cardano.Types.AssetName (AssetName)

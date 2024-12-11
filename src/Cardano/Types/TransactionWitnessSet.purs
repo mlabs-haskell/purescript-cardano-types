@@ -14,7 +14,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( transactionWitnessSet_bootstraps
   , transactionWitnessSet_nativeScripts
   , transactionWitnessSet_new
@@ -30,7 +30,7 @@ import Cardano.Serialization.Lib
   , transactionWitnessSet_vkeys
   , unpackListContainer
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.BootstrapWitness (BootstrapWitness)
 import Cardano.Types.BootstrapWitness as BoostrapWitness
 import Cardano.Types.BootstrapWitness as BootstrapWitness

@@ -12,7 +12,7 @@ import Aeson
   , toStringifiedNumbersJson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( packMapContainer
   , transactionMetadatum_asBytes
   , transactionMetadatum_asInt
@@ -27,8 +27,8 @@ import Cardano.Serialization.Lib
   , unpackListContainer
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packListContainer)
+import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite.Internal (packListContainer)
 import Cardano.Types.Int (Int) as Int
 import Cardano.Types.Internal.Helpers (decodeMap, encodeMap, encodeTagged')
 import Control.Alt ((<|>))

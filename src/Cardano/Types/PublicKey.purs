@@ -10,7 +10,7 @@ import Aeson
   , encodeAeson
   )
 import Cardano.FromData (class FromData, fromData)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( publicKey_asBytes
   , publicKey_fromBech32
   , publicKey_fromBytes
@@ -18,7 +18,7 @@ import Cardano.Serialization.Lib
   , publicKey_toBech32
   , publicKey_verify
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)

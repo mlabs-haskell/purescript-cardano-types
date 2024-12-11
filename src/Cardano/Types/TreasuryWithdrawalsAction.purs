@@ -8,7 +8,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.RewardAddress (RewardAddress)
 import Cardano.Types.RewardAddress (fromCsl, toCsl) as RewardAddress

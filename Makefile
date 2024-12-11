@@ -39,3 +39,7 @@ format:
 run-ci-actions:
 	nix build -L .#checks.x86_64-linux.formatting-check
 	nix build -L .#checks.x86_64-linux.tests
+
+node2nix:
+	cd nix/ && nix run nixpkgs#node2nix -- --development --lock ../package-lock.json -i ../package.json
+	rm nix/default.nix

@@ -8,7 +8,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Constitution (Constitution)
 import Cardano.Types.Constitution (fromCsl, toCsl) as Constitution
 import Cardano.Types.GovernanceActionId (GovernanceActionId)

@@ -2,13 +2,13 @@ module Cardano.Types.EnterpriseAddress where
 
 import Prelude
 
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( address_networkId
   , enterpriseAddress_new
   , enterpriseAddress_paymentCred
   , enterpriseAddress_toAddress
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Credential as Credential
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId

@@ -4,8 +4,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (fromBytes, toBytes)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromCbor)
 import Data.Function (on)

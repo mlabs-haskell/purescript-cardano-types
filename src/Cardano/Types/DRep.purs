@@ -8,7 +8,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential))
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Data.Either (Either(Left))

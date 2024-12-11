@@ -24,8 +24,8 @@ import Aeson
   , encodeAeson
   )
 import Aeson as Aeson
-import Cardano.Serialization.Lib (class IsBytes, packListContainer, toBytes)
-import Cardano.Serialization.Lib.Internal (class IsCsl, class IsListContainer)
+import Cardano.Data.Lite (class IsBytes, packListContainer, toBytes)
+import Cardano.Data.Lite.Internal (class IsCsl, class IsListContainer)
 import Control.Alt ((<|>))
 import Data.Bifunctor (bimap)
 import Data.Bitraversable (ltraverse)

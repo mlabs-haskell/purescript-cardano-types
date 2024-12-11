@@ -28,8 +28,8 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (Int) as Csl
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite (Int) as Csl
+import Cardano.Data.Lite
   ( fromBytes
   , int_asNegative
   , int_asPositive

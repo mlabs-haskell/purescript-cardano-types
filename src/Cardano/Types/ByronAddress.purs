@@ -8,8 +8,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (byronAddress_fromBase58, byronAddress_toBase58, fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (byronAddress_fromBase58, byronAddress_toBase58, fromBytes, toBytes)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Base58String (Base58String)
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromBytes)
 import Data.Function (on)

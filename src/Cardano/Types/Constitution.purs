@@ -8,7 +8,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Anchor (Anchor)
 import Cardano.Types.Anchor (fromCsl, toCsl) as Anchor
 import Cardano.Types.ScriptHash (ScriptHash)

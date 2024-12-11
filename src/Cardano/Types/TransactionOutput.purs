@@ -14,7 +14,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( dataCost_newCoinsPerByte
   , transactionOutput_address
   , transactionOutput_amount
@@ -26,7 +26,7 @@ import Cardano.Serialization.Lib
   , transactionOutput_setPlutusData
   , transactionOutput_setScriptRef
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Address (Address)
 import Cardano.Types.Address as Address
 import Cardano.Types.BigNum (BigNum)

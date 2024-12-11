@@ -2,8 +2,8 @@ module Cardano.AsCbor where
 
 import Prelude
 
-import Cardano.Serialization.Lib (bigInt_fromStr, bigInt_toStr, fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (bigInt_fromStr, bigInt_toStr, fromBytes, toBytes)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.CborBytes (CborBytes)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (unwrap, wrap)

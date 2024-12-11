@@ -9,7 +9,7 @@ import Aeson
   , fromString
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( fromBytes
   , plutusScript_bytes
   , plutusScript_hash
@@ -17,7 +17,7 @@ import Cardano.Serialization.Lib
   , plutusScript_newWithVersion
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
 import Cardano.Types.Language as Language
 import Cardano.Types.RawBytes (RawBytes)

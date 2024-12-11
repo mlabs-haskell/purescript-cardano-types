@@ -6,8 +6,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Serialization.Lib (fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (fromBytes, toBytes)
+import Cardano.Data.Lite as Csl
 import Data.ByteArray (hexToByteArray)
 import Data.Either (note)
 import Data.Function (on)

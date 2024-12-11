@@ -15,12 +15,12 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( transactionUnspentOutput_input
   , transactionUnspentOutput_new
   , transactionUnspentOutput_output
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionInput
   ( TransactionInput(TransactionInput)

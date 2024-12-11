@@ -29,7 +29,7 @@ import Cardano.Plutus.DataSchema
   , S
   , Z
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.ToData (class ToData, genericToData)
 import Cardano.Types.DataHash (DataHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')

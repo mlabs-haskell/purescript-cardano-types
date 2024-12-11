@@ -12,8 +12,8 @@ import Aeson
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
 import Cardano.FromData (class FromData, fromData)
 import Cardano.FromMetadata (class FromMetadata, fromMetadata)
-import Cardano.Serialization.Lib (assetName_name, assetName_new, fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (assetName_name, assetName_new, fromBytes, toBytes)
+import Cardano.Data.Lite as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Internal.Helpers (decodeUtf8)

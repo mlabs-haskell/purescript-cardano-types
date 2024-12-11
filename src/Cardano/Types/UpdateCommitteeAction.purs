@@ -8,8 +8,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (packListContainer, unpackListContainer)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (packListContainer, unpackListContainer)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Committee (Committee)
 import Cardano.Types.Committee (fromCsl, toCsl) as Committee
 import Cardano.Types.Credential (Credential)
