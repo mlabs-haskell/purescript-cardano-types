@@ -15,8 +15,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (transaction_setIsValid)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (transaction_setIsValid)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.AuxiliaryData (AuxiliaryData)
 import Cardano.Types.AuxiliaryData as AuxiliaryData
 import Cardano.Types.TransactionBody (TransactionBody, _outputs)

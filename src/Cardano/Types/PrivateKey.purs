@@ -3,7 +3,7 @@ module Cardano.Types.PrivateKey where
 import Prelude
 
 import Aeson (class EncodeAeson, encodeAeson)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( privateKey_asBytes
   , privateKey_fromBech32
   , privateKey_fromNormalBytes
@@ -13,7 +13,7 @@ import Cardano.Serialization.Lib
   , privateKey_toBech32
   , privateKey_toPublic
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Internal.Helpers (eqOrd)

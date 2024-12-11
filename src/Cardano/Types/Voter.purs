@@ -8,7 +8,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, (.:))
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Credential (Credential)
 import Cardano.Types.Credential (fromCsl, toCsl) as Credential
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)

@@ -8,7 +8,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( packMapContainer
   , protocolParamUpdate_adaPerUtxoByte
   , protocolParamUpdate_collateralPercentage
@@ -75,7 +75,7 @@ import Cardano.Serialization.Lib
   , protocolParamUpdate_treasuryGrowthRate
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.CostModel (CostModel)
 import Cardano.Types.CostModel as CostModel

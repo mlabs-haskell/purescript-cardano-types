@@ -8,8 +8,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (unpackListContainer)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (unpackListContainer)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
 import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
 import Cardano.Types.Internal.Helpers (decodeMap, encodeMap)

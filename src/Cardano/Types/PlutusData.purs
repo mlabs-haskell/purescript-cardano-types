@@ -24,7 +24,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( constrPlutusData_alternative
   , constrPlutusData_data
   , constrPlutusData_new
@@ -41,8 +41,8 @@ import Cardano.Serialization.Lib
   , plutusData_newMap
   , unpackMultiMapContainer
   )
-import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packListContainer, unpackListContainer)
+import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite.Internal (packListContainer, unpackListContainer)
 import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum

@@ -4,8 +4,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (fromBytes, toBytes, url_new, url_url)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (fromBytes, toBytes, url_new, url_url)
+import Cardano.Data.Lite as Csl
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)

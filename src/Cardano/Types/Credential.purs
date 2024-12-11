@@ -16,7 +16,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.ScriptHash (ScriptHash)

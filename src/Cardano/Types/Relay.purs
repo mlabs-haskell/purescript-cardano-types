@@ -12,7 +12,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( dnsRecordAorAAAA_new
   , dnsRecordAorAAAA_record
   , dnsRecordSRV_new
@@ -33,7 +33,7 @@ import Cardano.Serialization.Lib
   , singleHostName_new
   , singleHostName_port
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.Ipv4 (Ipv4)
 import Cardano.Types.Ipv6 (Ipv6)

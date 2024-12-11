@@ -3,7 +3,7 @@ module Cardano.Types.UtxoMap where
 import Prelude
 
 import Cardano.AsCbor (encodeCbor)
-import Cardano.Serialization.Lib (toBytes)
+import Cardano.Data.Lite (toBytes)
 import Cardano.Types.Address as Address
 import Cardano.Types.OutputDatum
   ( OutputDatum(OutputDatum, OutputDatumHash)

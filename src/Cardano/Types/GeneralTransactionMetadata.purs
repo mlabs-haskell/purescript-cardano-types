@@ -4,8 +4,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (packMapContainer, unpackMapContainer)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (packMapContainer, unpackMapContainer)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Internal.Helpers (decodeMap, encodeMap)
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum)

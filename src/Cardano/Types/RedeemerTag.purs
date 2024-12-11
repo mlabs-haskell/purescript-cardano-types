@@ -15,7 +15,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (unwrap, wrap)
 import Data.Show.Generic (genericShow)

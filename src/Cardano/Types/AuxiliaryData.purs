@@ -9,7 +9,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( auxiliaryData_metadata
   , auxiliaryData_nativeScripts
   , auxiliaryData_new
@@ -20,7 +20,7 @@ import Cardano.Serialization.Lib
   , packListContainer
   , unpackListContainer
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata)
 import Cardano.Types.GeneralTransactionMetadata as GeneralTransactionMetadatum

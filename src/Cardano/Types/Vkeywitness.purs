@@ -5,8 +5,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (vkeywitness_new, vkeywitness_signature, vkeywitness_vkey)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (vkeywitness_new, vkeywitness_signature, vkeywitness_vkey)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Vkey (Vkey)
 import Cardano.Types.Vkey as Vkey

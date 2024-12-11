@@ -12,12 +12,12 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.FromData (class FromData, fromData)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( transactionInput_index
   , transactionInput_new
   , transactionInput_transactionId
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum (zero) as BigNum
 import Cardano.Types.PlutusData (PlutusData(Constr))

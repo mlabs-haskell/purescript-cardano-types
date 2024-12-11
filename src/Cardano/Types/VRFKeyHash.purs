@@ -10,8 +10,8 @@ import Aeson
   )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.FromData (class FromData, fromData)
-import Cardano.Serialization.Lib (fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (fromBytes, toBytes)
+import Cardano.Data.Lite as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum as BigNum
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)

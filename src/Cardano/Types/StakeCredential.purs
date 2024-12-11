@@ -14,7 +14,7 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Credential
   ( Credential(PubKeyHashCredential, ScriptHashCredential)
   )

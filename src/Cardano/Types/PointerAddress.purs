@@ -9,13 +9,13 @@ import Aeson
   , decodeAeson
   , encodeAeson
   )
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( fromBytes
   , pointerAddress_fromAddress
   , pointerAddress_toAddress
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
 import Data.ByteArray (byteArrayToHex)
 import Data.Either (note)

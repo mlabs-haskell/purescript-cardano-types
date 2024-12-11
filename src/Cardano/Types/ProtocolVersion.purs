@@ -4,7 +4,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe (fromJust)

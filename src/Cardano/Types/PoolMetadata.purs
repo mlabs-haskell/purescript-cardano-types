@@ -8,8 +8,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (poolMetadata_new, poolMetadata_poolMetadataHash, poolMetadata_url)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (poolMetadata_new, poolMetadata_poolMetadataHash, poolMetadata_url)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.PoolMetadataHash (PoolMetadataHash)
 import Cardano.Types.URL (URL)
 import Cardano.Types.URL (fromCsl, toCsl) as URL

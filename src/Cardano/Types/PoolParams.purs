@@ -4,7 +4,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( packListContainer
   , poolParams_cost
   , poolParams_margin
@@ -18,7 +18,7 @@ import Cardano.Serialization.Lib
   , poolParams_vrfKeyhash
   , unpackListContainer
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.PoolMetadata (PoolMetadata)

@@ -2,7 +2,7 @@ module Cardano.Types.RewardAddress where
 
 import Prelude
 
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( address_fromBech32
   , address_networkId
   , address_toBech32
@@ -11,7 +11,7 @@ import Cardano.Serialization.Lib
   , rewardAddress_paymentCred
   , rewardAddress_toAddress
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Credential as Credential
 import Cardano.Types.NetworkId (NetworkId)

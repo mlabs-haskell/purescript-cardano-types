@@ -19,7 +19,7 @@ to generate this file without the comments in this block.
   , "bifunctors"
   , "bytearrays"
   , "cardano-plutus-data-schema"
-  , "cardano-serialization-lib"
+  , "cardano-data-lite"
   , "control"
   , "datetime"
   , "effect"

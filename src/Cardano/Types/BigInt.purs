@@ -9,8 +9,8 @@ module Cardano.Types.BigInt
 
 import Prelude
 
-import Cardano.Serialization.Lib (bigInt_divCeil, bigInt_fromStr, bigInt_toStr)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (bigInt_divCeil, bigInt_fromStr, bigInt_toStr)
+import Cardano.Data.Lite as Csl
 import Data.Maybe (fromJust)
 import Data.Nullable (toMaybe)
 import JS.BigInt (BigInt)

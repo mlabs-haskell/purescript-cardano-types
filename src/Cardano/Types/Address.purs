@@ -10,7 +10,7 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( address_fromBech32
   , address_networkId
   , address_toBech32
@@ -27,7 +27,7 @@ import Cardano.Serialization.Lib
   , rewardAddress_toAddress
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.BaseAddress (BaseAddress, fromCsl, toCsl) as BA
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.ByronAddress (ByronAddress) as BA

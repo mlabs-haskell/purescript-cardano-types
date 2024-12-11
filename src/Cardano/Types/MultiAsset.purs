@@ -4,8 +4,8 @@ import Prelude hiding (add)
 
 import Aeson (class DecodeAeson, class EncodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
-import Cardano.Serialization.Lib (packMapContainer, unpackMapContainer)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (packMapContainer, unpackMapContainer)
+import Cardano.Data.Lite as Csl
 import Cardano.Types.AssetName (AssetName, fromAssetName)
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum

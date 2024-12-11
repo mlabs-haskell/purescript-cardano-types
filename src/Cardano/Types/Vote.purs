@@ -15,7 +15,7 @@ import Aeson
   , fromString
   , toStringifiedNumbersJson
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)

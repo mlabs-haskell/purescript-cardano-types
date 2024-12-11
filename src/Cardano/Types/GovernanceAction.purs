@@ -16,7 +16,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction)
 import Cardano.Types.HardForkInitiationAction (fromCsl, toCsl) as HardForkInitiationAction
 import Cardano.Types.Internal.Helpers (encodeTagged')

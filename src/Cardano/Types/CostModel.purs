@@ -3,13 +3,13 @@ module Cardano.Types.CostModel where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( costModel_get
   , costModel_len
   , costModel_new
   , costModel_set
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Int (Int) as Int
 import Data.Array as Array
 import Data.FoldableWithIndex (forWithIndex_)

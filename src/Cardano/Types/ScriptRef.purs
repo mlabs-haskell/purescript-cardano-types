@@ -12,7 +12,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( fromBytes
   , scriptRef_nativeScript
   , scriptRef_newNativeScript
@@ -20,7 +20,7 @@ import Cardano.Serialization.Lib
   , scriptRef_plutusScript
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.NativeScript (NativeScript)
 import Cardano.Types.NativeScript as NativeScript
