@@ -16,14 +16,20 @@ import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Data.Lite
   ( dataCost_newCoinsPerByte
+  , dataOption_asData
+  , dataOption_asHash
+  , dataOption_newData
+  , dataOption_newHash
+  , data_encodedPlutusData
+  , data_new
+  , data_toBytes
+  , plutusData_newBytes
   , transactionOutput_address
   , transactionOutput_amount
-  , transactionOutput_dataHash
+  , transactionOutput_datumOption
   , transactionOutput_new
-  , transactionOutput_plutusData
   , transactionOutput_scriptRef
-  , transactionOutput_setDataHash
-  , transactionOutput_setPlutusData
+  , transactionOutput_setDatumOption
   , transactionOutput_setScriptRef
   )
 import Cardano.Data.Lite as Csl
@@ -32,10 +38,7 @@ import Cardano.Types.Address as Address
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.MultiAsset (MultiAsset(MultiAsset))
-import Cardano.Types.OutputDatum
-  ( OutputDatum(OutputDatum, OutputDatumHash)
-  , pprintOutputDatum
-  )
+import Cardano.Types.OutputDatum (OutputDatum(OutputDatum, OutputDatumHash), pprintOutputDatum)
 import Cardano.Types.PlutusData as PlutusData
 import Cardano.Types.ScriptRef (ScriptRef)
 import Cardano.Types.ScriptRef as ScriptRef
@@ -122,16 +125,23 @@ fromCsl to =
   where
   address = Address.fromCsl $ transactionOutput_address to
   amount = Value.fromCsl $ transactionOutput_amount to
-  datum = (OutputDatum <<< PlutusData.fromCsl <$> toMaybe (transactionOutput_plutusData to)) <|>
-    (OutputDatumHash <<< wrap <$> toMaybe (transactionOutput_dataHash to))
+  mDatumOption = toMaybe (transactionOutput_datumOption to)
+  datum =
+    ( OutputDatum <<< PlutusData.fromCsl <$> (plutusData_newBytes <<< data_encodedPlutusData) <$>
+        ( (toMaybe <<< dataOption_asData) =<<
+            mDatumOption
+        )
+    ) <|>
+      (OutputDatumHash <<< wrap <$> ((toMaybe <<< dataOption_asHash) =<< mDatumOption))
   scriptRef = ScriptRef.fromCsl <$> toMaybe (transactionOutput_scriptRef to)
 
 toCsl :: TransactionOutput -> Csl.TransactionOutput
 toCsl (TransactionOutput { address, amount, datum, scriptRef }) = unsafePerformEffect do
   let cslOutput = transactionOutput_new (Address.toCsl address) (Value.toCsl amount)
   for_ datum case _ of
-    OutputDatumHash dh -> transactionOutput_setDataHash cslOutput $ unwrap dh
-    OutputDatum dt -> transactionOutput_setPlutusData cslOutput $ PlutusData.toCsl dt
+    OutputDatumHash dh -> transactionOutput_setDatumOption cslOutput $ (dataOption_newHash $ unwrap dh)
+    OutputDatum dt -> transactionOutput_setDatumOption cslOutput $
+      (dataOption_newData $ data_new $ Csl.toBytes $ PlutusData.toCsl dt)
   for_ scriptRef $ transactionOutput_setScriptRef cslOutput <<< ScriptRef.toCsl
   pure cslOutput
 
