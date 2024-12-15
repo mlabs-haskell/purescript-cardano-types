@@ -55,6 +55,7 @@ module Test.Fixtures
   , txBinaryFixture5
   , txBinaryFixture6
   , txFixture1
+  , txBodyFixture1
   , txFixture2
   , txFixture3
   , txFixture4
@@ -81,6 +82,7 @@ import Prelude
 
 import Aeson (decodeAeson, fromString)
 import Cardano.AsCbor (decodeCbor)
+import Cardano.Data.Lite (PublicKey)
 import Cardano.Types
   ( Anchor
   , AuxiliaryData(AuxiliaryData)
@@ -431,31 +433,34 @@ plutusScriptFixture3 =
       )
   )
 
+txBodyFixture1 :: TransactionBody
+txBodyFixture1 = TransactionBody
+  { inputs: [ txInputFixture1 ]
+  , outputs: [ txOutputFixture1 ]
+  , fee: Coin $ BigNum.fromInt 177513
+  , ttl: Nothing
+  , certs: []
+  , withdrawals: Map.empty
+  , auxiliaryDataHash: Nothing
+  , validityStartInterval: Nothing
+  , mint: Nothing
+  , referenceInputs: mempty
+  , scriptDataHash: Nothing
+  , collateral: []
+  , requiredSigners: []
+  , networkId: Just MainnetId
+  , collateralReturn: Nothing
+  , totalCollateral: Nothing
+  , votingProposals: []
+  , votingProcedures: mempty
+  , currentTreasuryValue: Nothing
+  , donation: Nothing
+  }
+
 txFixture1 :: Transaction
 txFixture1 =
   Transaction
-    { body: TransactionBody
-        { inputs: [ txInputFixture1 ]
-        , outputs: [ txOutputFixture1 ]
-        , fee: Coin $ BigNum.fromInt 177513
-        , ttl: Nothing
-        , certs: []
-        , withdrawals: Map.empty
-        , auxiliaryDataHash: Nothing
-        , validityStartInterval: Nothing
-        , mint: Nothing
-        , referenceInputs: mempty
-        , scriptDataHash: Nothing
-        , collateral: []
-        , requiredSigners: []
-        , networkId: Just MainnetId
-        , collateralReturn: Nothing
-        , totalCollateral: Nothing
-        , votingProposals: []
-        , votingProcedures: mempty
-        , currentTreasuryValue: Nothing
-        , donation: Nothing
-        }
+    { body: txBodyFixture1
     , witnessSet: TransactionWitnessSet
         { vkeys: []
         , nativeScripts: []
