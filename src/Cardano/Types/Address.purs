@@ -21,8 +21,6 @@ import Cardano.Data.Lite
   , enterpriseAddress_fromAddress
   , enterpriseAddress_toAddress
   , fromBytes
-  , pointerAddress_fromAddress
-  , pointerAddress_toAddress
   , rewardAddress_fromAddress
   , rewardAddress_toAddress
   , toBytes
@@ -35,7 +33,6 @@ import Cardano.Types.EnterpriseAddress as EA
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId
 import Cardano.Types.PaymentCredential (PaymentCredential)
-import Cardano.Types.PointerAddress (PointerAddress) as PA
 import Cardano.Types.RewardAddress as RA
 import Cardano.Types.StakeCredential (StakeCredential)
 import Control.Alt ((<|>))
@@ -57,7 +54,6 @@ data Address
   | ByronAddress BA.ByronAddress
   | EnterpriseAddress EA.EnterpriseAddress
   | RewardAddress RA.RewardAddress
-  | PointerAddress PA.PointerAddress
 
 derive instance Generic Address _
 derive instance Eq Address
@@ -104,7 +100,6 @@ getPaymentCredential = case _ of
   ByronAddress _ -> Nothing
   EnterpriseAddress { paymentCredential } -> Just paymentCredential
   RewardAddress _ -> Nothing
-  PointerAddress _ -> Nothing
 
 getStakeCredential :: Address -> Maybe StakeCredential
 getStakeCredential = case _ of
@@ -112,7 +107,6 @@ getStakeCredential = case _ of
   ByronAddress _ -> Nothing
   EnterpriseAddress _ -> Nothing
   RewardAddress { stakeCredential } -> Just stakeCredential
-  PointerAddress _ -> Nothing
 
 toBech32 :: Address -> Bech32String
 toBech32 = toCsl >>> flip address_toBech32 (unsafeCoerce undefined)
@@ -133,13 +127,11 @@ toCsl = case _ of
     enterpriseAddress_toAddress $ EA.toCsl ea
   RewardAddress ra ->
     rewardAddress_toAddress $ RA.toCsl ra
-  PointerAddress pc ->
-    pointerAddress_toAddress $ unwrap pc
 
 fromCsl :: Csl.Address -> Address
 fromCsl addr =
   unsafePartial $ fromJust $
-    asBaseAddress <|> asByronAddress <|> asEnterpriseAddress <|> asRewardAddress <|> asPointerAddress
+    asBaseAddress <|> asByronAddress <|> asEnterpriseAddress <|> asRewardAddress
   where
   asBaseAddress = toMaybe (baseAddress_fromAddress addr) <#>
     BaseAddress <<< BA.fromCsl
@@ -149,5 +141,3 @@ fromCsl addr =
     EnterpriseAddress <<< EA.fromCsl
   asRewardAddress = toMaybe (rewardAddress_fromAddress addr) <#>
     RewardAddress <<< RA.fromCsl
-  asPointerAddress = toMaybe (pointerAddress_fromAddress addr) <#>
-    PointerAddress <<< wrap
