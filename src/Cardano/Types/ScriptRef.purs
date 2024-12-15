@@ -16,15 +16,18 @@ import Cardano.Data.Lite
   ( fromBytes
   , scriptRef_nativeScript
   , scriptRef_newNativeScript
-  , scriptRef_newPlutusScript
+  , scriptRef_newPlutusScript_v1
+  , scriptRef_newPlutusScript_v2
+  , scriptRef_newPlutusScript_v3
   , scriptRef_plutusScript
   , toBytes
   )
 import Cardano.Data.Lite as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
+import Cardano.Types.Language as Language
 import Cardano.Types.NativeScript (NativeScript)
 import Cardano.Types.NativeScript as NativeScript
-import Cardano.Types.PlutusScript (PlutusScript)
+import Cardano.Types.PlutusScript (PlutusScript(PlutusScript))
 import Cardano.Types.PlutusScript as PlutusScript
 import Control.Alt ((<|>))
 import Data.Either (Either(Left))
@@ -33,6 +36,7 @@ import Data.Maybe (Maybe(Just, Nothing), fromJust)
 import Data.Newtype (unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Data.Show.Generic (genericShow)
+import Data.Tuple.Nested ((/\))
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Arbitrary (genericArbitrary)
@@ -84,7 +88,10 @@ getPlutusScript _ = Nothing
 toCsl :: ScriptRef -> Csl.ScriptRef
 toCsl = case _ of
   NativeScriptRef ns -> scriptRef_newNativeScript $ NativeScript.toCsl ns
-  PlutusScriptRef ps -> scriptRef_newPlutusScript $ PlutusScript.toCsl ps
+  PlutusScriptRef ps@(PlutusScript (_ /\ lang)) -> case lang of
+    Language.PlutusV1 -> scriptRef_newPlutusScript_v1 $ PlutusScript.toCsl ps
+    Language.PlutusV2 -> scriptRef_newPlutusScript_v2 $ PlutusScript.toCsl ps
+    Language.PlutusV3 -> scriptRef_newPlutusScript_v3 $ PlutusScript.toCsl ps
 
 fromCsl :: Csl.ScriptRef -> ScriptRef
 fromCsl sr = unsafePartial $ fromJust $
