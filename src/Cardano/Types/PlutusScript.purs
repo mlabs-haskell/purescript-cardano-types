@@ -2,30 +2,18 @@ module Cardano.Types.PlutusScript where
 
 import Prelude
 
-import Aeson
-  ( class DecodeAeson
-  , class EncodeAeson
-  , decodeAeson
-  , fromString
-  )
+import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, fromString)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite
-  ( fromBytes
-  , plutusScript_bytes
-  , plutusScript_hash
-  , plutusScript_languageVersion
-  , plutusScript_newWithVersion
-  , toBytes
-  )
+import Cardano.Data.Lite (fromBytes, plutusScript_bytes, plutusScript_hash, plutusScript_new, toBytes)
 import Cardano.Data.Lite as Csl
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
-import Cardano.Types.Language as Language
 import Cardano.Types.RawBytes (RawBytes)
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Array.NonEmpty as NEA
 import Data.ByteArray (ByteArray)
 import Data.Either (hush)
 import Data.Generic.Rep (class Generic)
+import Data.Int as Int
 import Data.Maybe (fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -74,20 +62,27 @@ instance AsCbor PlutusScript where
   encodeCbor = toCsl >>> toBytes >>> wrap
   decodeCbor = unwrap >>> fromBytes >>> map fromCsl
 
+languageToNumber :: Language -> Number
+languageToNumber PlutusV1 = Int.toNumber 1
+languageToNumber PlutusV2 = Int.toNumber 2
+languageToNumber PlutusV3 = Int.toNumber 3
+
 hash :: PlutusScript -> ScriptHash
-hash = toCsl >>> plutusScript_hash >>> wrap
+hash script@(PlutusScript (_ /\ language)) = wrap $ plutusScript_hash (toCsl script)
+  (languageToNumber language)
 
 -- | Get raw Plutus script bytes
 getBytes :: PlutusScript -> RawBytes
 getBytes (PlutusScript (script /\ _)) = wrap script
 
 toCsl :: PlutusScript -> Csl.PlutusScript
-toCsl (PlutusScript (script /\ lang)) =
-  plutusScript_newWithVersion script (Language.toCsl lang)
+toCsl (PlutusScript (script /\ _)) =
+  plutusScript_new script
 
+-- TODO: extract language version
 fromCsl :: Csl.PlutusScript -> PlutusScript
 fromCsl ps =
   PlutusScript
     ( plutusScript_bytes ps
-        /\ Language.fromCsl (plutusScript_languageVersion ps)
+        /\ PlutusV1
     )
