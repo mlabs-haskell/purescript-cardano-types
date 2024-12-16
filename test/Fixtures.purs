@@ -273,8 +273,6 @@ protocolParamUpdate1 = wrap
       { numerator: bigNumOne, denominator: bigNumOne }
   , treasuryGrowthRate: Just $ UnitInterval
       { numerator: bigNumOne, denominator: bigNumOne }
-  , protocolVersion: Just $ ProtocolVersion
-      { major: 1, minor: 1 }
   , minPoolCost: Just $ wrap bigNumOne
   , adaPerUtxoByte: Just $ wrap bigNumOne
   , costModels: Just costModelsFixture1
