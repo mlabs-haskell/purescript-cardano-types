@@ -18,18 +18,10 @@ import Aeson
   , toStringifiedNumbersJson
   , (.:)
   )
-import Cardano.AsCbor (encodeCbor)
-import Cardano.FromData (class FromData, genericFromData)
-import Cardano.Plutus.DataSchema
-  ( class HasPlutusSchema
-  , type (:+)
-  , type (:=)
-  , type (@@)
-  , PNil
-  , S
-  , Z
-  )
+import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Data.Lite as Csl
+import Cardano.FromData (class FromData, genericFromData)
+import Cardano.Plutus.DataSchema (class HasPlutusSchema, type (:+), type (:=), type (@@), PNil, S, Z)
 import Cardano.ToData (class ToData, genericToData)
 import Cardano.Types.DataHash (DataHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
@@ -97,6 +89,10 @@ instance DecodeAeson OutputDatum where
             $ UnexpectedValue
             $ toStringifiedNumbersJson
             $ fromString tagValue
+
+instance AsCbor OutputDatum where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 instance Arbitrary OutputDatum where
   arbitrary = genericArbitrary
