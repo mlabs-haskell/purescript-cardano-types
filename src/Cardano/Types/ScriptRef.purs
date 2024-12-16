@@ -19,11 +19,14 @@ import Cardano.Data.Lite
   , scriptRef_newPlutusScript_v1
   , scriptRef_newPlutusScript_v2
   , scriptRef_newPlutusScript_v3
-  , scriptRef_plutusScript
+  , scriptRef_plutusScript_v1
+  , scriptRef_plutusScript_v2
+  , scriptRef_plutusScript_v3
   , toBytes
   )
 import Cardano.Data.Lite as Csl
 import Cardano.Types.Internal.Helpers (encodeTagged')
+import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
 import Cardano.Types.Language as Language
 import Cardano.Types.NativeScript (NativeScript)
 import Cardano.Types.NativeScript as NativeScript
@@ -95,5 +98,10 @@ toCsl = case _ of
 
 fromCsl :: Csl.ScriptRef -> ScriptRef
 fromCsl sr = unsafePartial $ fromJust $
-  (NativeScriptRef <<< NativeScript.fromCsl <$> toMaybe (scriptRef_nativeScript sr)) <|>
-    (PlutusScriptRef <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript sr))
+  (NativeScriptRef <<< NativeScript.fromCsl <$> toMaybe (scriptRef_nativeScript sr))
+    <|> (PlutusScriptRef <<< setLanguage PlutusV1 <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript_v1 sr))
+    <|> (PlutusScriptRef <<< setLanguage PlutusV2 <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript_v2 sr))
+    <|> (PlutusScriptRef <<< setLanguage PlutusV3 <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript_v3 sr))
+  where
+  setLanguage :: Language -> PlutusScript -> PlutusScript
+  setLanguage lang (PlutusScript (ba /\ _)) = PlutusScript (ba /\ lang)
