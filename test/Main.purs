@@ -4,6 +4,7 @@ import Prelude
 
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
 import Data.ByteArray (ByteArray)
+import Cardano.Types.OutputDatum (OutputDatum(..))
 import Data.Maybe (Maybe(Just))
 import Data.Newtype (wrap)
 import Data.Time.Duration (Milliseconds(Milliseconds))
@@ -82,6 +83,8 @@ suite = do
       roundtripTest "plutusDataFixture9" plutusDataFixture9
       roundtripTest "plutusDataFixture10" plutusDataFixture10
       roundtripTest "plutusDataFixture11" plutusDataFixture11
+    group "OutputDatum" do
+      roundtripTest "OutputDatum plutusDataFixture1" (OutputDatum plutusDataFixture1)
     group "Transaction" do
       roundtripTest "txFixture1" txFixture1
       roundtripTest "txFixture2" txFixture2
