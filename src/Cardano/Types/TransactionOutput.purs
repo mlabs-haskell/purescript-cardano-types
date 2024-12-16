@@ -23,6 +23,7 @@ import Cardano.Data.Lite
   , data_encodedPlutusData
   , data_new
   , data_toBytes
+  , plutusData_fromBytes
   , plutusData_newBytes
   , transactionOutput_address
   , transactionOutput_amount
@@ -127,9 +128,13 @@ fromCsl to =
   amount = Value.fromCsl $ transactionOutput_amount to
   mDatumOption = toMaybe (transactionOutput_datumOption to)
   datum =
-    ( OutputDatum <<< PlutusData.fromCsl <$> (plutusData_newBytes <<< data_encodedPlutusData) <$>
-        ( (toMaybe <<< dataOption_asData) =<<
-            mDatumOption
+    ( OutputDatum <<< PlutusData.fromCsl <$>
+        ( toMaybe <<< plutusData_fromBytes =<<
+            ( (data_encodedPlutusData) <$>
+                ( (toMaybe <<< dataOption_asData) =<<
+                    mDatumOption
+                )
+            )
         )
     ) <|>
       (OutputDatumHash <<< wrap <$> ((toMaybe <<< dataOption_asHash) =<< mDatumOption))
