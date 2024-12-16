@@ -79,7 +79,6 @@ toCsl :: PlutusScript -> Csl.PlutusScript
 toCsl (PlutusScript (script /\ _)) =
   plutusScript_new script
 
--- TODO: extract language version
 fromCsl :: Csl.PlutusScript -> PlutusScript
 fromCsl ps =
   PlutusScript
