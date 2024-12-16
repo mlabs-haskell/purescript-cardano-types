@@ -39,7 +39,6 @@ import Cardano.Data.Lite
   , protocolParamUpdate_poolDeposit
   , protocolParamUpdate_poolPledgeInfluence
   , protocolParamUpdate_poolVotingThresholds
-  , protocolParamUpdate_protocolVersion
   , protocolParamUpdate_refScriptCoinsPerByte
   , protocolParamUpdate_setAdaPerUtxoByte
   , protocolParamUpdate_setCollateralPercentage
@@ -69,7 +68,6 @@ import Cardano.Data.Lite
   , protocolParamUpdate_setPoolDeposit
   , protocolParamUpdate_setPoolPledgeInfluence
   , protocolParamUpdate_setPoolVotingThresholds
-  , protocolParamUpdate_setProtocolVersion
   , protocolParamUpdate_setRefScriptCoinsPerByte
   , protocolParamUpdate_setTreasuryGrowthRate
   , protocolParamUpdate_treasuryGrowthRate
@@ -91,8 +89,6 @@ import Cardano.Types.Language (Language)
 import Cardano.Types.Language as Language
 import Cardano.Types.PoolVotingThresholds (PoolVotingThresholds)
 import Cardano.Types.PoolVotingThresholds (fromCsl, toCsl) as PoolVotingThresholds
-import Cardano.Types.ProtocolVersion (ProtocolVersion)
-import Cardano.Types.ProtocolVersion as ProtocolVersion
 import Cardano.Types.UnitInterval (UnitInterval)
 import Cardano.Types.UnitInterval as UnitInterval
 import Data.Generic.Rep (class Generic)
@@ -122,7 +118,6 @@ newtype ProtocolParamUpdate = ProtocolParamUpdate
   , poolPledgeInfluence :: Maybe UnitInterval
   , expansionRate :: Maybe UnitInterval
   , treasuryGrowthRate :: Maybe UnitInterval
-  , protocolVersion :: Maybe ProtocolVersion
   , minPoolCost :: Maybe Coin
   , adaPerUtxoByte :: Maybe Coin
   , costModels :: Maybe (Map Language CostModel)
@@ -174,7 +169,6 @@ toCsl
       , poolPledgeInfluence
       , expansionRate
       , treasuryGrowthRate
-      , protocolVersion
       , minPoolCost
       , adaPerUtxoByte
       , costModels
@@ -208,7 +202,6 @@ toCsl
   for_ poolPledgeInfluence $ protocolParamUpdate_setPoolPledgeInfluence pp <<< UnitInterval.toCsl
   for_ expansionRate $ protocolParamUpdate_setExpansionRate pp <<< UnitInterval.toCsl
   for_ treasuryGrowthRate $ protocolParamUpdate_setTreasuryGrowthRate pp <<< UnitInterval.toCsl
-  for_ protocolVersion $ protocolParamUpdate_setProtocolVersion pp <<< ProtocolVersion.toCsl
   for_ minPoolCost $ protocolParamUpdate_setMinPoolCost pp <<< unwrap <<< unwrap
   for_ adaPerUtxoByte $ protocolParamUpdate_setAdaPerUtxoByte pp <<< unwrap <<< unwrap
   for_ costModels $ protocolParamUpdate_setCostModels pp
@@ -247,7 +240,6 @@ fromCsl pp =
     , poolPledgeInfluence
     , expansionRate
     , treasuryGrowthRate
-    , protocolVersion
     , minPoolCost
     , adaPerUtxoByte
     , costModels
@@ -285,7 +277,6 @@ fromCsl pp =
   poolPledgeInfluence = UnitInterval.fromCsl <$> use protocolParamUpdate_poolPledgeInfluence
   expansionRate = UnitInterval.fromCsl <$> use protocolParamUpdate_expansionRate
   treasuryGrowthRate = UnitInterval.fromCsl <$> use protocolParamUpdate_treasuryGrowthRate
-  protocolVersion = ProtocolVersion.fromCsl <$> use protocolParamUpdate_protocolVersion
   minPoolCost = wrap <<< wrap <$> use protocolParamUpdate_minPoolCost
   adaPerUtxoByte = wrap <<< wrap <$> use protocolParamUpdate_adaPerUtxoByte
   costModels = costModelsFromCsl <$> use protocolParamUpdate_costModels
