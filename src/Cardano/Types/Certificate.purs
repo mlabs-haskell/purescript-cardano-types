@@ -280,11 +280,11 @@ fromCsl csl = unsafePartial $ fromJust $
   unregDrepCert =
     toMaybe (Csl.certificate_asDrepDeregistration csl) <#> \x ->
       UnregDrepCert
-        (Credential.fromCsl $ Csl.dRepDeregistration_votingCredential x)
+        (Credential.fromCsl $ Csl.dRepDeregistration_drepCredential x)
         (wrap $ wrap $ Csl.dRepDeregistration_coin x)
 
   updateDrepCert =
     toMaybe (Csl.certificate_asDrepUpdate csl) <#> \x ->
       UpdateDrepCert
-        (Credential.fromCsl $ Csl.dRepUpdate_votingCredential x)
+        (Credential.fromCsl $ Csl.dRepUpdate_drepCredential x)
         (Anchor.fromCsl <$> toMaybe (Csl.dRepUpdate_anchor x))
