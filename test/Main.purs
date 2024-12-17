@@ -13,7 +13,8 @@ import Effect.Aff (Aff, launchAff_)
 import Mote (group, test)
 import Mote.TestPlanM (TestPlanM, interpretWithConfig)
 import Test.Fixtures
-  ( int1
+  ( auxiliaryDataFixture1
+  , int1
   , mint0
   , mint1
   , nativeScriptFixture1
@@ -91,6 +92,8 @@ suite = do
       roundtripTest "PlutusScriptRef plutusScriptFixture1" (PlutusScriptRef plutusScriptFixture1)
       roundtripTest "PlutusScriptRef plutusScriptFixture2" (PlutusScriptRef plutusScriptFixture2)
       roundtripTest "PlutusScriptRef plutusScriptFixture3" (PlutusScriptRef plutusScriptFixture3)
+    group "AuxiliaryData" do
+      roundtripTest "auxiliaryDataFixture1" auxiliaryDataFixture1
     group "Transaction" do
       roundtripTest "txFixture1" txFixture1
       roundtripTest "txFixture2" txFixture2
