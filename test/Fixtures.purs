@@ -26,6 +26,7 @@ module Test.Fixtures
   , nativeScriptFixture4
   , nativeScriptFixture5
   , nativeScriptFixture6
+  , auxiliaryDataFixture1
   , nativeScriptFixture7
   , nullPaymentPubKeyHash
   , partiallyAppliedScriptFixture
@@ -177,6 +178,16 @@ import Data.UInt as UInt
 import JS.BigInt as BigInt
 import Partial.Unsafe (unsafePartial)
 import Test.Fixtures.CostModels (costModelsFixture1)
+
+auxiliaryDataFixture1 :: AuxiliaryData
+auxiliaryDataFixture1 = AuxiliaryData
+  { metadata: Just $ GeneralTransactionMetadata
+      ( Map.fromFoldable
+          [ BigNum.fromInt 8 /\ Text "foo" ]
+      )
+  , nativeScripts: Nothing
+  , plutusScripts: Nothing
+  }
 
 txOutputFixture1 :: TransactionOutput
 txOutputFixture1 =
