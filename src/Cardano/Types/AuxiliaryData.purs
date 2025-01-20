@@ -12,7 +12,7 @@ import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite
   ( auxiliaryData_metadata
   , auxiliaryData_nativeScripts
-  , auxiliaryData_new
+  , auxiliaryData_newShelleyMetadata
   , auxiliaryData_plutusScripts_v1
   , auxiliaryData_plutusScripts_v2
   , auxiliaryData_plutusScripts_v3
@@ -87,7 +87,7 @@ hashAuxiliaryData = toCsl >>> Csl.hashAuxiliaryData >>> wrap
 toCsl :: AuxiliaryData -> Csl.AuxiliaryData
 toCsl
   (AuxiliaryData { metadata, nativeScripts, plutusScripts }) = unsafePerformEffect do
-  ad <- auxiliaryData_new
+  ad <- auxiliaryData_newShelleyMetadata
   for_ metadata $
     GeneralTransactionMetadatum.toCsl >>> auxiliaryData_setMetadata ad
   for_ nativeScripts $
