@@ -22,9 +22,7 @@ import Cardano.Data.Lite
   , dataOption_newHash
   , data_encodedPlutusData
   , data_new
-  , data_toBytes
   , plutusData_fromBytes
-  , plutusData_newBytes
   , transactionOutput_address
   , transactionOutput_amount
   , transactionOutput_datumOption
