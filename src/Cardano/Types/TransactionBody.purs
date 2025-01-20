@@ -3,6 +3,7 @@ module Cardano.Types.TransactionBody where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
+import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite
   ( packListContainer
   , packMapContainer
@@ -146,6 +147,10 @@ instance Ord TransactionBody where
 
 instance Show TransactionBody where
   show = genericShow
+
+instance AsCbor TransactionBody where
+  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
 
 derive newtype instance EncodeAeson TransactionBody
 derive newtype instance DecodeAeson TransactionBody
