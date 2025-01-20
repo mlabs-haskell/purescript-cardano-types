@@ -35,13 +35,13 @@
         sha512 = "9rTvUJIAj5d3//U5FDPWGJ1nFJLuWb30vugGOrWk7aNZ6y9tuA3PI7Cc9dP8WEXKVyK1vuuk8rSFP2iqXnlgrw==";
       };
     };
-    "@mlabs-haskell/cardano-data-lite-git+ssh://git@github.com/mlabs-haskell/cardano-data-lite.git#0fd1d12dc3c1e29f98c4d68592e6d6014ef721aa" = {
+    "@mlabs-haskell/cardano-data-lite-git+ssh://git@github.com/mlabs-haskell/cardano-data-lite.git#01274415829dc56d3b136b33c27d614a5e53e71f" = {
       name = "_at_mlabs-haskell_slash_cardano-data-lite";
       packageName = "@mlabs-haskell/cardano-data-lite";
       version = "1.0.0";
       src = builtins.fetchGit {
         url = "ssh://git@github.com/mlabs-haskell/cardano-data-lite.git";
-        rev = "0fd1d12dc3c1e29f98c4d68592e6d6014ef721aa";
+        rev = "01274415829dc56d3b136b33c27d614a5e53e71f";
       };
     };
     "@mlabs-haskell/json-bigint-2.0.0" = {
@@ -152,7 +152,7 @@
       sources."@aws-crypto/crc32-5.2.0"
       sources."@aws-crypto/util-5.2.0"
       sources."@aws-sdk/types-3.696.0"
-      sources."@mlabs-haskell/cardano-data-lite-git+ssh://git@github.com/mlabs-haskell/cardano-data-lite.git#0fd1d12dc3c1e29f98c4d68592e6d6014ef721aa"
+      sources."@mlabs-haskell/cardano-data-lite-git+ssh://git@github.com/mlabs-haskell/cardano-data-lite.git#01274415829dc56d3b136b33c27d614a5e53e71f"
       sources."@mlabs-haskell/json-bigint-2.0.0"
       sources."@noble/ed25519-2.1.0"
       sources."@noble/hashes-1.6.1"
