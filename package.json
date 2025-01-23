@@ -5,7 +5,7 @@
         "test": "spago test"
     },
     "dependencies": {
-        "@mlabs-haskell/cardano-data-lite": "https://github.com/mlabs-haskell/cardano-data-lite.git#01274415829dc56d3b136b33c27d614a5e53e71f",
+        "@mlabs-haskell/cardano-data-lite": "0.1.0-prerelease3",
         "@mlabs-haskell/json-bigint": "^2.0.0"
     },
     "prettier": {
