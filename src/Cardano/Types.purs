@@ -45,6 +45,11 @@ import Cardano.Types.Certificate
       , UpdateDrepCert
       )
   ) as X
+import Cardano.Types.Chain
+  ( BlockHeaderHash(BlockHeaderHash)
+  , ChainTip(ChainTip)
+  , Tip(TipAtGenesis, Tip)
+  ) as X
 import Cardano.Types.Coin (Coin(Coin)) as X
 import Cardano.Types.Committee (Committee(Committee)) as X
 import Cardano.Types.Constitution (Constitution(Constitution)) as X
@@ -53,10 +58,21 @@ import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCred
 import Cardano.Types.DRep (DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)) as X
 import Cardano.Types.DRepVotingThresholds (DRepVotingThresholds(DRepVotingThresholds)) as X
 import Cardano.Types.DataHash (DataHash(DataHash)) as X
+import Cardano.Types.DelegationAndRewards (DelegationsAndRewards) as X
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash(Ed25519KeyHash)) as X
 import Cardano.Types.Ed25519Signature (Ed25519Signature(Ed25519Signature)) as X
 import Cardano.Types.EnterpriseAddress (EnterpriseAddress) as X
 import Cardano.Types.Epoch (Epoch(Epoch)) as X
+import Cardano.Types.EraSummaries
+  ( EpochLength(EpochLength)
+  , EraSummaries(EraSummaries)
+  , EraSummary(EraSummary)
+  , EraSummaryParameters(EraSummaryParameters)
+  , EraSummaryTime(EraSummaryTime)
+  , RelativeTime(RelativeTime)
+  , SafeZone(SafeZone)
+  , SlotLength(SlotLength)
+  ) as X
 import Cardano.Types.ExUnitPrices (ExUnitPrices(ExUnitPrices)) as X
 import Cardano.Types.ExUnits (ExUnits(ExUnits)) as X
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata(GeneralTransactionMetadata)) as X
@@ -94,6 +110,13 @@ import Cardano.Types.NativeScript
 import Cardano.Types.NetworkId (NetworkId(TestnetId, MainnetId)) as X
 import Cardano.Types.NewConstitutionAction (NewConstitutionAction(NewConstitutionAction)) as X
 import Cardano.Types.NoConfidenceAction (NoConfidenceAction(NoConfidenceAction)) as X
+import Cardano.Types.Ogmios
+  ( AdditionalUtxoSet(AdditionalUtxoSet)
+  , OgmiosAddress
+  , OgmiosTxOut
+  , OgmiosTxOutRef
+  , OgmiosUtxoMap
+  ) as X
 import Cardano.Types.OutputDatum (OutputDatum(OutputDatum, OutputDatumHash)) as X
 import Cardano.Types.ParameterChangeAction (ParameterChangeAction(ParameterChangeAction)) as X
 import Cardano.Types.PaymentCredential (PaymentCredential(PaymentCredential)) as X

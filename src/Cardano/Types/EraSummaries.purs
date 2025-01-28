@@ -1,4 +1,4 @@
-module Cardano.Types.EraSummarie
+module Cardano.Types.EraSummaries
   ( EpochLength(EpochLength)
   , EraSummaries(EraSummaries)
   , EraSummary(EraSummary)
