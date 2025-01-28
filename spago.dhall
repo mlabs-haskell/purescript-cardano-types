@@ -14,6 +14,7 @@ to generate this file without the comments in this block.
 , dependencies =
   [ "aeson"
   , "aff"
+  , "argonaut-codecs"
   , "arraybuffer-types"
   , "arrays"
   , "bifunctors"
@@ -28,6 +29,8 @@ to generate this file without the comments in this block.
   , "exceptions"
   , "foldable-traversable"
   , "foreign-object"
+  , "formatters"
+  , "heterogeneous"
   , "integers"
   , "js-bigints"
   , "lattice"
@@ -50,12 +53,15 @@ to generate this file without the comments in this block.
   , "record"
   , "safe-coerce"
   , "spec"
+  , "strings"
+  , "stringutils"
   , "these"
   , "tuples"
   , "typelevel-prelude"
   , "uint"
   , "unfoldable"
   , "unsafe-coerce"
+  , "untagged-union"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
