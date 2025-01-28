@@ -1,4 +1,4 @@
-module Cardano.Types.DelegationAndRewards
+module Cardano.Types.DelegationsAndRewards
   ( DelegationsAndRewards
   ) where
 
