@@ -10,8 +10,6 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.FromData (class FromData)
-import Cardano.FromMetadata (class FromMetadata)
 import Cardano.Data.Lite
   ( ed25519KeyHash_fromBech32
   , ed25519KeyHash_toBech32
@@ -19,6 +17,8 @@ import Cardano.Data.Lite
   , toBytes
   )
 import Cardano.Data.Lite as Csl
+import Cardano.FromData (class FromData)
+import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
 import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Bech32String (Bech32String)
