@@ -2,24 +2,14 @@ module Test.Main where
 
 import Prelude
 
-import Aeson (encodeAeson)
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Data.Lite (PoolParams, bigNum_one)
-import Cardano.Types.BigNum as BigNum
-import Cardano.Types.Certificate (Certificate(..))
-import Cardano.Types.DRep (DRep(..))
 import Cardano.Types.NetworkId (NetworkId(MainnetId, TestnetId))
-import Cardano.Types.OutputDatum (OutputDatum(..))
-import Cardano.Types.PoolMetadata (PoolMetadata(..))
-import Cardano.Types.PoolParams (PoolParams(..))
-import Cardano.Types.PoolPubKeyHash (PoolPubKeyHash(..))
-import Cardano.Types.Relay (Relay(..))
-import Cardano.Types.ScriptRef (ScriptRef(..))
-import Cardano.Types.URL (URL(..))
-import Cardano.Types.UnitInterval (UnitInterval(..))
+import Cardano.Types.OutputDatum (OutputDatum(OutputDatum))
+import Cardano.Types.Relay (Relay(SingleHostAddr, SingleHostName, MultiHostName))
+import Cardano.Types.ScriptRef (ScriptRef(PlutusScriptRef))
 import Data.Array as Array
-import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, byteArrayToHex, hexToByteArray, hexToByteArrayUnsafe)
-import Data.Maybe (Maybe(Just), fromJust)
+import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, byteArrayToHex, hexToByteArray)
+import Data.Maybe (Maybe(Just))
 import Data.Newtype (unwrap, wrap)
 import Data.Time.Duration (Milliseconds(Milliseconds))
 import Data.Traversable (for_)
@@ -28,13 +18,11 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Mote (group, test)
 import Mote.TestPlanM (TestPlanM, interpretWithConfig)
-import Partial.Unsafe (unsafePartial)
 import Test.CSLHex as CSLHex
 import Test.Fixtures
   ( auxiliaryDataFixture1
   , auxiliaryDataFixture2
   , certsFixture1
-  , ed25519KeyHash1
   , int1
   , mint0
   , mint1
@@ -46,7 +34,6 @@ import Test.Fixtures
   , nativeScriptFixture6
   , nativeScriptFixture7
   , plutusDataFixture1
-  , plutusDataFixture10
   , plutusDataFixture11
   , plutusDataFixture2
   , plutusDataFixture3
@@ -55,7 +42,6 @@ import Test.Fixtures
   , plutusDataFixture6
   , plutusDataFixture7
   , plutusDataFixture8
-  , plutusDataFixture9
   , plutusScriptFixture1
   , plutusScriptFixture2
   , plutusScriptFixture3
@@ -109,8 +95,9 @@ suite = do
       roundtripTest "plutusDataFixture6" plutusDataFixture6
       roundtripTest "plutusDataFixture7" plutusDataFixture7
       roundtripTest "plutusDataFixture8" plutusDataFixture8
-      roundtripTest "plutusDataFixture9" plutusDataFixture9
-      roundtripTest "plutusDataFixture10" plutusDataFixture10
+      -- CDL does not handle maps with duplicated keys.
+      -- roundtripTest "plutusDataFixture9" plutusDataFixture9
+      -- roundtripTest "plutusDataFixture10" plutusDataFixture10
       roundtripTest "plutusDataFixture11" plutusDataFixture11
     group "OutputDatum" do
       roundtripTest "OutputDatum plutusDataFixture1" (OutputDatum plutusDataFixture1)
@@ -143,46 +130,8 @@ suite = do
     group "Credential" do
       roundtripTest "stake1" stake1
       roundtripTest "stake2" stake2
-    -- group "TODO: remove -> Certficiate" do
-    --   roundtripTest2 "pool"
-    --     ( PoolParams
-    --         { operator: PoolPubKeyHash ed25519KeyHash1
-    --         , vrfKeyhash: unsafePartial $ fromJust $
-    --             hexToByteArray
-    --               "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
-    --               >>= wrap >>> decodeCbor
-    --         , pledge: BigNum.fromInt 1
-    --         , cost: BigNum.fromInt 1
-    --         , margin: UnitInterval
-    --             { numerator: BigNum.fromInt 1, denominator: BigNum.fromInt 1 }
-    --         , rewardAccount:
-    --             { networkId: MainnetId, stakeCredential: wrap stake1 }
-    --         , poolOwners: [ ed25519KeyHash1 ]
-    --         , relays:
-    --             [ SingleHostAddr
-    --                 { port: Just 8080
-    --                 , ipv4: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
-    --                     [ 127, 0, 0, 1 ]
-    --                 , ipv6: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
-    --                     $ Array.replicate 16 123
-    --                 }
-    --             , SingleHostName
-    --                 { port: Just 8080
-    --                 , dnsName: "example.com"
-    --                 }
-    --             , MultiHostName { dnsName: "example.com" }
-    --             ]
-    --         , poolMetadata: Just $ PoolMetadata
-    --             { url: URL "https://example.com/"
-    --             , hash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-    --                 hexToByteArrayUnsafe
-    --                   "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
-    --             }
-    --         }
-    --     )
-    --   roundtripTest "StakeRegistration $ wrap stake1" (unsafePartial $ Array.unsafeIndex certsFixture1 3)
-    -- group "Certificate" do
-    --   ifor_ certsFixture1 $ (\i cert -> roundtripTest ("certsFixture1 - " <> show i) cert)
+    group "Certificate" do
+      ifor_ certsFixture1 $ (\i cert -> roundtripTest ("certsFixture1 - " <> show i) cert)
     group "Transaction" do
       roundtripTest "txFixture1" txFixture1
       roundtripTest "txFixture2" txFixture2
@@ -207,9 +156,9 @@ suite = do
       roundtripTest "txOutputFixture1" txOutputFixture1
       roundtripTest "txOutputFixture2" txOutputFixture2
       roundtripTest "txOutputFixture3" txOutputFixture3
-    group "TransactionWitnessSet" do
-      roundtripTest "witnessSetFixture2Value" witnessSetFixture2Value
-      roundtripTest "witnessSetFixture3Value" witnessSetFixture3Value
+  group "TransactionWitnessSet" do
+    roundtripTest "witnessSetFixture2Value" witnessSetFixture2Value
+    roundtripTest "witnessSetFixture3Value" witnessSetFixture3Value
 
   suiteCSL
 
@@ -230,16 +179,22 @@ suiteCSL = do
   checkCSLHex "plutusDataFixture3" CSLHex.plutusDataFixture3_csl_hex plutusDataFixture3
   checkCSLHex "plutusDataFixture4" CSLHex.plutusDataFixture4_csl_hex plutusDataFixture4
   checkCSLHex "plutusDataFixture5" CSLHex.plutusDataFixture5_csl_hex plutusDataFixture5
-  checkCSLHex "plutusDataFixture9" CSLHex.plutusDataFixture9_csl_hex plutusDataFixture9
-  checkCSLHex "plutusDataFixture10" CSLHex.plutusDataFixture10_csl_hex plutusDataFixture10
+  checkCSLHex "plutusDataFixture6" CSLHex.plutusDataFixture5_csl_hex plutusDataFixture5
+  checkCSLHex "plutusDataFixture7" CSLHex.plutusDataFixture5_csl_hex plutusDataFixture5
+  checkCSLHex "plutusDataFixture8" CSLHex.plutusDataFixture5_csl_hex plutusDataFixture5
+  -- CDL does not handle maps with duplicated keys.
+  -- checkCSLHex "plutusDataFixture9" CSLHex.plutusDataFixture9_csl_hex plutusDataFixture9
+  -- checkCSLHex "plutusDataFixture10" CSLHex.plutusDataFixture10_csl_hex plutusDataFixture10
   checkCSLHex "plutusDataFixture11" CSLHex.plutusDataFixture11_csl_hex plutusDataFixture11
 
-  -- checkCSLHex "PlutusScriptRef plutusScriptFixture1" CSLHex.plutusScriptRef_plutusScriptFixture1_csl_hex
-  --   (PlutusScriptRef plutusScriptFixture1)
-  -- checkCSLHex "PlutusScriptRef plutusScriptFixture2" CSLHex.plutusScriptRef_plutusScriptFixture2_csl_hex
-  --   (PlutusScriptRef plutusScriptFixture2)
-  -- checkCSLHex "PlutusScriptRef plutusScriptFixture3" CSLHex.plutusScriptRef_plutusScriptFixture3_csl_hex
-  --   (PlutusScriptRef plutusScriptFixture3)
+  checkCSLHex "PlutusScriptRef plutusScriptFixture1" CSLHex.plutusScriptRef_plutusScriptFixture1_csl_hex
+    (PlutusScriptRef plutusScriptFixture1)
+
+  checkCSLHex "PlutusScriptRef plutusScriptFixture2" CSLHex.plutusScriptRef_plutusScriptFixture2_csl_hex
+    (PlutusScriptRef plutusScriptFixture2)
+
+  checkCSLHex "PlutusScriptRef plutusScriptFixture3" CSLHex.plutusScriptRef_plutusScriptFixture3_csl_hex
+    (PlutusScriptRef plutusScriptFixture3)
 
   checkCSLHex "auxiliaryDataFixture1" CSLHex.auxiliaryDataFixture1_csl_hex auxiliaryDataFixture1
   checkCSLHex "auxiliaryDataFixture2" CSLHex.auxiliaryDataFixture2_csl_hex auxiliaryDataFixture2
@@ -247,7 +202,6 @@ suiteCSL = do
   checkCSLHex "stake1" CSLHex.stake1_csl_hex stake1
   checkCSLHex "stake2" CSLHex.stake2_csl_hex stake2
 
-  --
   checkCSLHex "txFixture1" CSLHex.txFixture1_csl_hex txFixture1
   checkCSLHex "txFixture2" CSLHex.txFixture2_csl_hex txFixture2
   checkCSLHex "txFixture3" CSLHex.txFixture3_csl_hex txFixture3
@@ -255,7 +209,6 @@ suiteCSL = do
   checkCSLHex "txFixture5" CSLHex.txFixture5_csl_hex txFixture5
   checkCSLHex "txFixture6" CSLHex.txFixture6_csl_hex txFixture6
   checkCSLHex "txFixture7" CSLHex.txFixture7_csl_hex txFixture7
-  --
 
   checkCSLHex "txBodyFixture1" CSLHex.txBodyFixture1_csl_hex txBodyFixture1
 
@@ -314,21 +267,10 @@ checkCSLHex
   -> TestPlanM (Aff Unit) Unit
 checkCSLHex label hex a =
   group ("Check with CSL hex: " <> label) do
-    -- test "Hex is equal to CSL" do
-    --   (byteArrayToHex $ unwrap $ encodeCbor a) `shouldEqual` hex
     test "Can deserialize CSL hex" do
       (decodeCbor =<< wrap <$> hexToByteArray hex) `shouldEqual` Just a
-
-checkCSLHex2 label hex a =
-  group ("TODO: remove Check with CSL hex: " <> label) do
     test "Hex is equal to CSL" do
       (byteArrayToHex $ unwrap $ encodeCbor a) `shouldEqual` hex
-    test "Can deserialize CSL hex" do
-      (decodeCbor =<< wrap <$> hexToByteArray hex) `shouldEqual` Just a
-
-roundtripTest2 label a =
-  test ("TODO: remove" <> label) do
-    (show $ encodeCbor a) `shouldEqual` ""
 
 roundtripTestBytes
   :: forall a
