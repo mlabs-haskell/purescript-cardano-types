@@ -110,13 +110,6 @@ import Cardano.Types.NativeScript
 import Cardano.Types.NetworkId (NetworkId(TestnetId, MainnetId)) as X
 import Cardano.Types.NewConstitutionAction (NewConstitutionAction(NewConstitutionAction)) as X
 import Cardano.Types.NoConfidenceAction (NoConfidenceAction(NoConfidenceAction)) as X
-import Cardano.Types.Ogmios
-  ( AdditionalUtxoSet(AdditionalUtxoSet)
-  , OgmiosAddress
-  , OgmiosTxOut
-  , OgmiosTxOutRef
-  , OgmiosUtxoMap
-  ) as X
 import Cardano.Types.OutputDatum (OutputDatum(OutputDatum, OutputDatumHash)) as X
 import Cardano.Types.ParameterChangeAction (ParameterChangeAction(ParameterChangeAction)) as X
 import Cardano.Types.PaymentCredential (PaymentCredential(PaymentCredential)) as X
