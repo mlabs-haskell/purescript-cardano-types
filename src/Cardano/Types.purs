@@ -210,6 +210,32 @@ import Cardano.Types.TransactionWitnessSet
   , _vkeys
   ) as X
 import Cardano.Types.TreasuryWithdrawalsAction (TreasuryWithdrawalsAction(TreasuryWithdrawalsAction)) as X
+import Cardano.Types.TxEvaluation
+  ( ExecutionUnits
+  , OgmiosAddress
+  , OgmiosDatum
+  , OgmiosScript
+  , OgmiosTxId
+  , OgmiosTxIn
+  , OgmiosTxOut
+  , OgmiosTxOutRef
+  , RedeemerPointer
+  , ScriptFailure
+      ( ExtraRedeemers
+      , MissingRequiredDatums
+      , MissingRequiredScripts
+      , ValidatorFailed
+      , UnknownInputReferencedByRedeemer
+      , NonScriptInputReferencedByRedeemer
+      , NoCostModelForLanguage
+      , InternalLedgerTypeConversionError
+      , IllFormedExecutionBudget
+      )
+  , TxEvaluationFailure(UnparsedError, AdditionalUtxoOverlap, ScriptFailures)
+  , TxEvaluationR(TxEvaluationR)
+  , TxEvaluationResult(TxEvaluationResult)
+  , showRedeemerPointer
+  ) as X
 import Cardano.Types.URL (URL(URL)) as X
 import Cardano.Types.UnitInterval (UnitInterval(UnitInterval)) as X
 import Cardano.Types.UpdateCommitteeAction (UpdateCommitteeAction(UpdateCommitteeAction)) as X
