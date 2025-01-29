@@ -14,7 +14,6 @@ to generate this file without the comments in this block.
 , dependencies =
   [ "aeson"
   , "aff"
-  , "argonaut-codecs"
   , "arraybuffer-types"
   , "arrays"
   , "bifunctors"
@@ -54,14 +53,12 @@ to generate this file without the comments in this block.
   , "safe-coerce"
   , "spec"
   , "strings"
-  , "stringutils"
   , "these"
   , "tuples"
   , "typelevel-prelude"
   , "uint"
   , "unfoldable"
   , "unsafe-coerce"
-  , "untagged-union"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
