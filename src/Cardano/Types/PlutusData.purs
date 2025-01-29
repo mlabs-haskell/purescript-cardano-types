@@ -25,11 +25,9 @@ import Aeson
   )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite
-  ( PlutusMapValues
-  , constrPlutusData_alternative
+  ( constrPlutusData_alternative
   , constrPlutusData_data
   , constrPlutusData_new
-  , packMapContainer
   , plutusData_asBytes
   , plutusData_asConstrPlutusData
   , plutusData_asInteger
@@ -40,9 +38,6 @@ import Cardano.Data.Lite
   , plutusData_newInteger
   , plutusData_newList
   , plutusData_newMap
-  , plutusMap_keys
-  , plutusMap_values
-  , unpackMapContainer
   )
 import Cardano.Data.Lite as Csl
 import Cardano.Data.Lite.Internal
@@ -55,7 +50,7 @@ import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Control.Alt ((<|>))
-import Data.Array (modifyAtIndices, singleton, snoc, zip) as Array
+import Data.Array (modifyAtIndices, singleton, snoc) as Array
 import Data.Array.NonEmpty as NA
 import Data.ByteArray (ByteArray, byteArrayToHex, hexToByteArray)
 import Data.Either (Either(Left))
