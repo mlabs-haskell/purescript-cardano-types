@@ -6,9 +6,9 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.FromData (class FromData, fromData)
 import Cardano.Data.Lite (fromBytes, toBytes)
 import Cardano.Data.Lite as Csl
+import Cardano.FromData (class FromData, fromData)
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum (zero) as BigNum
 import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromBytes)

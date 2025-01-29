@@ -10,10 +10,10 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.FromData (class FromData, fromData)
-import Cardano.FromMetadata (class FromMetadata, fromMetadata)
 import Cardano.Data.Lite (assetName_name, assetName_new, fromBytes, toBytes)
 import Cardano.Data.Lite as Csl
+import Cardano.FromData (class FromData, fromData)
+import Cardano.FromMetadata (class FromMetadata, fromMetadata)
 import Cardano.ToData (class ToData, toData)
 import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Internal.Helpers (decodeUtf8)
