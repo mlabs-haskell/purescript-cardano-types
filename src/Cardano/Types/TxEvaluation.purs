@@ -1,6 +1,8 @@
 module Cardano.Types.TxEvaluation
   ( OgmiosTxIn
   , OgmiosTxOutRef
+  , OgmiosTxOut
+  , OgmiosAddress
   , RedeemerPointer
   , ExecutionUnits
   , OgmiosDatum
@@ -25,9 +27,12 @@ module Cardano.Types.TxEvaluation
 
 import Prelude
 
+import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.RedeemerTag (RedeemerTag)
 import Cardano.Types.ScriptHash (ScriptHash)
+import Cardano.Types.ScriptRef (ScriptRef)
+import Cardano.Types.Value (Value)
 import Data.Either (Either)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
@@ -45,6 +50,16 @@ type OgmiosTxOutRef =
   { txId :: String
   , index :: UInt
   }
+
+type OgmiosTxOut =
+  { address :: OgmiosAddress
+  , value :: Value
+  , datumHash :: Maybe String
+  , datum :: Maybe String
+  , script :: Maybe ScriptRef
+  }
+
+type OgmiosAddress = Bech32String
 
 type RedeemerPointer = { redeemerTag :: RedeemerTag, redeemerIndex :: UInt }
 
