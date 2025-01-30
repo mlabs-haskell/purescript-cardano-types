@@ -76,14 +76,11 @@ empty = Transaction
   }
 
 hash :: Transaction -> TransactionHash
-hash =
-  wrap
-    <<< Csl.fixedTransaction_transactionHash
-    -- assuming every Transaction can be converted to FixedTransaction
-    <<< unsafePartial fromJust
-    <<< Csl.fromBytes
-    <<< Csl.toBytes
-    <<< toCsl
+hash = unwrap
+  >>> _.body
+  >>> TransactionBody.toCsl
+  >>> Csl.hashTransaction
+  >>> wrap
 
 findUtxos
   :: (TransactionOutput -> Boolean)
