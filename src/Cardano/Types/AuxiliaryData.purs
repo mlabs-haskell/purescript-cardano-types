@@ -21,6 +21,7 @@ import Cardano.Data.Lite
   , auxiliaryData_setPlutusScripts_v1
   , auxiliaryData_setPlutusScripts_v2
   , auxiliaryData_setPlutusScripts_v3
+  , generalTransactionMetadata_new
   , packListContainer
   , unpackListContainer
   )
@@ -87,7 +88,7 @@ hashAuxiliaryData = toCsl >>> Csl.hashAuxiliaryData >>> wrap
 toCsl :: AuxiliaryData -> Csl.AuxiliaryData
 toCsl
   (AuxiliaryData { metadata, nativeScripts, plutusScripts }) = unsafePerformEffect do
-  ad <- auxiliaryData_newShelleyMetadata
+  ad <- auxiliaryData_newShelleyMetadata <$> generalTransactionMetadata_new
   for_ metadata $
     GeneralTransactionMetadatum.toCsl >>> auxiliaryData_setMetadata ad
   for_ nativeScripts $
