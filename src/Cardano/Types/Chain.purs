@@ -39,6 +39,7 @@ newtype BlockHeaderHash = BlockHeaderHash String
 derive instance Generic BlockHeaderHash _
 derive instance Newtype BlockHeaderHash _
 derive newtype instance Eq BlockHeaderHash
+derive newtype instance Ord BlockHeaderHash
 
 instance Show BlockHeaderHash where
   show = genericShow

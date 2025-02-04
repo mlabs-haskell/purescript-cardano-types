@@ -156,6 +156,7 @@ newtype EpochLength = EpochLength BigInt
 derive instance Generic EpochLength _
 derive instance Newtype EpochLength _
 derive newtype instance Eq EpochLength
+derive newtype instance Ord EpochLength
 derive newtype instance DecodeAeson EpochLength
 derive newtype instance EncodeAeson EpochLength
 
@@ -168,6 +169,7 @@ newtype SlotLength = SlotLength Number
 derive instance Generic SlotLength _
 derive instance Newtype SlotLength _
 derive newtype instance Eq SlotLength
+derive newtype instance Ord SlotLength
 derive newtype instance DecodeAeson SlotLength
 
 instance EncodeAeson SlotLength where
@@ -187,6 +189,7 @@ newtype SafeZone = SafeZone BigInt
 derive instance Generic SafeZone _
 derive instance Newtype SafeZone _
 derive newtype instance Eq SafeZone
+derive newtype instance Ord SafeZone
 derive newtype instance Semiring SafeZone
 derive newtype instance DecodeAeson SafeZone
 derive newtype instance EncodeAeson SafeZone
