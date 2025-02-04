@@ -23,6 +23,18 @@ Here's what is included:
 - `AssetClass`
 - `PaymentPubKeyHash`
 - `UtxoMap`
+- `Chain`
+- `ChainTip`
+- `BlockHeaderHash`
+- `DelegationsAndRewards`
+- `EpochLength`
+- `EraSummaries`
+- `EraSummary`
+- `EraSummaryParameters`
+- `EraSummaryTime`
+- `RelativeTime`
+- `SafeZone`
+- `SlotLength`
 
 ## Limitations
 

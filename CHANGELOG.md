@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and we follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v4.1.0
+
+- introduce `Cardano.Types.Chain` module with exported types: `Chain`, `ChainTip`, `BlockHeaderHash`
+- introduce `Cardano.Types.DelegationsAndRewards` module with exported types: `DelegationsAndRewards`
+- introduce `Cardano.Types.EraSummaries` module with exported types: `EpochLength`, `EraSummaries`, `EraSummary`, `EraSummaryParameters`, `EraSummaryTime`, `RelativeTime`, `SafeZone`, `SlotLength`
+
 # v4.0.0
 
 ## Changed
