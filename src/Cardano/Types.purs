@@ -134,6 +134,17 @@ import Cardano.Types.PrivateKey (PrivateKey(PrivateKey)) as X
 import Cardano.Types.ProtocolParamUpdate (ProtocolParamUpdate(ProtocolParamUpdate)) as X
 import Cardano.Types.ProtocolVersion (ProtocolVersion(ProtocolVersion)) as X
 import Cardano.Types.PublicKey (PublicKey(PublicKey)) as X
+import Cardano.Types.Rational
+  ( class RationalComponent
+  , Rational
+  , denominator
+  , fromNumber
+  , numerator
+  , recip
+  , reduce
+  , toUnitInterval
+  , (%)
+  ) as X
 import Cardano.Types.RawBytes (RawBytes(RawBytes)) as X
 import Cardano.Types.Redeemer (Redeemer(Redeemer)) as X
 import Cardano.Types.RedeemerDatum (RedeemerDatum(RedeemerDatum)) as X
@@ -155,6 +166,13 @@ import Cardano.Types.ScriptRef (ScriptRef(NativeScriptRef, PlutusScriptRef)) as 
 import Cardano.Types.Slot (Slot(Slot)) as X
 import Cardano.Types.StakeCredential (StakeCredential(StakeCredential)) as X
 import Cardano.Types.StakePubKeyHash (StakePubKeyHash(StakePubKeyHash)) as X
+import Cardano.Types.StakeValidatorHash
+  ( StakeValidatorHash(StakeValidatorHash)
+  ) as X
+import Cardano.Types.SystemStart
+  ( SystemStart(SystemStart)
+  , sysStartUnixTime
+  ) as X
 import Cardano.Types.Transaction
   ( Transaction(Transaction)
   , _auxiliaryData
