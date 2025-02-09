@@ -1,4 +1,4 @@
-module Cardano.Types.ProtocolParams
+module Cardano.Types.ProtocolParameters
   ( ProtocolParameters(ProtocolParameters)
   ) where
 
