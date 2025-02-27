@@ -35,6 +35,10 @@ Here's what is included:
 - `RelativeTime`
 - `SafeZone`
 - `SlotLength`
+- `ProtocolParameters`
+- `Rational`
+- `StakeValidatorHash`
+- `SystemStart`
 
 ## Limitations
 
