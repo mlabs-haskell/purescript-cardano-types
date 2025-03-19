@@ -163,11 +163,11 @@ let
 
     "cardano-data-lite" = pkgs.stdenv.mkDerivation {
         name = "cardano-data-lite";
-        version = "0164fefe0a6c292032efc24dae0b5d569ae50349";
+        version = "070a1a502472211853099c2566a7e9100a7b1a61";
         src = pkgs.fetchgit {
           url = "https://github.com/mlabs-haskell/purescript-cardano-data-lite";
-          rev = "0164fefe0a6c292032efc24dae0b5d569ae50349";
-          sha256 = "1vd347jiaqzqplvpr5986wzcg7j9v2bryi6vs5000pabijwymckj";
+          rev = "070a1a502472211853099c2566a7e9100a7b1a61";
+          sha256 = "117ryx4w2lzkw4v8rsz7lp4nld6dd08nw2s8mcjcrw1dwrp2j4gk";
         };
         phases = "installPhase";
         installPhase = "ln -s $src $out";
