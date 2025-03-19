@@ -86,12 +86,12 @@
           src = ./.;
 
 
-          mkNodeEnv = {withDevDeps ? true}:
+          mkNodeEnv = { withDevDeps ? true }:
             import
-            (pkgs.runCommand "node-packages"
-              {
-                buildInputs = [pkgs.nodePackages.node2nix];
-              } ''
+              (pkgs.runCommand "node-packages"
+                {
+                  buildInputs = [ pkgs.nodePackages.node2nix ];
+                } ''
                 mkdir $out
                 cd $out
                 cp ${src}/package-lock.json ./package-lock.json
@@ -99,22 +99,23 @@
                 node2nix ${pkgs.lib.optionalString withDevDeps "--development"} \
                   --lock ./package-lock.json -i ./package.json
               '')
-            {inherit pkgs nodejs system;};
+              { inherit pkgs nodejs system; };
 
-          mkNodeModules = {withDevDeps ? true}: let
-            nodeEnv = mkNodeEnv {inherit withDevDeps;};
-            modules =
-              pkgs.callPackage
-              (_:
-                nodeEnv
-                // {
-                  shell = nodeEnv.shell.override {
-                    # see https://github.com/svanderburg/node2nix/issues/198
-                    buildInputs = [pkgs.nodePackages.node-gyp-build];
-                  };
-                });
-          in
-            (modules {}).shell.nodeDependencies;
+          mkNodeModules = { withDevDeps ? true }:
+            let
+              nodeEnv = mkNodeEnv { inherit withDevDeps; };
+              modules =
+                pkgs.callPackage
+                  (_:
+                    nodeEnv
+                    // {
+                      shell = nodeEnv.shell.override {
+                        # see https://github.com/svanderburg/node2nix/issues/198
+                        buildInputs = [ pkgs.nodePackages.node-gyp-build ];
+                      };
+                    });
+            in
+            (modules { }).shell.nodeDependencies;
 
           nodeModules = mkNodeModules { };
 
