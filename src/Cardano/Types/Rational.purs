@@ -24,7 +24,7 @@ import Aeson
 import Cardano.FromData (class FromData)
 import Cardano.ToData (class ToData)
 import Cardano.Types.BigNum as BigNum
-import Cardano.Types.PlutusData (PlutusData(..))
+import Cardano.Types.PlutusData (PlutusData(Constr, Integer))
 import Cardano.Types.UnitInterval (UnitInterval)
 import Data.Either (Either(Left))
 import Data.Maybe (Maybe(Just, Nothing), maybe)

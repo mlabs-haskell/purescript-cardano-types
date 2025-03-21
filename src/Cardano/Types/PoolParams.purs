@@ -4,7 +4,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( packListContainer
   , poolParams_cost
   , poolParams_margin
@@ -18,7 +18,7 @@ import Cardano.Serialization.Lib
   , poolParams_vrfKeyhash
   , unpackListContainer
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.PoolMetadata (PoolMetadata)
@@ -64,11 +64,11 @@ instance Show PoolParams where
   show = genericShow
 
 instance AsCbor PoolParams where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-toCsl :: PoolParams -> Csl.PoolParams
-toCsl
+toCdl :: PoolParams -> Cdl.PoolParams
+toCdl
   ( PoolParams
       { operator
       , vrfKeyhash
@@ -85,21 +85,21 @@ toCsl
   (unwrap vrfKeyhash)
   (unwrap pledge)
   (unwrap cost)
-  (UnitInterval.toCsl margin)
-  (RewardAddress.toCsl rewardAccount)
+  (UnitInterval.toCdl margin)
+  (RewardAddress.toCdl rewardAccount)
   (packListContainer $ map unwrap poolOwners)
-  (packListContainer $ Relay.toCsl <$> relays)
-  (fromMaybe (unsafeCoerce undefined) (poolMetadata <#> PoolMetadata.toCsl))
+  (packListContainer $ Relay.toCdl <$> relays)
+  (fromMaybe (unsafeCoerce undefined) (poolMetadata <#> PoolMetadata.toCdl))
 
-fromCsl :: Csl.PoolParams -> PoolParams
-fromCsl csl = PoolParams
+fromCdl :: Cdl.PoolParams -> PoolParams
+fromCdl csl = PoolParams
   { operator: wrap $ wrap $ poolParams_operator csl
   , vrfKeyhash: wrap $ poolParams_vrfKeyhash csl
   , pledge: wrap $ poolParams_pledge csl
   , cost: wrap $ poolParams_cost csl
-  , margin: UnitInterval.fromCsl $ poolParams_margin csl
-  , rewardAccount: RewardAddress.fromCsl $ poolParams_rewardAccount csl
+  , margin: UnitInterval.fromCdl $ poolParams_margin csl
+  , rewardAccount: RewardAddress.fromCdl $ poolParams_rewardAccount csl
   , poolOwners: map wrap $ unpackListContainer $ poolParams_poolOwners csl
-  , relays: map Relay.fromCsl $ unpackListContainer $ poolParams_relays csl
-  , poolMetadata: toMaybe (poolParams_poolMetadata csl) <#> PoolMetadata.fromCsl
+  , relays: map Relay.fromCdl $ unpackListContainer $ poolParams_relays csl
+  , poolMetadata: toMaybe (poolParams_poolMetadata csl) <#> PoolMetadata.fromCdl
   }

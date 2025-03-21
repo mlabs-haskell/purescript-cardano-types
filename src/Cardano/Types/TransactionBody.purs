@@ -3,7 +3,8 @@ module Cardano.Types.TransactionBody where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.Serialization.Lib
+import Cardano.AsCbor (class AsCbor)
+import Cardano.Data.Lite
   ( packListContainer
   , packMapContainer
   , transactionBody_auxiliaryDataHash
@@ -47,7 +48,7 @@ import Cardano.Serialization.Lib
   , unpackListContainer
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.Certificate (Certificate)
 import Cardano.Types.Certificate as Certificate
@@ -68,7 +69,7 @@ import Cardano.Types.TransactionInput as TransactionInput
 import Cardano.Types.TransactionOutput (TransactionOutput)
 import Cardano.Types.TransactionOutput as TransactionOutput
 import Cardano.Types.VotingProcedures (VotingProcedures)
-import Cardano.Types.VotingProcedures (fromCsl, toCsl) as VotingProcedures
+import Cardano.Types.VotingProcedures (fromCdl, toCdl) as VotingProcedures
 import Cardano.Types.VotingProposal (VotingProposal)
 import Cardano.Types.VotingProposal as VotingProposal
 import Data.Function (on)
@@ -147,11 +148,15 @@ instance Ord TransactionBody where
 instance Show TransactionBody where
   show = genericShow
 
+instance AsCbor TransactionBody where
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
+
 derive newtype instance EncodeAeson TransactionBody
 derive newtype instance DecodeAeson TransactionBody
 
-toCsl :: TransactionBody -> Csl.TransactionBody
-toCsl
+toCdl :: TransactionBody -> Cdl.TransactionBody
+toCdl
   ( TransactionBody
       { inputs
       , outputs
@@ -178,18 +183,18 @@ toCsl
   -- inputs, outputs, fee
   let
     tb = transactionBody_newTxBody
-      (packListContainer $ TransactionInput.toCsl <$> inputs)
-      (packListContainer $ TransactionOutput.toCsl <$> outputs)
+      (packListContainer $ TransactionInput.toCdl <$> inputs)
+      (packListContainer $ TransactionOutput.toCdl <$> outputs)
       (unwrap $ unwrap fee)
   -- ttl
   for_ ttl $ transactionBody_setTtl tb <<< unwrap <<< unwrap
   -- certs
-  withNonEmptyArray (Certificate.toCsl <$> certs) $ transactionBody_setCerts tb
+  withNonEmptyArray (Certificate.toCdl <$> certs) $ transactionBody_setCerts tb
   -- withdrawals
   unless (Map.isEmpty withdrawals)
     $ transactionBody_setWithdrawals tb
     $ packMapContainer
-    $ map (RewardAddress.toCsl *** unwrap <<< unwrap)
+    $ map (RewardAddress.toCdl *** unwrap <<< unwrap)
     $ Map.toUnfoldable withdrawals
   -- auxiliaryDataHash
   for_ auxiliaryDataHash $ transactionBody_setAuxiliaryDataHash tb <<< unwrap
@@ -199,36 +204,36 @@ toCsl
     <<< unwrap
     <<< unwrap
   -- mint
-  for_ mint $ transactionBody_setMint tb <<< Mint.toCsl
+  for_ mint $ transactionBody_setMint tb <<< Mint.toCdl
   -- scriptDataHash
   for_ scriptDataHash $ transactionBody_setScriptDataHash tb <<< unwrap
   -- collateral
-  withNonEmptyArray (TransactionInput.toCsl <$> collateral) (transactionBody_setCollateral tb)
+  withNonEmptyArray (TransactionInput.toCdl <$> collateral) (transactionBody_setCollateral tb)
   -- requiredSigners
   withNonEmptyArray (unwrap <$> requiredSigners) (transactionBody_setRequiredSigners tb)
   -- networkId
-  for_ networkId $ transactionBody_setNetworkId tb <<< NetworkId.toCsl
+  for_ networkId $ transactionBody_setNetworkId tb <<< NetworkId.toCdl
   -- collateralReturn
-  for_ collateralReturn $ transactionBody_setCollateralReturn tb <<< TransactionOutput.toCsl
+  for_ collateralReturn $ transactionBody_setCollateralReturn tb <<< TransactionOutput.toCdl
   -- totalCollateral
   for_ totalCollateral $ transactionBody_setTotalCollateral tb <<< unwrap <<< unwrap
   -- referenceInputs
-  withNonEmptyArray (TransactionInput.toCsl <$> referenceInputs) $
+  withNonEmptyArray (TransactionInput.toCdl <$> referenceInputs) $
     transactionBody_setReferenceInputs tb
   -- votingProposals
-  withNonEmptyArray (VotingProposal.toCsl <$> votingProposals) $
+  withNonEmptyArray (VotingProposal.toCdl <$> votingProposals) $
     transactionBody_setVotingProposals tb
   -- votingProcedures
   when (votingProcedures /= mempty) do
-    transactionBody_setVotingProcedures tb $ VotingProcedures.toCsl votingProcedures
+    transactionBody_setVotingProcedures tb $ VotingProcedures.toCdl votingProcedures
   -- currentTreasuryValue
   for_ currentTreasuryValue $ transactionBody_setCurrentTreasuryValue tb <<< unwrap <<< unwrap
   -- donation
   for_ donation $ transactionBody_setDonation tb <<< unwrap <<< unwrap
   pure tb
 
-fromCsl :: Csl.TransactionBody -> TransactionBody
-fromCsl tb =
+fromCdl :: Cdl.TransactionBody -> TransactionBody
+fromCdl tb =
   TransactionBody
     { inputs
     , outputs
@@ -252,41 +257,41 @@ fromCsl tb =
     , donation
     }
   where
-  inputs = map TransactionInput.fromCsl $ unpackListContainer $
+  inputs = map TransactionInput.fromCdl $ unpackListContainer $
     transactionBody_inputs tb
-  outputs = map TransactionOutput.fromCsl $ unpackListContainer $
+  outputs = map TransactionOutput.fromCdl $ unpackListContainer $
     transactionBody_outputs tb
   fee = wrap $ wrap $ transactionBody_fee tb
   ttl = wrap <<< wrap <$>
     toMaybe (transactionBody_ttlBignum tb)
-  certs = Certificate.fromCsl <$> fromMaybe []
+  certs = Certificate.fromCdl <$> fromMaybe []
     (map unpackListContainer $ toMaybe $ transactionBody_certs tb)
   withdrawals = fromMaybe Map.empty
-    $ map (unpackMapContainerToMapWith RewardAddress.fromCsl (wrap <<< wrap))
+    $ map (unpackMapContainerToMapWith RewardAddress.fromCdl (wrap <<< wrap))
     $ toMaybe
     $ transactionBody_withdrawals tb
   auxiliaryDataHash = wrap <$>
     toMaybe (transactionBody_auxiliaryDataHash tb)
   validityStartInterval = wrap <<< wrap <$>
     toMaybe (transactionBody_validityStartIntervalBignum tb)
-  mint = Mint.fromCsl <$> toMaybe (transactionBody_mint tb)
+  mint = Mint.fromCdl <$> toMaybe (transactionBody_mint tb)
   scriptDataHash = wrap <$> toMaybe (transactionBody_scriptDataHash tb)
-  collateral = map TransactionInput.fromCsl $ fromMaybe []
+  collateral = map TransactionInput.fromCdl $ fromMaybe []
     $ map unpackListContainer
     $ toMaybe (transactionBody_collateral tb)
   requiredSigners = map wrap $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_requiredSigners tb)
-  networkId = NetworkId.fromCsl <$>
+  networkId = NetworkId.fromCdl <$>
     toMaybe (transactionBody_networkId tb)
-  collateralReturn = TransactionOutput.fromCsl <$>
+  collateralReturn = TransactionOutput.fromCdl <$>
     toMaybe (transactionBody_collateralReturn tb)
   totalCollateral = wrap <<< wrap <$>
     toMaybe (transactionBody_totalCollateral tb)
-  referenceInputs = map TransactionInput.fromCsl $ fromMaybe [] $ unpackListContainer <$>
+  referenceInputs = map TransactionInput.fromCdl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_referenceInputs tb)
-  votingProposals = map VotingProposal.fromCsl $ fromMaybe [] $ unpackListContainer <$>
+  votingProposals = map VotingProposal.fromCdl $ fromMaybe [] $ unpackListContainer <$>
     toMaybe (transactionBody_votingProposals tb)
-  votingProcedures = maybe mempty VotingProcedures.fromCsl $
+  votingProcedures = maybe mempty VotingProcedures.fromCdl $
     toMaybe (transactionBody_votingProcedures tb)
   currentTreasuryValue = wrap <<< wrap <$>
     toMaybe (transactionBody_currentTreasuryValue tb)

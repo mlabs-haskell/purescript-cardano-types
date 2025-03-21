@@ -1,7 +1,7 @@
 module Cardano.Types.ExUnits
   ( ExUnits(ExUnits)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   , empty
   ) where
 
@@ -9,7 +9,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Data.Generic.Rep (class Generic)
@@ -45,17 +45,17 @@ instance Show ExUnits where
   show = genericShow
 
 instance AsCbor ExUnits where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-fromCsl :: Csl.ExUnits -> ExUnits
-fromCsl eu =
+fromCdl :: Cdl.ExUnits -> ExUnits
+fromCdl eu =
   let
-    mem = wrap (Csl.exUnits_mem eu)
-    steps = wrap (Csl.exUnits_steps eu)
+    mem = wrap (Cdl.exUnits_mem eu)
+    steps = wrap (Cdl.exUnits_steps eu)
   in
     (wrap { mem, steps })
 
-toCsl :: ExUnits -> Csl.ExUnits
-toCsl (ExUnits { mem, steps }) =
-  Csl.exUnits_new (unwrap mem) (unwrap steps)
+toCdl :: ExUnits -> Cdl.ExUnits
+toCdl (ExUnits { mem, steps }) =
+  Cdl.exUnits_new (unwrap mem) (unwrap steps)

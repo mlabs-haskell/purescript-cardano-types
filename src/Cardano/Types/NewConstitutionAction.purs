@@ -1,18 +1,18 @@
 module Cardano.Types.NewConstitutionAction
   ( NewConstitutionAction(NewConstitutionAction)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Constitution (Constitution)
-import Cardano.Types.Constitution (fromCsl, toCsl) as Constitution
+import Cardano.Types.Constitution (fromCdl, toCdl) as Constitution
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
-import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
+import Cardano.Types.GovernanceActionId (fromCdl, toCdl) as GovernanceActionId
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -35,24 +35,24 @@ instance Show NewConstitutionAction where
   show = genericShow
 
 instance AsCbor NewConstitutionAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: NewConstitutionAction -> Csl.NewConstitutionAction
-toCsl (NewConstitutionAction rec) =
-  maybe (Csl.newConstitutionAction_new constitution)
-    (flip Csl.newConstitutionAction_newWithActionId constitution <<< GovernanceActionId.toCsl)
+toCdl :: NewConstitutionAction -> Cdl.NewConstitutionAction
+toCdl (NewConstitutionAction rec) =
+  maybe (Cdl.newConstitutionAction_new constitution)
+    (flip Cdl.newConstitutionAction_newWithActionId constitution <<< GovernanceActionId.toCdl)
     rec.actionId
   where
-  constitution = Constitution.toCsl rec.constitution
+  constitution = Constitution.toCdl rec.constitution
 
-fromCsl :: Csl.NewConstitutionAction -> NewConstitutionAction
-fromCsl action =
+fromCdl :: Cdl.NewConstitutionAction -> NewConstitutionAction
+fromCdl action =
   NewConstitutionAction
     { constitution:
-        Constitution.fromCsl $
-          Csl.newConstitutionAction_constitution action
+        Constitution.fromCdl $
+          Cdl.newConstitutionAction_constitution action
     , actionId:
-        GovernanceActionId.fromCsl <$>
-          toMaybe (Csl.newConstitutionAction_govActionId action)
+        GovernanceActionId.fromCdl <$>
+          toMaybe (Cdl.newConstitutionAction_govActionId action)
     }

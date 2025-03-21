@@ -8,7 +8,6 @@ import Cardano.Types.Address
       , ByronAddress
       , EnterpriseAddress
       , RewardAddress
-      , PointerAddress
       )
   ) as X
 import Cardano.Types.Anchor (Anchor(Anchor)) as X
@@ -124,7 +123,6 @@ import Cardano.Types.PlutusData
       )
   ) as X
 import Cardano.Types.PlutusScript (PlutusScript(PlutusScript)) as X
-import Cardano.Types.PointerAddress (PointerAddress) as X
 import Cardano.Types.PoolMetadata (PoolMetadata(PoolMetadata)) as X
 import Cardano.Types.PoolMetadataHash (PoolMetadataHash(PoolMetadataHash)) as X
 import Cardano.Types.PoolParams (PoolParams(PoolParams)) as X

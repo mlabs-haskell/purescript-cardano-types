@@ -4,12 +4,12 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( unitInterval_denominator
   , unitInterval_new
   , unitInterval_numerator
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BigNum (BigNum)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -31,14 +31,14 @@ instance Show UnitInterval where
   show = genericShow
 
 instance AsCbor UnitInterval where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-toCsl :: UnitInterval -> Csl.UnitInterval
-toCsl (UnitInterval { numerator, denominator }) = unitInterval_new (unwrap numerator) (unwrap denominator)
+toCdl :: UnitInterval -> Cdl.UnitInterval
+toCdl (UnitInterval { numerator, denominator }) = unitInterval_new (unwrap numerator) (unwrap denominator)
 
-fromCsl :: Csl.UnitInterval -> UnitInterval
-fromCsl csl = UnitInterval
+fromCdl :: Cdl.UnitInterval -> UnitInterval
+fromCdl csl = UnitInterval
   { numerator: wrap $ unitInterval_numerator csl
   , denominator: wrap $ unitInterval_denominator csl
   }

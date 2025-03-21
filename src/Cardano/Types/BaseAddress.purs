@@ -2,14 +2,14 @@ module Cardano.Types.BaseAddress where
 
 import Prelude
 
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( address_networkId
   , baseAddress_new
   , baseAddress_paymentCred
   , baseAddress_stakeCred
   , baseAddress_toAddress
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Credential as Credential
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId
@@ -28,18 +28,18 @@ type BaseAddress =
 
 -- no AsCbor instance, because there is no to_bytes method in CSL
 
-toCsl :: BaseAddress -> Csl.BaseAddress
-toCsl { networkId, paymentCredential, stakeCredential } =
+toCdl :: BaseAddress -> Cdl.BaseAddress
+toCdl { networkId, paymentCredential, stakeCredential } =
   baseAddress_new
     (Int.toNumber $ NetworkId.toInt networkId)
-    (Credential.toCsl $ unwrap paymentCredential)
-    (Credential.toCsl $ unwrap stakeCredential)
+    (Credential.toCdl $ unwrap paymentCredential)
+    (Credential.toCdl $ unwrap stakeCredential)
 
-fromCsl :: Csl.BaseAddress -> BaseAddress
-fromCsl addr =
+fromCdl :: Cdl.BaseAddress -> BaseAddress
+fromCdl addr =
   { networkId
-  , paymentCredential: wrap $ Credential.fromCsl $ baseAddress_paymentCred addr
-  , stakeCredential: wrap $ Credential.fromCsl $ baseAddress_stakeCred addr
+  , paymentCredential: wrap $ Credential.fromCdl $ baseAddress_paymentCred addr
+  , stakeCredential: wrap $ Credential.fromCdl $ baseAddress_stakeCred addr
   }
   where
   networkId :: NetworkId

@@ -10,10 +10,10 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
+import Cardano.Data.Lite (assetName_name, assetName_new, fromBytes, toBytes)
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, fromData)
 import Cardano.FromMetadata (class FromMetadata, fromMetadata)
-import Cardano.Serialization.Lib (assetName_name, assetName_new, fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Internal.Helpers (decodeUtf8)
@@ -27,7 +27,7 @@ import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary, arbitrary)
 import Test.QuickCheck.Gen (resize)
 
-newtype AssetName = AssetName Csl.AssetName
+newtype AssetName = AssetName Cdl.AssetName
 
 derive instance Generic AssetName _
 derive instance Newtype AssetName _
@@ -62,12 +62,12 @@ unAssetName = unwrap >>> assetName_name
 
 fromAssetName
   :: forall (r :: Type). (ByteArray -> r) -> (String -> r) -> AssetName -> r
-fromAssetName arrayHandler stringHandler (AssetName assetNameCsl) = either
+fromAssetName arrayHandler stringHandler (AssetName assetNameCdl) = either
   (const $ arrayHandler bs)
   stringHandler
   (decodeUtf8 bs)
   where
-  bs = assetName_name assetNameCsl
+  bs = assetName_name assetNameCdl
 
 instance DecodeAeson AssetName where
   decodeAeson = do

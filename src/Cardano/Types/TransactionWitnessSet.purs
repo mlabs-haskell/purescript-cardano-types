@@ -1,7 +1,7 @@
 module Cardano.Types.TransactionWitnessSet
   ( TransactionWitnessSet(TransactionWitnessSet)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   , _redeemers
   , _plutusData
   , _plutusScripts
@@ -14,38 +14,44 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( transactionWitnessSet_bootstraps
   , transactionWitnessSet_nativeScripts
   , transactionWitnessSet_new
   , transactionWitnessSet_plutusData
-  , transactionWitnessSet_plutusScripts
+  , transactionWitnessSet_plutusScripts_v1
+  , transactionWitnessSet_plutusScripts_v2
+  , transactionWitnessSet_plutusScripts_v3
   , transactionWitnessSet_redeemers
   , transactionWitnessSet_setBootstraps
   , transactionWitnessSet_setNativeScripts
   , transactionWitnessSet_setPlutusData
-  , transactionWitnessSet_setPlutusScripts
+  , transactionWitnessSet_setPlutusScripts_v1
+  , transactionWitnessSet_setPlutusScripts_v2
+  , transactionWitnessSet_setPlutusScripts_v3
   , transactionWitnessSet_setRedeemers
   , transactionWitnessSet_setVkeys
   , transactionWitnessSet_vkeys
   , unpackListContainer
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BootstrapWitness (BootstrapWitness)
 import Cardano.Types.BootstrapWitness as BoostrapWitness
 import Cardano.Types.BootstrapWitness as BootstrapWitness
 import Cardano.Types.Internal.Helpers (withNonEmptyArray)
+import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
 import Cardano.Types.NativeScript (NativeScript)
 import Cardano.Types.NativeScript as NativeScript
 import Cardano.Types.PlutusData (PlutusData)
 import Cardano.Types.PlutusData as PlutusData
-import Cardano.Types.PlutusScript (PlutusScript)
+import Cardano.Types.PlutusScript (PlutusScript(PlutusScript))
 import Cardano.Types.PlutusScript as PlutusScript
 import Cardano.Types.Redeemer (Redeemer)
 import Cardano.Types.Redeemer as Redeemer
 import Cardano.Types.Vkeywitness (Vkeywitness)
 import Cardano.Types.Vkeywitness as Vkeywitness
 import Data.Array (nub)
+import Data.Array as Array
 import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens')
 import Data.Lens.Iso.Newtype (_Newtype)
@@ -54,6 +60,7 @@ import Data.Maybe (Maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (Nullable, toMaybe)
 import Data.Show.Generic (genericShow)
+import Data.Tuple.Nested ((/\))
 import Effect.Unsafe (unsafePerformEffect)
 import Type.Proxy (Proxy(Proxy))
 
@@ -79,11 +86,11 @@ instance Show TransactionWitnessSet where
   show = genericShow
 
 instance AsCbor TransactionWitnessSet where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-fromCsl :: Csl.TransactionWitnessSet -> TransactionWitnessSet
-fromCsl ws =
+fromCdl :: Cdl.TransactionWitnessSet -> TransactionWitnessSet
+fromCdl ws =
   TransactionWitnessSet
     { vkeys
     , nativeScripts
@@ -93,23 +100,29 @@ fromCsl ws =
     , redeemers
     }
   where
-  use :: forall a. (Csl.TransactionWitnessSet -> Nullable a) -> Maybe a
+  use :: forall a. (Cdl.TransactionWitnessSet -> Nullable a) -> Maybe a
   use f = toMaybe (f ws)
-  vkeys = map Vkeywitness.fromCsl $ fromMaybe []
+
+  vkeys = map Vkeywitness.fromCdl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_vkeys
-  nativeScripts = map NativeScript.fromCsl $ fromMaybe []
+  nativeScripts = map NativeScript.fromCdl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_nativeScripts
-  bootstraps = map BoostrapWitness.fromCsl $ fromMaybe []
+  bootstraps = map BoostrapWitness.fromCdl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_bootstraps
-  plutusScripts = map PlutusScript.fromCsl $ fromMaybe []
-    $ unpackListContainer <$> use transactionWitnessSet_plutusScripts
-  plutusData = map PlutusData.fromCsl $ fromMaybe []
+  plutusScripts_v1 = map (flip PlutusScript.fromCdl PlutusV1) $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_plutusScripts_v1
+  plutusScripts_v2 = map (flip PlutusScript.fromCdl PlutusV2) $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_plutusScripts_v2
+  plutusScripts_v3 = map (flip PlutusScript.fromCdl PlutusV3) $ fromMaybe []
+    $ unpackListContainer <$> use transactionWitnessSet_plutusScripts_v3
+  plutusScripts = plutusScripts_v1 <> plutusScripts_v2 <> plutusScripts_v3
+  plutusData = map PlutusData.fromCdl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_plutusData
-  redeemers = map Redeemer.fromCsl $ fromMaybe []
+  redeemers = map Redeemer.fromCdl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_redeemers
 
-toCsl :: TransactionWitnessSet -> Csl.TransactionWitnessSet
-toCsl
+toCdl :: TransactionWitnessSet -> Cdl.TransactionWitnessSet
+toCdl
   ( TransactionWitnessSet
       { vkeys
       , nativeScripts
@@ -120,19 +133,25 @@ toCsl
       }
   ) = unsafePerformEffect do
   ws <- transactionWitnessSet_new
-  withNonEmptyArray (Vkeywitness.toCsl <$> vkeys) $
+  withNonEmptyArray (Vkeywitness.toCdl <$> vkeys) $
     transactionWitnessSet_setVkeys ws
-  withNonEmptyArray (NativeScript.toCsl <$> nativeScripts) $
+  withNonEmptyArray (NativeScript.toCdl <$> nativeScripts) $
     transactionWitnessSet_setNativeScripts ws
-  withNonEmptyArray (BootstrapWitness.toCsl <$> bootstraps) $
+  withNonEmptyArray (BootstrapWitness.toCdl <$> bootstraps) $
     transactionWitnessSet_setBootstraps ws
-  withNonEmptyArray (PlutusScript.toCsl <$> nub plutusScripts) $
-    transactionWitnessSet_setPlutusScripts ws
-  withNonEmptyArray (PlutusData.toCsl <$> plutusData) $
+  withNonEmptyArray (PlutusScript.toCdl <$> nub ps_v1) $ transactionWitnessSet_setPlutusScripts_v1 ws
+  withNonEmptyArray (PlutusScript.toCdl <$> nub ps_v2) $ transactionWitnessSet_setPlutusScripts_v2 ws
+  withNonEmptyArray (PlutusScript.toCdl <$> nub ps_v3) $ transactionWitnessSet_setPlutusScripts_v3 ws
+  withNonEmptyArray (PlutusData.toCdl <$> plutusData) $
     transactionWitnessSet_setPlutusData ws
-  withNonEmptyArray (Redeemer.toCsl <$> redeemers) $
+  withNonEmptyArray (Redeemer.toCdl <$> redeemers) $
     transactionWitnessSet_setRedeemers ws
   pure ws
+  where
+  filterByLang lang = Array.filter (\(PlutusScript (_ /\ l)) -> lang == l)
+  ps_v1 = filterByLang PlutusV1 plutusScripts
+  ps_v2 = filterByLang PlutusV2 plutusScripts
+  ps_v3 = filterByLang PlutusV3 plutusScripts
 
 _redeemers :: Lens' TransactionWitnessSet (Array Redeemer)
 _redeemers = _Newtype <<< prop (Proxy :: Proxy "redeemers")

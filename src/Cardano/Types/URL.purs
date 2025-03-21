@@ -4,8 +4,8 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (fromBytes, toBytes, url_new, url_url)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (fromBytes, toBytes, url_new, url_url)
+import Cardano.Data.Lite as Cdl
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -20,14 +20,14 @@ derive newtype instance EncodeAeson URL
 derive newtype instance DecodeAeson URL
 
 instance AsCbor URL where
-  encodeCbor = toCsl >>> toBytes >>> wrap
-  decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> toBytes >>> wrap
+  decodeCbor = unwrap >>> fromBytes >>> map fromCdl
 
 instance Show URL where
   show = genericShow
 
-toCsl :: URL -> Csl.URL
-toCsl (URL str) = url_new str
+toCdl :: URL -> Cdl.URL
+toCdl (URL str) = url_new str
 
-fromCsl :: Csl.URL -> URL
-fromCsl = URL <<< url_url
+fromCdl :: Cdl.URL -> URL
+fromCdl = URL <<< url_url

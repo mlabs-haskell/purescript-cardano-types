@@ -1,21 +1,21 @@
 module Cardano.Types.BootstrapWitness
   ( BootstrapWitness(BootstrapWitness)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( bootstrapWitness_attributes
   , bootstrapWitness_chainCode
   , bootstrapWitness_new
   , bootstrapWitness_signature
   , bootstrapWitness_vkey
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Vkey (Vkey)
 import Cardano.Types.Vkey as Vkey
@@ -40,25 +40,25 @@ instance Show BootstrapWitness where
   show = genericShow
 
 instance AsCbor BootstrapWitness where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance EncodeAeson BootstrapWitness where
-  encodeAeson = toCsl >>> encodeAeson
+  encodeAeson = toCdl >>> encodeAeson
 
 instance DecodeAeson BootstrapWitness where
-  decodeAeson = map fromCsl <<< decodeAeson
+  decodeAeson = map fromCdl <<< decodeAeson
 
-fromCsl :: Csl.BootstrapWitness -> BootstrapWitness
-fromCsl bw =
+fromCdl :: Cdl.BootstrapWitness -> BootstrapWitness
+fromCdl bw =
   let
-    vkey = Vkey.fromCsl $ bootstrapWitness_vkey bw
+    vkey = Vkey.fromCdl $ bootstrapWitness_vkey bw
     signature = wrap $ bootstrapWitness_signature bw
     chainCode = bootstrapWitness_chainCode bw
     attributes = bootstrapWitness_attributes bw
   in
     wrap { vkey, signature, chainCode, attributes }
 
-toCsl :: BootstrapWitness -> Csl.BootstrapWitness
-toCsl (BootstrapWitness { vkey, signature, chainCode, attributes }) =
-  bootstrapWitness_new (Vkey.toCsl vkey) (unwrap signature) chainCode attributes
+toCdl :: BootstrapWitness -> Cdl.BootstrapWitness
+toCdl (BootstrapWitness { vkey, signature, chainCode, attributes }) =
+  bootstrapWitness_new (Vkey.toCdl vkey) (unwrap signature) chainCode attributes

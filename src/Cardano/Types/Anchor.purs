@@ -1,17 +1,17 @@
 module Cardano.Types.Anchor
   ( Anchor(Anchor)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.AnchorDataHash (AnchorDataHash)
 import Cardano.Types.URL (URL)
-import Cardano.Types.URL (fromCsl, toCsl) as URL
+import Cardano.Types.URL (fromCdl, toCdl) as URL
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -32,15 +32,15 @@ instance Show Anchor where
   show = genericShow
 
 instance AsCbor Anchor where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: Anchor -> Csl.Anchor
-toCsl (Anchor { url, dataHash }) = Csl.anchor_new (URL.toCsl url) (unwrap dataHash)
+toCdl :: Anchor -> Cdl.Anchor
+toCdl (Anchor { url, dataHash }) = Cdl.anchor_new (URL.toCdl url) (unwrap dataHash)
 
-fromCsl :: Csl.Anchor -> Anchor
-fromCsl anchor =
+fromCdl :: Cdl.Anchor -> Anchor
+fromCdl anchor =
   Anchor
-    { url: URL.fromCsl $ Csl.anchor_url anchor
-    , dataHash: wrap $ Csl.anchor_anchorDataHash anchor
+    { url: URL.fromCdl $ Cdl.anchor_url anchor
+    , dataHash: wrap $ Cdl.anchor_anchorDataHash anchor
     }

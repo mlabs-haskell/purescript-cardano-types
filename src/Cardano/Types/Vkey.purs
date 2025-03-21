@@ -4,7 +4,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.PublicKey (PublicKey(PublicKey))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -22,12 +22,12 @@ derive newtype instance DecodeAeson Vkey
 instance Show Vkey where
   show = genericShow
 
-fromCsl :: Csl.Vkey -> Vkey
-fromCsl = Csl.vkey_publicKey >>> wrap >>> wrap
+fromCdl :: Cdl.Vkey -> Vkey
+fromCdl = Cdl.vkey_publicKey >>> wrap >>> wrap
 
-toCsl :: Vkey -> Csl.Vkey
-toCsl = unwrap >>> unwrap >>> Csl.vkey_new
+toCdl :: Vkey -> Cdl.Vkey
+toCdl = unwrap >>> unwrap >>> Cdl.vkey_new
 
 instance AsCbor Vkey where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl

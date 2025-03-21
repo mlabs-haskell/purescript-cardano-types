@@ -1,16 +1,16 @@
 module Cardano.Types.Constitution
   ( Constitution(Constitution)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Anchor (Anchor)
-import Cardano.Types.Anchor (fromCsl, toCsl) as Anchor
+import Cardano.Types.Anchor (fromCdl, toCdl) as Anchor
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, maybe)
@@ -34,20 +34,20 @@ instance Show Constitution where
   show = genericShow
 
 instance AsCbor Constitution where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: Constitution -> Csl.Constitution
-toCsl (Constitution rec) =
-  maybe (Csl.constitution_new anchor)
-    (Csl.constitution_newWithScriptHash anchor <<< unwrap)
+toCdl :: Constitution -> Cdl.Constitution
+toCdl (Constitution rec) =
+  maybe (Cdl.constitution_new anchor)
+    (Cdl.constitution_newWithScriptHash anchor <<< unwrap)
     rec.scriptHash
   where
-  anchor = Anchor.toCsl rec.anchor
+  anchor = Anchor.toCdl rec.anchor
 
-fromCsl :: Csl.Constitution -> Constitution
-fromCsl constitution =
+fromCdl :: Cdl.Constitution -> Constitution
+fromCdl constitution =
   Constitution
-    { anchor: Anchor.fromCsl $ Csl.constitution_anchor constitution
-    , scriptHash: wrap <$> toMaybe (Csl.constitution_scriptHash constitution)
+    { anchor: Anchor.fromCdl $ Cdl.constitution_anchor constitution
+    , scriptHash: wrap <$> toMaybe (Cdl.constitution_scriptHash constitution)
     }

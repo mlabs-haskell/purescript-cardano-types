@@ -4,7 +4,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
 import Data.Maybe (fromJust)
@@ -28,14 +28,14 @@ instance Show ProtocolVersion where
   show = genericShow
 
 instance AsCbor ProtocolVersion where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-toCsl :: ProtocolVersion -> Csl.ProtocolVersion
-toCsl (ProtocolVersion { major, minor }) = Csl.protocolVersion_new (Int.toNumber major) (Int.toNumber minor)
+toCdl :: ProtocolVersion -> Cdl.ProtocolVersion
+toCdl (ProtocolVersion { major, minor }) = Cdl.protocolVersion_new (Int.toNumber major) (Int.toNumber minor)
 
-fromCsl :: Csl.ProtocolVersion -> ProtocolVersion
-fromCsl csl = ProtocolVersion
-  { major: unsafePartial $ fromJust $ Int.fromNumber $ Csl.protocolVersion_major csl
-  , minor: unsafePartial $ fromJust $ Int.fromNumber $ Csl.protocolVersion_minor csl
+fromCdl :: Cdl.ProtocolVersion -> ProtocolVersion
+fromCdl csl = ProtocolVersion
+  { major: unsafePartial $ fromJust $ Int.fromNumber $ Cdl.protocolVersion_major csl
+  , minor: unsafePartial $ fromJust $ Int.fromNumber $ Cdl.protocolVersion_minor csl
   }

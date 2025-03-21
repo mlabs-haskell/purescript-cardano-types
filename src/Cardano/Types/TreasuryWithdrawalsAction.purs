@@ -1,17 +1,17 @@
 module Cardano.Types.TreasuryWithdrawalsAction
   ( TreasuryWithdrawalsAction(TreasuryWithdrawalsAction)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.RewardAddress (RewardAddress)
-import Cardano.Types.RewardAddress (fromCsl, toCsl) as RewardAddress
+import Cardano.Types.RewardAddress (fromCdl, toCdl) as RewardAddress
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
@@ -38,28 +38,28 @@ instance Show TreasuryWithdrawalsAction where
   show = genericShow
 
 instance AsCbor TreasuryWithdrawalsAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: TreasuryWithdrawalsAction -> Csl.TreasuryWithdrawalsAction
-toCsl (TreasuryWithdrawalsAction rec) =
+toCdl :: TreasuryWithdrawalsAction -> Cdl.TreasuryWithdrawalsAction
+toCdl (TreasuryWithdrawalsAction rec) =
   case rec.policyHash of
     Nothing ->
-      Csl.treasuryWithdrawalsAction_new withdrawals
+      Cdl.treasuryWithdrawalsAction_new withdrawals
     Just policyHash ->
-      Csl.treasuryWithdrawalsAction_newWithPolicyHash withdrawals
+      Cdl.treasuryWithdrawalsAction_newWithPolicyHash withdrawals
         (unwrap policyHash)
   where
   withdrawals =
-    Csl.packMapContainer $
-      (RewardAddress.toCsl *** unwrap <<< unwrap) <$> Map.toUnfoldable rec.withdrawals
+    Cdl.packMapContainer $
+      (RewardAddress.toCdl *** unwrap <<< unwrap) <$> Map.toUnfoldable rec.withdrawals
 
-fromCsl :: Csl.TreasuryWithdrawalsAction -> TreasuryWithdrawalsAction
-fromCsl action =
+fromCdl :: Cdl.TreasuryWithdrawalsAction -> TreasuryWithdrawalsAction
+fromCdl action =
   TreasuryWithdrawalsAction
     { withdrawals:
-        Csl.treasuryWithdrawalsAction_withdrawals action #
-          Csl.unpackMapContainerToMapWith RewardAddress.fromCsl (wrap <<< wrap)
+        Cdl.treasuryWithdrawalsAction_withdrawals action #
+          Cdl.unpackMapContainerToMapWith RewardAddress.fromCdl (wrap <<< wrap)
     , policyHash:
-        wrap <$> toMaybe (Csl.treasuryWithdrawalsAction_policyHash action)
+        wrap <$> toMaybe (Cdl.treasuryWithdrawalsAction_policyHash action)
     }

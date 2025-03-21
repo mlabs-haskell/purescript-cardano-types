@@ -1,16 +1,16 @@
 module Cardano.Types.PoolVotingThresholds
   ( PoolVotingThresholds(PoolVotingThresholds)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.UnitInterval (UnitInterval)
-import Cardano.Types.UnitInterval (fromCsl, toCsl) as UnitInterval
+import Cardano.Types.UnitInterval (fromCdl, toCdl) as UnitInterval
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -38,34 +38,34 @@ instance Show PoolVotingThresholds where
   show = genericShow
 
 instance AsCbor PoolVotingThresholds where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: PoolVotingThresholds -> Csl.PoolVotingThresholds
-toCsl (PoolVotingThresholds rec) =
-  Csl.poolVotingThresholds_new
-    (UnitInterval.toCsl rec.motionNoConfidence)
-    (UnitInterval.toCsl rec.committeeNormal)
-    (UnitInterval.toCsl rec.committeeNoConfidence)
-    (UnitInterval.toCsl rec.hardForkInitiation)
-    (UnitInterval.toCsl rec.securityRelevantThreshold)
+toCdl :: PoolVotingThresholds -> Cdl.PoolVotingThresholds
+toCdl (PoolVotingThresholds rec) =
+  Cdl.poolVotingThresholds_new
+    (UnitInterval.toCdl rec.motionNoConfidence)
+    (UnitInterval.toCdl rec.committeeNormal)
+    (UnitInterval.toCdl rec.committeeNoConfidence)
+    (UnitInterval.toCdl rec.hardForkInitiation)
+    (UnitInterval.toCdl rec.securityRelevantThreshold)
 
-fromCsl :: Csl.PoolVotingThresholds -> PoolVotingThresholds
-fromCsl pvt =
+fromCdl :: Cdl.PoolVotingThresholds -> PoolVotingThresholds
+fromCdl pvt =
   PoolVotingThresholds
     { motionNoConfidence:
-        UnitInterval.fromCsl $
-          Csl.poolVotingThresholds_motionNoConfidence pvt
+        UnitInterval.fromCdl $
+          Cdl.poolVotingThresholds_motionNoConfidence pvt
     , committeeNormal:
-        UnitInterval.fromCsl $
-          Csl.poolVotingThresholds_committeeNormal pvt
+        UnitInterval.fromCdl $
+          Cdl.poolVotingThresholds_committeeNormal pvt
     , committeeNoConfidence:
-        UnitInterval.fromCsl $
-          Csl.poolVotingThresholds_committeeNoConfidence pvt
+        UnitInterval.fromCdl $
+          Cdl.poolVotingThresholds_committeeNoConfidence pvt
     , hardForkInitiation:
-        UnitInterval.fromCsl $
-          Csl.poolVotingThresholds_hardForkInitiation pvt
+        UnitInterval.fromCdl $
+          Cdl.poolVotingThresholds_hardForkInitiation pvt
     , securityRelevantThreshold:
-        UnitInterval.fromCsl $
-          Csl.poolVotingThresholds_securityRelevantThreshold pvt
+        UnitInterval.fromCdl $
+          Cdl.poolVotingThresholds_securityRelevantThreshold pvt
     }

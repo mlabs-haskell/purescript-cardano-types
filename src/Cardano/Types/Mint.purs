@@ -4,8 +4,8 @@ module Cardano.Types.Mint
   , flatten
   , unflatten
   , singleton
-  , toCsl
-  , fromCsl
+  , toCdl
+  , fromCdl
   , union
   , fromMultiAsset
   , toMultiAsset
@@ -15,13 +15,13 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( unpackListContainer
   , unpackMapContainer
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packMapContainerWithClone)
+import Cardano.Data.Lite as Cdl
+import Cardano.Data.Lite.Internal (packMapContainerWithClone)
 import Cardano.Types.AssetName (AssetName)
 import Cardano.Types.Int as Int
 import Cardano.Types.MultiAsset (MultiAsset)
@@ -58,10 +58,10 @@ instance Show Mint where
   show = genericShow
 
 instance EncodeAeson Mint where
-  encodeAeson = toCsl >>> encodeAeson
+  encodeAeson = toCdl >>> encodeAeson
 
 instance DecodeAeson Mint where
-  decodeAeson = map fromCsl <<< decodeAeson
+  decodeAeson = map fromCdl <<< decodeAeson
 
 instance Partial => Semigroup Mint where
   append x y =
@@ -72,8 +72,8 @@ instance Partial => Monoid Mint where
   mempty = empty
 
 instance AsCbor Mint where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 empty :: Mint
 empty = Mint Map.empty
@@ -154,8 +154,8 @@ unionNonAda (Mint l) (Mint r) =
   in
     unBoth <$> combined
 
-toCsl :: Mint -> Csl.Mint
-toCsl mint | Mint mp <- normalizeMint mint =
+toCdl :: Mint -> Cdl.Mint
+toCdl mint | Mint mp <- normalizeMint mint =
   do
     packMapContainerWithClone $
       -- TODO: why is a clone needed?
@@ -173,14 +173,14 @@ toCsl mint | Mint mp <- normalizeMint mint =
                 )
             )
   where
-  coerceToMints :: Csl.MintAssets -> Csl.MintsAssets
+  coerceToMints :: Cdl.MintAssets -> Cdl.MintsAssets
   coerceToMints = unsafeCoerce
 
 -- NOTE: CSL.Mint can store multiple entries for the same policy id.
 -- We should probably change the representation to match CSL
 -- https://github.com/Emurgo/cardano-serialization-lib/blob/4a35ef11fd5c4931626c03025fe6f67743a6bdf9/rust/src/lib.rs#L3627
-fromCsl :: Csl.Mint -> Mint
-fromCsl = unpackMapContainer
+fromCdl :: Cdl.Mint -> Mint
+fromCdl = unpackMapContainer
   >>> map (wrap *** unpackMintsAssets)
   >>> foldMints
   >>> wrap
@@ -194,7 +194,7 @@ fromCsl = unpackMapContainer
     )
     Map.empty
 
-  unpackMintsAssets :: Csl.MintsAssets -> Map AssetName Int.Int
+  unpackMintsAssets :: Cdl.MintsAssets -> Map AssetName Int.Int
   unpackMintsAssets =
     unpackListContainer
       >>> map (unpackMapContainerToMapWith (wrap :: _ -> AssetName) wrap)
@@ -202,5 +202,5 @@ fromCsl = unpackMapContainer
 
   addTokenQuantities :: Int.Int -> Int.Int -> Int.Int
   addTokenQuantities x y =
-    unsafePerformEffect $ maybe (throw "Mint.fromCsl: numeric overflow") pure $
+    unsafePerformEffect $ maybe (throw "Mint.fromCdl: numeric overflow") pure $
       Int.add x y

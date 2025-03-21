@@ -10,12 +10,12 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( value_coin
   , value_multiasset
   , value_newWithAssets
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Asset (Asset(Asset, AdaAsset))
 import Cardano.Types.AssetClass (AssetClass(AssetClass))
 import Cardano.Types.AssetName (AssetName)
@@ -101,8 +101,8 @@ instance DecodeAeson Value where
     pure $ Value coin nonAdaAsset
 
 instance AsCbor Value where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 empty :: Value
 empty = Value Coin.zero MultiAsset.empty
@@ -259,13 +259,13 @@ coinToValue (Coin i) = lovelaceValueOf i
 valueToCoin :: Value -> Coin
 valueToCoin = Coin <<< valueOf AdaAsset
 
-fromCsl :: Csl.Value -> Value
-fromCsl value = Value coin multiAsset
+fromCdl :: Cdl.Value -> Value
+fromCdl value = Value coin multiAsset
   where
   coin = Coin $ wrap $ value_coin value
   multiAsset = fromMaybe MultiAsset.empty $
-    MultiAsset.fromCsl <$> toMaybe (value_multiasset value)
+    MultiAsset.fromCdl <$> toMaybe (value_multiasset value)
 
-toCsl :: Value -> Csl.Value
-toCsl (Value coin multiAsset) =
-  value_newWithAssets (unwrap $ unwrap coin) (MultiAsset.toCsl multiAsset)
+toCdl :: Value -> Cdl.Value
+toCdl (Value coin multiAsset) =
+  value_newWithAssets (unwrap $ unwrap coin) (MultiAsset.toCdl multiAsset)

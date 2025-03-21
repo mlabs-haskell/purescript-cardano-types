@@ -12,7 +12,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( dnsRecordAorAAAA_new
   , dnsRecordAorAAAA_record
   , dnsRecordSRV_new
@@ -33,7 +33,7 @@ import Cardano.Serialization.Lib
   , singleHostName_new
   , singleHostName_port
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.Ipv4 (Ipv4)
 import Cardano.Types.Ipv6 (Ipv6)
@@ -93,11 +93,11 @@ instance DecodeAeson Relay where
         $ fromString tagValue
 
 instance AsCbor Relay where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-toCsl :: Relay -> Csl.Relay
-toCsl = case _ of
+toCdl :: Relay -> Cdl.Relay
+toCdl = case _ of
   SingleHostAddr { port, ipv4, ipv6 } ->
     relay_newSingleHostAddr $ singleHostAddr_new
       -- TODO: the type signatures are wrong in ps-csl, because the codegen hasn't been adapted to handle this case. It only happens once.
@@ -112,40 +112,40 @@ toCsl = case _ of
   MultiHostName { dnsName } ->
     relay_newMultiHostName $ multiHostName_new $ dnsRecordSRV_new dnsName
 
-fromCsl :: Csl.Relay -> Relay
-fromCsl csl = unsafePartial $ fromJust $
+fromCdl :: Cdl.Relay -> Relay
+fromCdl csl = unsafePartial $ fromJust $
   singleHostAddr <|> singleHostName <|> multiHostName
   where
   singleHostAddr = toMaybe (relay_asSingleHostAddr csl) <#>
-    singleHostAddrFromCsl >>> SingleHostAddr
+    singleHostAddrFromCdl >>> SingleHostAddr
 
-  singleHostAddrFromCsl
-    :: Csl.SingleHostAddr
+  singleHostAddrFromCdl
+    :: Cdl.SingleHostAddr
     -> { port :: Maybe Int
        , ipv4 :: Maybe Ipv4
        , ipv6 :: Maybe Ipv6
        }
-  singleHostAddrFromCsl sha =
+  singleHostAddrFromCdl sha =
     { port: unsafePartial $ fromJust <<< Int.fromNumber <$> toMaybe (singleHostAddr_port sha)
     , ipv4: wrap <$> toMaybe (singleHostAddr_ipv4 sha)
     , ipv6: wrap <$> toMaybe (singleHostAddr_ipv6 sha)
     }
 
   singleHostName = toMaybe (relay_asSingleHostName csl) <#>
-    singleHostNameFromCsl >>> SingleHostName
+    singleHostNameFromCdl >>> SingleHostName
 
-  singleHostNameFromCsl
-    :: Csl.SingleHostName
+  singleHostNameFromCdl
+    :: Cdl.SingleHostName
     -> { port :: Maybe Int
        , dnsName :: String
        }
-  singleHostNameFromCsl shn =
+  singleHostNameFromCdl shn =
     { port: unsafePartial $ fromJust <<< Int.fromNumber <$> toMaybe (singleHostName_port shn)
     , dnsName: dnsRecordAorAAAA_record $ singleHostName_dnsName shn
     }
 
   multiHostName = toMaybe (relay_asMultiHostName csl) <#>
-    multiHostNameFromCsl >>> MultiHostName
+    multiHostNameFromCdl >>> MultiHostName
 
-  multiHostNameFromCsl :: Csl.MultiHostName -> { dnsName :: String }
-  multiHostNameFromCsl mhn = { dnsName: dnsRecordSRV_record $ multiHostName_dnsName mhn }
+  multiHostNameFromCdl :: Cdl.MultiHostName -> { dnsName :: String }
+  multiHostNameFromCdl mhn = { dnsName: dnsRecordSRV_record $ multiHostName_dnsName mhn }

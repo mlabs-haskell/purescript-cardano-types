@@ -10,15 +10,15 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.FromData (class FromData)
-import Cardano.FromMetadata (class FromMetadata)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( ed25519KeyHash_fromBech32
   , ed25519KeyHash_toBech32
   , fromBytes
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
+import Cardano.FromData (class FromData)
+import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
 import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Bech32String (Bech32String)
@@ -44,7 +44,7 @@ import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck.Arbitrary (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
-newtype Ed25519KeyHash = Ed25519KeyHash Csl.Ed25519KeyHash
+newtype Ed25519KeyHash = Ed25519KeyHash Cdl.Ed25519KeyHash
 
 derive instance Generic Ed25519KeyHash _
 derive instance Newtype Ed25519KeyHash _

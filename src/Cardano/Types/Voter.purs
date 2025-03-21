@@ -1,16 +1,16 @@
 module Cardano.Types.Voter
   ( Voter(Cc, Drep, Spo)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, (.:))
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Credential (Credential)
-import Cardano.Types.Credential (fromCsl, toCsl) as Credential
+import Cardano.Types.Credential (fromCdl, toCdl) as Credential
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Control.Alt ((<|>))
@@ -53,26 +53,26 @@ instance DecodeAeson Voter where
       _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
 
 instance AsCbor Voter where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: Voter -> Csl.Voter
-toCsl = case _ of
-  Cc cred -> Csl.voter_newConstitutionalCommitteeHotCredential $ Credential.toCsl cred
-  Drep cred -> Csl.voter_newDrepCredential $ Credential.toCsl cred
-  Spo keyHash -> Csl.voter_newStakePoolKeyHash $ unwrap keyHash
+toCdl :: Voter -> Cdl.Voter
+toCdl = case _ of
+  Cc cred -> Cdl.voter_newConstitutionalCommitteeHotCredential $ Credential.toCdl cred
+  Drep cred -> Cdl.voter_newDrepCredential $ Credential.toCdl cred
+  Spo keyHash -> Cdl.voter_newStakePoolKeyHash $ unwrap keyHash
 
-fromCsl :: Csl.Voter -> Voter
-fromCsl voter =
+fromCdl :: Cdl.Voter -> Voter
+fromCdl voter =
   unsafePartial fromJust $
-    ( Cc <<< Credential.fromCsl <$>
-        toMaybe (Csl.voter_toConstitutionalCommitteeHotCredential voter)
+    ( Cc <<< Credential.fromCdl <$>
+        toMaybe (Cdl.voter_toConstitutionalCommitteeHotCredential voter)
     )
       <|>
-        ( Drep <<< Credential.fromCsl <$>
-            toMaybe (Csl.voter_toDrepCredential voter)
+        ( Drep <<< Credential.fromCdl <$>
+            toMaybe (Cdl.voter_toDrepCredential voter)
         )
       <|>
         ( Spo <<< wrap <$>
-            toMaybe (Csl.voter_toStakePoolKeyHash voter)
+            toMaybe (Cdl.voter_toStakePoolKeyHash voter)
         )

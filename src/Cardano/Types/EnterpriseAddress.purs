@@ -2,13 +2,13 @@ module Cardano.Types.EnterpriseAddress where
 
 import Prelude
 
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( address_networkId
   , enterpriseAddress_new
   , enterpriseAddress_paymentCred
   , enterpriseAddress_toAddress
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Credential as Credential
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId
@@ -23,15 +23,15 @@ type EnterpriseAddress =
   , paymentCredential :: PaymentCredential
   }
 
-toCsl :: EnterpriseAddress -> Csl.EnterpriseAddress
-toCsl = case _ of
+toCdl :: EnterpriseAddress -> Cdl.EnterpriseAddress
+toCdl = case _ of
   { networkId, paymentCredential } ->
-    enterpriseAddress_new (Int.toNumber $ NetworkId.toInt networkId) (Credential.toCsl $ unwrap paymentCredential)
+    enterpriseAddress_new (Int.toNumber $ NetworkId.toInt networkId) (Credential.toCdl $ unwrap paymentCredential)
 
-fromCsl :: Csl.EnterpriseAddress -> EnterpriseAddress
-fromCsl addr =
+fromCdl :: Cdl.EnterpriseAddress -> EnterpriseAddress
+fromCdl addr =
   { networkId
-  , paymentCredential: wrap $ Credential.fromCsl $ enterpriseAddress_paymentCred addr
+  , paymentCredential: wrap $ Credential.fromCdl $ enterpriseAddress_paymentCred addr
   }
   where
   networkId :: NetworkId

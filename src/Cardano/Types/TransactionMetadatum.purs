@@ -12,7 +12,7 @@ import Aeson
   , toStringifiedNumbersJson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( packMapContainer
   , transactionMetadatum_asBytes
   , transactionMetadatum_asInt
@@ -27,8 +27,8 @@ import Cardano.Serialization.Lib
   , unpackListContainer
   , unpackMapContainerToMapWith
   )
-import Cardano.Serialization.Lib as Csl
-import Cardano.Serialization.Lib.Internal (packListContainer)
+import Cardano.Data.Lite as Cdl
+import Cardano.Data.Lite.Internal (packListContainer)
 import Cardano.Types.Int (Int) as Int
 import Cardano.Types.Internal.Helpers (decodeMap, encodeMap, encodeTagged')
 import Control.Alt ((<|>))
@@ -82,25 +82,25 @@ instance DecodeAeson TransactionMetadatum where
         $ fromString tagValue
 
 instance AsCbor TransactionMetadatum where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-toCsl
-  :: TransactionMetadatum -> Csl.TransactionMetadatum
-toCsl = case _ of
+toCdl
+  :: TransactionMetadatum -> Cdl.TransactionMetadatum
+toCdl = case _ of
   Map mp ->
-    transactionMetadatum_newMap $ packMapContainer $ map (toCsl *** toCsl) $
+    transactionMetadatum_newMap $ packMapContainer $ map (toCdl *** toCdl) $
       Map.toUnfoldable mp
   List l ->
-    transactionMetadatum_newList $ packListContainer $ map toCsl l
+    transactionMetadatum_newList $ packListContainer $ map toCdl l
   Int int -> transactionMetadatum_newInt $ unwrap int
   Bytes bytes -> transactionMetadatum_newBytes bytes
   Text text -> transactionMetadatum_newText text
 
-fromCsl :: Csl.TransactionMetadatum -> TransactionMetadatum
-fromCsl csl = unsafePartial $ fromJust $
-  Map <<< unpackMapContainerToMapWith fromCsl fromCsl <$> toMaybe (transactionMetadatum_asMap csl)
-    <|> List <<< map fromCsl <<< unpackListContainer <$> toMaybe (transactionMetadatum_asList csl)
+fromCdl :: Cdl.TransactionMetadatum -> TransactionMetadatum
+fromCdl csl = unsafePartial $ fromJust $
+  Map <<< unpackMapContainerToMapWith fromCdl fromCdl <$> toMaybe (transactionMetadatum_asMap csl)
+    <|> List <<< map fromCdl <<< unpackListContainer <$> toMaybe (transactionMetadatum_asList csl)
     <|> Int <<< wrap <$> toMaybe (transactionMetadatum_asInt csl)
     <|> Bytes <$> toMaybe (transactionMetadatum_asBytes csl)
     <|>

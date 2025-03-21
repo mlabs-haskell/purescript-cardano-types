@@ -1,7 +1,7 @@
 module Cardano.Types.Language
   ( Language(PlutusV1, PlutusV2, PlutusV3)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -16,7 +16,7 @@ import Aeson
   , toStringifiedNumbersJson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (unwrap, wrap)
@@ -52,21 +52,21 @@ instance DecodeAeson Language where
         other
 
 instance AsCbor Language where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance Arbitrary Language where
   arbitrary = genericArbitrary
 
-fromCsl :: Csl.Language -> Language
-fromCsl lang =
-  case Csl.fromCslEnum (Csl.language_kind lang) of
-    Csl.LanguageKind_PlutusV1 -> PlutusV1
-    Csl.LanguageKind_PlutusV2 -> PlutusV2
-    Csl.LanguageKind_PlutusV3 -> PlutusV3
+fromCdl :: Cdl.Language -> Language
+fromCdl lang =
+  case Cdl.fromCslEnum (Cdl.language_kind lang) of
+    Cdl.LanguageKind_PlutusV1 -> PlutusV1
+    Cdl.LanguageKind_PlutusV2 -> PlutusV2
+    Cdl.LanguageKind_PlutusV3 -> PlutusV3
 
-toCsl :: Language -> Csl.Language
-toCsl = case _ of
-  PlutusV1 -> Csl.language_newPlutusV1
-  PlutusV2 -> Csl.language_newPlutusV2
-  PlutusV3 -> Csl.language_newPlutusV3
+toCdl :: Language -> Cdl.Language
+toCdl = case _ of
+  PlutusV1 -> Cdl.language_newPlutusV1
+  PlutusV2 -> Cdl.language_newPlutusV2
+  PlutusV3 -> Cdl.language_newPlutusV3

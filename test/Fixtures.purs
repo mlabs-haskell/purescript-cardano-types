@@ -12,10 +12,13 @@
 module Test.Fixtures
   ( addressString1
   , currencySymbol1
+  , certsFixture1
   , ed25519KeyHash1
   , ed25519KeyHashFixture1
   , fullyAppliedScriptFixture
   , int1
+  , stake1
+  , stake2
   , mint0
   , mint1
   , mkSampleTx
@@ -26,6 +29,8 @@ module Test.Fixtures
   , nativeScriptFixture4
   , nativeScriptFixture5
   , nativeScriptFixture6
+  , auxiliaryDataFixture1
+  , auxiliaryDataFixture2
   , nativeScriptFixture7
   , nullPaymentPubKeyHash
   , partiallyAppliedScriptFixture
@@ -55,6 +60,7 @@ module Test.Fixtures
   , txBinaryFixture5
   , txBinaryFixture6
   , txFixture1
+  , txBodyFixture1
   , txFixture2
   , txFixture3
   , txFixture4
@@ -64,6 +70,7 @@ module Test.Fixtures
   , txOutputBinaryFixture1
   , txOutputFixture1
   , txOutputFixture2
+  , txOutputFixture3
   , unappliedScriptFixture
   , utxoFixture1
   , utxoFixture1'
@@ -176,6 +183,28 @@ import JS.BigInt as BigInt
 import Partial.Unsafe (unsafePartial)
 import Test.Fixtures.CostModels (costModelsFixture1)
 
+auxiliaryDataFixture1 :: AuxiliaryData
+auxiliaryDataFixture1 = AuxiliaryData
+  { metadata: Just $ GeneralTransactionMetadata
+      ( Map.fromFoldable
+          [ BigNum.fromInt 8 /\ Text "foo" ]
+      )
+  , nativeScripts: Nothing
+  , plutusScripts: Nothing
+  }
+
+auxiliaryDataFixture2 :: AuxiliaryData
+auxiliaryDataFixture2 = AuxiliaryData
+  { metadata: Just $ GeneralTransactionMetadata
+      ( Map.fromFoldable
+          [ BigNum.fromInt 8 /\ Text "foo"
+          , BigNum.fromInt 1 /\ Text "bar"
+          ]
+      )
+  , nativeScripts: Just [ nativeScriptFixture1, nativeScriptFixture2, nativeScriptFixture3 ]
+  , plutusScripts: Just [ plutusScriptFixture1, plutusScriptFixture2, plutusScriptFixture3 ]
+  }
+
 txOutputFixture1 :: TransactionOutput
 txOutputFixture1 =
   TransactionOutput
@@ -214,6 +243,21 @@ txOutputFixture2 =
     , datum: Nothing
     , scriptRef: Nothing
     }
+
+txOutputFixture3 :: TransactionOutput
+txOutputFixture3 = TransactionOutput
+  { address: keyHashBaseAddress
+      { stake:
+          "0f45aaf1b2959db6e5ff94dbb1f823bf257680c3c723ac2d49f97546"
+      -- $ T.Bech32 "hbas_1xranhpfej50zdup5jy995dlj9juem9x36syld8wm465hz92acfp"
+      , payment:
+          "30fb3b8539951e26f034910a5a37f22cb99d94d1d409f69ddbaea971"
+      }
+  , amount: Value (Coin $ BigNum.fromInt 490234098)
+      MultiAsset.empty
+  , datum: Just $ OutputDatum plutusDataFixture1
+  , scriptRef: Just $ PlutusScriptRef plutusScriptFixture2
+  }
 
 currencySymbol1 :: ScriptHash
 currencySymbol1 = unsafePartial $ fromJust $ decodeCbor $ wrap $
@@ -271,8 +315,6 @@ protocolParamUpdate1 = wrap
       { numerator: bigNumOne, denominator: bigNumOne }
   , treasuryGrowthRate: Just $ UnitInterval
       { numerator: bigNumOne, denominator: bigNumOne }
-  , protocolVersion: Just $ ProtocolVersion
-      { major: 1, minor: 1 }
   , minPoolCost: Just $ wrap bigNumOne
   , adaPerUtxoByte: Just $ wrap bigNumOne
   , costModels: Just costModelsFixture1
@@ -431,31 +473,34 @@ plutusScriptFixture3 =
       )
   )
 
+txBodyFixture1 :: TransactionBody
+txBodyFixture1 = TransactionBody
+  { inputs: [ txInputFixture1 ]
+  , outputs: [ txOutputFixture1 ]
+  , fee: Coin $ BigNum.fromInt 177513
+  , ttl: Nothing
+  , certs: []
+  , withdrawals: Map.empty
+  , auxiliaryDataHash: Nothing
+  , validityStartInterval: Nothing
+  , mint: Nothing
+  , referenceInputs: mempty
+  , scriptDataHash: Nothing
+  , collateral: []
+  , requiredSigners: []
+  , networkId: Just MainnetId
+  , collateralReturn: Nothing
+  , totalCollateral: Nothing
+  , votingProposals: []
+  , votingProcedures: mempty
+  , currentTreasuryValue: Nothing
+  , donation: Nothing
+  }
+
 txFixture1 :: Transaction
 txFixture1 =
   Transaction
-    { body: TransactionBody
-        { inputs: [ txInputFixture1 ]
-        , outputs: [ txOutputFixture1 ]
-        , fee: Coin $ BigNum.fromInt 177513
-        , ttl: Nothing
-        , certs: []
-        , withdrawals: Map.empty
-        , auxiliaryDataHash: Nothing
-        , validityStartInterval: Nothing
-        , mint: Nothing
-        , referenceInputs: mempty
-        , scriptDataHash: Nothing
-        , collateral: []
-        , requiredSigners: []
-        , networkId: Just MainnetId
-        , collateralReturn: Nothing
-        , totalCollateral: Nothing
-        , votingProposals: []
-        , votingProcedures: mempty
-        , currentTreasuryValue: Nothing
-        , donation: Nothing
-        }
+    { body: txBodyFixture1
     , witnessSet: TransactionWitnessSet
         { vkeys: []
         , nativeScripts: []
@@ -577,6 +622,65 @@ mint0 = Mint $ Map.fromFoldable
 int1 :: Int.Int
 int1 = Int.newPositive BigNum.one
 
+certsFixture1 :: Array Certificate
+certsFixture1 =
+  [ StakeRegistration $ wrap stake1
+  , StakeDeregistration $ wrap stake1
+  , StakeDelegation (wrap stake1)
+      (PoolPubKeyHash ed25519KeyHash1)
+  , PoolRegistration $ PoolParams
+      { operator: PoolPubKeyHash ed25519KeyHash1
+      , vrfKeyhash: unsafePartial $ fromJust $
+          hexToByteArray
+            "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
+            >>= wrap >>> decodeCbor
+      , pledge: bigNumOne
+      , cost: bigNumOne
+      , margin: UnitInterval
+          { numerator: bigNumOne, denominator: bigNumOne }
+      , rewardAccount:
+          { networkId: MainnetId, stakeCredential: wrap stake1 }
+      , poolOwners: [ ed25519KeyHash1 ]
+      , relays:
+          [ SingleHostAddr
+              { port: Just 8080
+              , ipv4: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
+                  [ 127, 0, 0, 1 ]
+              , ipv6: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
+                  $ Array.replicate 16 123
+              }
+          , SingleHostName
+              { port: Just 8080
+              , dnsName: "example.com"
+              }
+          , MultiHostName { dnsName: "example.com" }
+          ]
+      , poolMetadata: Just $ PoolMetadata
+          { url: URL "https://example.com/"
+          , hash: unsafePartial $ fromJust $ decodeCbor $ wrap $
+              hexToByteArrayUnsafe
+                "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
+          }
+      }
+  , PoolRetirement
+      { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
+      , epoch: Epoch one
+      }
+  , VoteDelegCert (wrap stake1) (DrepCred stake1)
+  , StakeVoteDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) AlwaysAbstain
+  , StakeRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (Coin BigNum.one)
+  , VoteRegDelegCert (wrap stake1) AlwaysNoConfidence (Coin BigNum.one)
+  , StakeVoteRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (DrepCred stake1) (Coin BigNum.one)
+  , AuthCommitteeHotCert { coldCred: stake1, hotCred: stake2 }
+  , ResignCommitteeColdCert stake1 (Just anchor1)
+  , ResignCommitteeColdCert stake2 Nothing
+  , RegDrepCert stake1 (Coin BigNum.one) (Just anchor1)
+  , RegDrepCert stake2 (Coin BigNum.one) Nothing
+  , UnregDrepCert stake1 (Coin BigNum.one)
+  , UpdateDrepCert stake1 (Just anchor1)
+  , UpdateDrepCert stake2 Nothing
+  ]
+
 txFixture4 :: Transaction
 txFixture4 =
   Transaction
@@ -610,63 +714,7 @@ txFixture4 =
             ]
         , fee: Coin $ BigNum.fromInt 177513
         , ttl: Nothing -- Just $ Slot $ BigNum.fromInt 123
-        , certs:
-            [ StakeRegistration $ wrap stake1
-            , StakeDeregistration $ wrap stake1
-            , StakeDelegation (wrap stake1)
-                (PoolPubKeyHash ed25519KeyHash1)
-            , PoolRegistration $ PoolParams
-                { operator: PoolPubKeyHash ed25519KeyHash1
-                , vrfKeyhash: unsafePartial $ fromJust $
-                    hexToByteArray
-                      "fbf6d41985670b9041c5bf362b5262cf34add5d265975de176d613ca05f37096"
-                      >>= wrap >>> decodeCbor
-                , pledge: bigNumOne
-                , cost: bigNumOne
-                , margin: UnitInterval
-                    { numerator: bigNumOne, denominator: bigNumOne }
-                , rewardAccount:
-                    { networkId: MainnetId, stakeCredential: wrap stake1 }
-                , poolOwners: [ ed25519KeyHash1 ]
-                , relays:
-                    [ SingleHostAddr
-                        { port: Just 8080
-                        , ipv4: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
-                            [ 127, 0, 0, 1 ]
-                        , ipv6: decodeCbor $ wrap $ byteArrayFromIntArrayUnsafe
-                            $ Array.replicate 16 123
-                        }
-                    , SingleHostName
-                        { port: Just 8080
-                        , dnsName: "example.com"
-                        }
-                    , MultiHostName { dnsName: "example.com" }
-                    ]
-                , poolMetadata: Just $ PoolMetadata
-                    { url: URL "https://example.com/"
-                    , hash: unsafePartial $ fromJust $ decodeCbor $ wrap $
-                        hexToByteArrayUnsafe
-                          "94b8cac47761c1140c57a48d56ab15d27a842abff041b3798b8618fa84641f5a"
-                    }
-                }
-            , PoolRetirement
-                { poolKeyHash: PoolPubKeyHash ed25519KeyHash1
-                , epoch: Epoch one
-                }
-            , VoteDelegCert (wrap stake1) (DrepCred stake1)
-            , StakeVoteDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) AlwaysAbstain
-            , StakeRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (Coin BigNum.one)
-            , VoteRegDelegCert (wrap stake1) AlwaysNoConfidence (Coin BigNum.one)
-            , StakeVoteRegDelegCert (wrap stake1) (PoolPubKeyHash ed25519KeyHash1) (DrepCred stake1) (Coin BigNum.one)
-            , AuthCommitteeHotCert { coldCred: stake1, hotCred: stake2 }
-            , ResignCommitteeColdCert stake1 (Just anchor1)
-            , ResignCommitteeColdCert stake2 Nothing
-            , RegDrepCert stake1 (Coin BigNum.one) (Just anchor1)
-            , RegDrepCert stake2 (Coin BigNum.one) Nothing
-            , UnregDrepCert stake1 (Coin BigNum.one)
-            , UpdateDrepCert stake1 (Just anchor1)
-            , UpdateDrepCert stake2 Nothing
-            ]
+        , certs: certsFixture1
         , withdrawals: Map.fromFoldable
             [ rewardAddress1 /\ Coin BigNum.one ]
         , auxiliaryDataHash: decodeCbor $ wrap

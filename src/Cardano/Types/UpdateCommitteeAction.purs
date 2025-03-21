@@ -1,21 +1,21 @@
 module Cardano.Types.UpdateCommitteeAction
   ( UpdateCommitteeAction(UpdateCommitteeAction)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (packListContainer, unpackListContainer)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (packListContainer, unpackListContainer)
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Committee (Committee)
-import Cardano.Types.Committee (fromCsl, toCsl) as Committee
+import Cardano.Types.Committee (fromCdl, toCdl) as Committee
 import Cardano.Types.Credential (Credential)
-import Cardano.Types.Credential (fromCsl, toCsl) as Credential
+import Cardano.Types.Credential (fromCdl, toCdl) as Credential
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
-import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
+import Cardano.Types.GovernanceActionId (fromCdl, toCdl) as GovernanceActionId
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -39,31 +39,31 @@ instance Show UpdateCommitteeAction where
   show = genericShow
 
 instance AsCbor UpdateCommitteeAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: UpdateCommitteeAction -> Csl.UpdateCommitteeAction
-toCsl (UpdateCommitteeAction rec) =
+toCdl :: UpdateCommitteeAction -> Cdl.UpdateCommitteeAction
+toCdl (UpdateCommitteeAction rec) =
   case rec.actionId of
     Nothing ->
-      Csl.updateCommitteeAction_new committee membersToRemove
+      Cdl.updateCommitteeAction_new committee membersToRemove
     Just actionId ->
-      Csl.updateCommitteeAction_newWithActionId (GovernanceActionId.toCsl actionId) committee
+      Cdl.updateCommitteeAction_newWithActionId (GovernanceActionId.toCdl actionId) committee
         membersToRemove
   where
-  committee = Committee.toCsl rec.committee
-  membersToRemove = packListContainer $ Credential.toCsl <$> rec.membersToRemove
+  committee = Committee.toCdl rec.committee
+  membersToRemove = packListContainer $ Credential.toCdl <$> rec.membersToRemove
 
-fromCsl :: Csl.UpdateCommitteeAction -> UpdateCommitteeAction
-fromCsl action =
+fromCdl :: Cdl.UpdateCommitteeAction -> UpdateCommitteeAction
+fromCdl action =
   UpdateCommitteeAction
     { committee:
-        Committee.fromCsl $
-          Csl.updateCommitteeAction_committee action
+        Committee.fromCdl $
+          Cdl.updateCommitteeAction_committee action
     , membersToRemove:
-        Credential.fromCsl <$>
-          unpackListContainer (Csl.updateCommitteeAction_membersToRemove action)
+        Credential.fromCdl <$>
+          unpackListContainer (Cdl.updateCommitteeAction_membersToRemove action)
     , actionId:
-        GovernanceActionId.fromCsl <$>
-          toMaybe (Csl.updateCommitteeAction_govActionId action)
+        GovernanceActionId.fromCdl <$>
+          toMaybe (Cdl.updateCommitteeAction_govActionId action)
     }

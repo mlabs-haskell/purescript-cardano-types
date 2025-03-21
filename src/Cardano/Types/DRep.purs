@@ -1,14 +1,14 @@
 module Cardano.Types.DRep
   ( DRep(DrepCred, AlwaysAbstain, AlwaysNoConfidence)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Credential (Credential(PubKeyHashCredential, ScriptHashCredential))
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Data.Either (Either(Left))
@@ -47,25 +47,25 @@ instance DecodeAeson DRep where
       _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
 
 instance AsCbor DRep where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: DRep -> Csl.DRep
-toCsl = case _ of
-  DrepCred (PubKeyHashCredential keyHash) -> Csl.dRep_newKeyHash $ unwrap keyHash
-  DrepCred (ScriptHashCredential scriptHash) -> Csl.dRep_newScriptHash $ unwrap scriptHash
-  AlwaysAbstain -> Csl.dRep_newAlwaysAbstain
-  AlwaysNoConfidence -> Csl.dRep_newAlwaysNoConfidence
+toCdl :: DRep -> Cdl.DRep
+toCdl = case _ of
+  DrepCred (PubKeyHashCredential keyHash) -> Cdl.dRep_newKeyHash $ unwrap keyHash
+  DrepCred (ScriptHashCredential scriptHash) -> Cdl.dRep_newScriptHash $ unwrap scriptHash
+  AlwaysAbstain -> Cdl.dRep_newAlwaysAbstain
+  AlwaysNoConfidence -> Cdl.dRep_newAlwaysNoConfidence
 
-fromCsl :: Csl.DRep -> DRep
-fromCsl drep =
+fromCdl :: Cdl.DRep -> DRep
+fromCdl drep =
   unsafePartial fromJust $
-    case Csl.fromCslEnum (Csl.dRep_kind drep) of
-      Csl.DRepKind_KeyHash ->
+    case Cdl.fromCslEnum (Cdl.dRep_kind drep) of
+      Cdl.DRepKind_KeyHash ->
         DrepCred <<< PubKeyHashCredential <<< wrap <$>
-          toMaybe (Csl.dRep_toKeyHash drep)
-      Csl.DRepKind_ScriptHash ->
+          toMaybe (Cdl.dRep_toKeyHash drep)
+      Cdl.DRepKind_ScriptHash ->
         DrepCred <<< ScriptHashCredential <<< wrap <$>
-          toMaybe (Csl.dRep_toScriptHash drep)
-      Csl.DRepKind_AlwaysAbstain -> pure AlwaysAbstain
-      Csl.DRepKind_AlwaysNoConfidence -> pure AlwaysNoConfidence
+          toMaybe (Cdl.dRep_toScriptHash drep)
+      Cdl.DRepKind_AlwaysAbstain -> pure AlwaysAbstain
+      Cdl.DRepKind_AlwaysNoConfidence -> pure AlwaysNoConfidence

@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and we follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v5.0.0
+
+## Changed
+
+- Replaced cardano-serialization-lib (CSL) with [cardano-data-lite (CDL)](https://github.com/mlabs-haskell/purescript-cardano-data-lite) ([#21](https://github.com/mlabs-haskell/purescript-cardano-types/pull/21))
+  - `fromCsl` and `toCsl` functions renamed to `fromCdl` and `toCdl` respectively
+- `PlutusScript.fromCdl` (previously `fromCsl`) now accepts an additional `Language` parameter, since the corresponding CDL type doesn't preserve the language tag ([#21](https://github.com/mlabs-haskell/purescript-cardano-types/pull/21))
+
+## Removed
+
+- `AsCbor` instance for `PlutusScript`. Please use the `PlutusScript.encodeCbor` and `PlutusScript.decodeCbor` functions instead ([#21](https://github.com/mlabs-haskell/purescript-cardano-types/pull/21))
+- `PointerAddress` and the corresponding `Address` constructor [(marked as deprecated in Conway)](https://github.com/cardano-foundation/CIPs/blob/1b3913da832566ad2a46955fc91c859dc9e88537/CIP-0019/CIP-0019-cardano-addresses.abnf#L5-L6) ([#21](https://github.com/mlabs-haskell/purescript-cardano-types/pull/21))
+
 # v4.1.0
 
 - introduce `Cardano.Types.Chain` module with exported types: `Chain`, `ChainTip`, `BlockHeaderHash`

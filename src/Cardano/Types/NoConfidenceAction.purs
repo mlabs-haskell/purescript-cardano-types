@@ -1,16 +1,16 @@
 module Cardano.Types.NoConfidenceAction
   ( NoConfidenceAction(NoConfidenceAction)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
-import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
+import Cardano.Types.GovernanceActionId (fromCdl, toCdl) as GovernanceActionId
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -32,19 +32,19 @@ instance Show NoConfidenceAction where
   show = genericShow
 
 instance AsCbor NoConfidenceAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: NoConfidenceAction -> Csl.NoConfidenceAction
-toCsl (NoConfidenceAction { actionId }) =
-  maybe Csl.noConfidenceAction_new
-    (Csl.noConfidenceAction_newWithActionId <<< GovernanceActionId.toCsl)
+toCdl :: NoConfidenceAction -> Cdl.NoConfidenceAction
+toCdl (NoConfidenceAction { actionId }) =
+  maybe Cdl.noConfidenceAction_new
+    (Cdl.noConfidenceAction_newWithActionId <<< GovernanceActionId.toCdl)
     actionId
 
-fromCsl :: Csl.NoConfidenceAction -> NoConfidenceAction
-fromCsl action =
+fromCdl :: Cdl.NoConfidenceAction -> NoConfidenceAction
+fromCdl action =
   NoConfidenceAction
     { actionId:
-        GovernanceActionId.fromCsl <$>
-          toMaybe (Csl.noConfidenceAction_govActionId action)
+        GovernanceActionId.fromCdl <$>
+          toMaybe (Cdl.noConfidenceAction_govActionId action)
     }

@@ -1,8 +1,8 @@
 module Cardano.Types.TransactionOutput
   ( TransactionOutput(TransactionOutput)
   , pprintTransactionOutput
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   , minAdaForOutput
   , _amount
   , _scriptRef
@@ -14,28 +14,30 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( dataCost_newCoinsPerByte
+  , dataOption_asData
+  , dataOption_asHash
+  , dataOption_newData
+  , dataOption_newHash
+  , data_encodedPlutusData
+  , data_new
+  , plutusData_fromBytes
   , transactionOutput_address
   , transactionOutput_amount
-  , transactionOutput_dataHash
+  , transactionOutput_datumOption
   , transactionOutput_new
-  , transactionOutput_plutusData
   , transactionOutput_scriptRef
-  , transactionOutput_setDataHash
-  , transactionOutput_setPlutusData
+  , transactionOutput_setDatumOption
   , transactionOutput_setScriptRef
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Address (Address)
 import Cardano.Types.Address as Address
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.MultiAsset (MultiAsset(MultiAsset))
-import Cardano.Types.OutputDatum
-  ( OutputDatum(OutputDatum, OutputDatumHash)
-  , pprintOutputDatum
-  )
+import Cardano.Types.OutputDatum (OutputDatum(OutputDatum, OutputDatumHash), pprintOutputDatum)
 import Cardano.Types.PlutusData as PlutusData
 import Cardano.Types.ScriptRef (ScriptRef)
 import Cardano.Types.ScriptRef as ScriptRef
@@ -92,8 +94,8 @@ instance Show TransactionOutput where
   show = genericShow
 
 instance AsCbor TransactionOutput where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance Arbitrary TransactionOutput where
   arbitrary = genericArbitrary
@@ -114,25 +116,36 @@ pprintTransactionOutput
 -- | Accepts a coins per byte parameter value
 minAdaForOutput :: TransactionOutput -> BigNum -> Coin
 minAdaForOutput output dataCost = wrap $ wrap $
-  Csl.minAdaForOutput (toCsl output) (dataCost_newCoinsPerByte $ unwrap dataCost)
+  Cdl.minAdaForOutput (toCdl output) (dataCost_newCoinsPerByte $ unwrap dataCost)
 
-fromCsl :: Csl.TransactionOutput -> TransactionOutput
-fromCsl to =
+fromCdl :: Cdl.TransactionOutput -> TransactionOutput
+fromCdl to =
   TransactionOutput { address, amount, datum, scriptRef }
   where
-  address = Address.fromCsl $ transactionOutput_address to
-  amount = Value.fromCsl $ transactionOutput_amount to
-  datum = (OutputDatum <<< PlutusData.fromCsl <$> toMaybe (transactionOutput_plutusData to)) <|>
-    (OutputDatumHash <<< wrap <$> toMaybe (transactionOutput_dataHash to))
-  scriptRef = ScriptRef.fromCsl <$> toMaybe (transactionOutput_scriptRef to)
+  address = Address.fromCdl $ transactionOutput_address to
+  amount = Value.fromCdl $ transactionOutput_amount to
+  mDatumOption = toMaybe (transactionOutput_datumOption to)
+  datum =
+    ( OutputDatum <<< PlutusData.fromCdl <$>
+        ( toMaybe <<< plutusData_fromBytes =<<
+            ( (data_encodedPlutusData) <$>
+                ( (toMaybe <<< dataOption_asData) =<<
+                    mDatumOption
+                )
+            )
+        )
+    ) <|>
+      (OutputDatumHash <<< wrap <$> ((toMaybe <<< dataOption_asHash) =<< mDatumOption))
+  scriptRef = ScriptRef.fromCdl <$> toMaybe (transactionOutput_scriptRef to)
 
-toCsl :: TransactionOutput -> Csl.TransactionOutput
-toCsl (TransactionOutput { address, amount, datum, scriptRef }) = unsafePerformEffect do
-  let cslOutput = transactionOutput_new (Address.toCsl address) (Value.toCsl amount)
+toCdl :: TransactionOutput -> Cdl.TransactionOutput
+toCdl (TransactionOutput { address, amount, datum, scriptRef }) = unsafePerformEffect do
+  let cslOutput = transactionOutput_new (Address.toCdl address) (Value.toCdl amount)
   for_ datum case _ of
-    OutputDatumHash dh -> transactionOutput_setDataHash cslOutput $ unwrap dh
-    OutputDatum dt -> transactionOutput_setPlutusData cslOutput $ PlutusData.toCsl dt
-  for_ scriptRef $ transactionOutput_setScriptRef cslOutput <<< ScriptRef.toCsl
+    OutputDatumHash dh -> transactionOutput_setDatumOption cslOutput $ (dataOption_newHash $ unwrap dh)
+    OutputDatum dt -> transactionOutput_setDatumOption cslOutput $
+      (dataOption_newData $ data_new $ Cdl.toBytes $ PlutusData.toCdl dt)
+  for_ scriptRef $ transactionOutput_setScriptRef cslOutput <<< ScriptRef.toCdl
   pure cslOutput
 
 _amount :: Lens' TransactionOutput Value

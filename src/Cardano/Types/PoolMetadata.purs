@@ -1,18 +1,18 @@
 module Cardano.Types.PoolMetadata
   ( PoolMetadata(PoolMetadata)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib (poolMetadata_new, poolMetadata_poolMetadataHash, poolMetadata_url)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite (poolMetadata_new, poolMetadata_poolMetadataHash, poolMetadata_url)
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.PoolMetadataHash (PoolMetadataHash)
 import Cardano.Types.URL (URL)
-import Cardano.Types.URL (fromCsl, toCsl) as URL
+import Cardano.Types.URL (fromCdl, toCdl) as URL
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -33,14 +33,14 @@ instance Show PoolMetadata where
   show = genericShow
 
 instance AsCbor PoolMetadata where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-fromCsl :: Csl.PoolMetadata -> PoolMetadata
-fromCsl csl = PoolMetadata
-  { url: URL.fromCsl $ poolMetadata_url csl
+fromCdl :: Cdl.PoolMetadata -> PoolMetadata
+fromCdl csl = PoolMetadata
+  { url: URL.fromCdl $ poolMetadata_url csl
   , hash: wrap $ poolMetadata_poolMetadataHash csl
   }
 
-toCsl :: PoolMetadata -> Csl.PoolMetadata
-toCsl (PoolMetadata { url, hash }) = poolMetadata_new (URL.toCsl url) (unwrap hash)
+toCdl :: PoolMetadata -> Cdl.PoolMetadata
+toCdl (PoolMetadata { url, hash }) = poolMetadata_new (URL.toCdl url) (unwrap hash)

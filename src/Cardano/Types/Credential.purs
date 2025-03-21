@@ -2,8 +2,8 @@ module Cardano.Types.Credential
   ( Credential(PubKeyHashCredential, ScriptHashCredential)
   , asPubKeyHash
   , asScriptHash
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -16,7 +16,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor)
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.ScriptHash (ScriptHash)
@@ -90,17 +90,17 @@ instance DecodeAeson Credential where
       _ -> Left $ TypeMismatch ("Unknown tag: " <> tag)
 
 instance AsCbor Credential where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-toCsl :: Credential -> Csl.Credential
-toCsl = case _ of
+toCdl :: Credential -> Cdl.Credential
+toCdl = case _ of
   PubKeyHashCredential kh ->
-    Csl.credential_fromKeyhash (unwrap kh)
+    Cdl.credential_fromKeyhash (unwrap kh)
   ScriptHashCredential sh ->
-    Csl.credential_fromScripthash (unwrap sh)
+    Cdl.credential_fromScripthash (unwrap sh)
 
-fromCsl :: Csl.Credential -> Credential
-fromCsl sc = unsafePartial $ fromJust $
-  (map (PubKeyHashCredential <<< wrap) $ toMaybe $ Csl.credential_toKeyhash sc) <|>
-    (map (ScriptHashCredential <<< wrap) $ toMaybe $ Csl.credential_toScripthash sc)
+fromCdl :: Cdl.Credential -> Credential
+fromCdl sc = unsafePartial $ fromJust $
+  (map (PubKeyHashCredential <<< wrap) $ toMaybe $ Cdl.credential_toKeyhash sc) <|>
+    (map (ScriptHashCredential <<< wrap) $ toMaybe $ Cdl.credential_toScripthash sc)

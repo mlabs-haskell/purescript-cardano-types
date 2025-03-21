@@ -10,7 +10,7 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( address_fromBech32
   , address_networkId
   , address_toBech32
@@ -21,21 +21,18 @@ import Cardano.Serialization.Lib
   , enterpriseAddress_fromAddress
   , enterpriseAddress_toAddress
   , fromBytes
-  , pointerAddress_fromAddress
-  , pointerAddress_toAddress
   , rewardAddress_fromAddress
   , rewardAddress_toAddress
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
-import Cardano.Types.BaseAddress (BaseAddress, fromCsl, toCsl) as BA
+import Cardano.Data.Lite as Cdl
+import Cardano.Types.BaseAddress (BaseAddress, fromCdl, toCdl) as BA
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.ByronAddress (ByronAddress) as BA
 import Cardano.Types.EnterpriseAddress as EA
 import Cardano.Types.NetworkId (NetworkId)
 import Cardano.Types.NetworkId as NetworkId
 import Cardano.Types.PaymentCredential (PaymentCredential)
-import Cardano.Types.PointerAddress (PointerAddress) as PA
 import Cardano.Types.RewardAddress as RA
 import Cardano.Types.StakeCredential (StakeCredential)
 import Control.Alt ((<|>))
@@ -57,7 +54,6 @@ data Address
   | ByronAddress BA.ByronAddress
   | EnterpriseAddress EA.EnterpriseAddress
   | RewardAddress RA.RewardAddress
-  | PointerAddress PA.PointerAddress
 
 derive instance Generic Address _
 derive instance Eq Address
@@ -73,8 +69,8 @@ instance Show Address where
   show addr = "(Address.fromBech32Unsafe " <> show (toBech32 addr) <> ")"
 
 instance AsCbor Address where
-  encodeCbor = toCsl >>> toBytes >>> wrap
-  decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> toBytes >>> wrap
+  decodeCbor = unwrap >>> fromBytes >>> map fromCdl
 
 instance Arbitrary Address where
   arbitrary = oneOf $ NonEmpty.cons' (BaseAddress <$> arbitrary)
@@ -96,7 +92,7 @@ mkPaymentAddress networkId paymentCredential = case _ of
 
 getNetworkId :: Address -> NetworkId
 getNetworkId = unsafePartial $
-  toCsl >>> address_networkId >>> Int.fromNumber >>> fromJust >>> NetworkId.fromInt >>> fromJust
+  toCdl >>> address_networkId >>> Int.fromNumber >>> fromJust >>> NetworkId.fromInt >>> fromJust
 
 getPaymentCredential :: Address -> Maybe PaymentCredential
 getPaymentCredential = case _ of
@@ -104,7 +100,6 @@ getPaymentCredential = case _ of
   ByronAddress _ -> Nothing
   EnterpriseAddress { paymentCredential } -> Just paymentCredential
   RewardAddress _ -> Nothing
-  PointerAddress _ -> Nothing
 
 getStakeCredential :: Address -> Maybe StakeCredential
 getStakeCredential = case _ of
@@ -112,42 +107,37 @@ getStakeCredential = case _ of
   ByronAddress _ -> Nothing
   EnterpriseAddress _ -> Nothing
   RewardAddress { stakeCredential } -> Just stakeCredential
-  PointerAddress _ -> Nothing
 
 toBech32 :: Address -> Bech32String
-toBech32 = toCsl >>> flip address_toBech32 (unsafeCoerce undefined)
+toBech32 = toCdl >>> flip address_toBech32 (unsafeCoerce undefined)
 
 fromBech32 :: Bech32String -> Maybe Address
-fromBech32 = map fromCsl <<< toMaybe <<< address_fromBech32
+fromBech32 = map fromCdl <<< toMaybe <<< address_fromBech32
 
 fromBech32Unsafe :: Partial => Bech32String -> Address
 fromBech32Unsafe = fromJust <<< fromBech32
 
-toCsl :: Address -> Csl.Address
-toCsl = case _ of
+toCdl :: Address -> Cdl.Address
+toCdl = case _ of
   BaseAddress ba ->
-    baseAddress_toAddress $ BA.toCsl ba
+    baseAddress_toAddress $ BA.toCdl ba
   ByronAddress ba ->
     byronAddress_toAddress $ unwrap ba
   EnterpriseAddress ea ->
-    enterpriseAddress_toAddress $ EA.toCsl ea
+    enterpriseAddress_toAddress $ EA.toCdl ea
   RewardAddress ra ->
-    rewardAddress_toAddress $ RA.toCsl ra
-  PointerAddress pc ->
-    pointerAddress_toAddress $ unwrap pc
+    rewardAddress_toAddress $ RA.toCdl ra
 
-fromCsl :: Csl.Address -> Address
-fromCsl addr =
+fromCdl :: Cdl.Address -> Address
+fromCdl addr =
   unsafePartial $ fromJust $
-    asBaseAddress <|> asByronAddress <|> asEnterpriseAddress <|> asRewardAddress <|> asPointerAddress
+    asBaseAddress <|> asByronAddress <|> asEnterpriseAddress <|> asRewardAddress
   where
   asBaseAddress = toMaybe (baseAddress_fromAddress addr) <#>
-    BaseAddress <<< BA.fromCsl
+    BaseAddress <<< BA.fromCdl
   asByronAddress = toMaybe (byronAddress_fromAddress addr) <#>
     ByronAddress <<< wrap
   asEnterpriseAddress = toMaybe (enterpriseAddress_fromAddress addr) <#>
-    EnterpriseAddress <<< EA.fromCsl
+    EnterpriseAddress <<< EA.fromCdl
   asRewardAddress = toMaybe (rewardAddress_fromAddress addr) <#>
-    RewardAddress <<< RA.fromCsl
-  asPointerAddress = toMaybe (pointerAddress_fromAddress addr) <#>
-    PointerAddress <<< wrap
+    RewardAddress <<< RA.fromCdl

@@ -10,15 +10,15 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.FromData (class FromData)
-import Cardano.FromMetadata (class FromMetadata)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( fromBytes
   , scriptHash_fromBech32
   , scriptHash_toBech32
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
+import Cardano.FromData (class FromData)
+import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
 import Cardano.ToMetadata (class ToMetadata, toMetadata)
 import Cardano.Types.Bech32String (Bech32String)
@@ -37,7 +37,7 @@ import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
 -- | blake2b-224 hash digests of serialized monetary scripts
-newtype ScriptHash = ScriptHash Csl.ScriptHash
+newtype ScriptHash = ScriptHash Cdl.ScriptHash
 
 derive instance Newtype ScriptHash _
 derive instance Generic ScriptHash _

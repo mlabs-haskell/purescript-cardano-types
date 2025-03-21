@@ -6,12 +6,12 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
+import Cardano.Data.Lite (fromBytes, toBytes)
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, fromData)
-import Cardano.Serialization.Lib (fromBytes, toBytes)
-import Cardano.Serialization.Lib as Csl
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum (zero) as BigNum
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromBytes)
+import Cardano.Types.Internal.Helpers (compareViaCdlBytes, eqOrd, showFromBytes)
 import Cardano.Types.PlutusData (PlutusData(Constr))
 import Data.ByteArray (byteArrayFromIntArrayUnsafe)
 import Data.Function (on)
@@ -26,7 +26,7 @@ import Test.QuickCheck.Gen (chooseInt, vectorOf)
 -- | 32-bytes blake2b256 hash of a tx body.
 -- | NOTE. Plutus docs might incorrectly state that it uses
 -- |       SHA256 for this purposes.
-newtype TransactionHash = TransactionHash Csl.TransactionHash
+newtype TransactionHash = TransactionHash Cdl.TransactionHash
 
 derive instance Generic TransactionHash _
 derive instance Newtype TransactionHash _
@@ -37,7 +37,7 @@ instance Eq TransactionHash where
 -- This is not newtyped derived because it will be used for ordering a
 -- `TransactionInput`, we want lexicographical ordering on the hexstring.
 instance Ord TransactionHash where
-  compare = compareViaCslBytes `on` unwrap
+  compare = compareViaCdlBytes `on` unwrap
 
 instance Show TransactionHash where
   show = unwrap >>> showFromBytes "TransactionHash"

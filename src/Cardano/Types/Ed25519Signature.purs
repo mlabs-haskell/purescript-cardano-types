@@ -10,13 +10,13 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( ed25519Signature_fromBech32
   , ed25519Signature_toBech32
   , fromBytes
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Bech32String (Bech32String)
 import Data.Either (note)
 import Data.Function (on)
@@ -25,7 +25,7 @@ import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 
-newtype Ed25519Signature = Ed25519Signature Csl.Ed25519Signature
+newtype Ed25519Signature = Ed25519Signature Cdl.Ed25519Signature
 
 derive instance Generic Ed25519Signature _
 derive instance Newtype Ed25519Signature _

@@ -30,7 +30,7 @@ import Aeson
   )
 import Aeson (JsonDecodeError(TypeMismatch)) as Aeson
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( bigNum_checkedAdd
   , bigNum_checkedMul
   , bigNum_checkedSub
@@ -45,7 +45,7 @@ import Cardano.Serialization.Lib
   , fromBytes
   , toBytes
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Internal.Helpers (clone, eqOrd)
 import Data.Array.NonEmpty as NA
 import Data.Either (note)
@@ -66,7 +66,7 @@ import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, oneOf)
 
 -- | Unisigned 64-bit integer, 0..18446744073709551615
-newtype BigNum = BigNum Csl.BigNum
+newtype BigNum = BigNum Cdl.BigNum
 
 derive instance Generic BigNum _
 derive instance Newtype BigNum _

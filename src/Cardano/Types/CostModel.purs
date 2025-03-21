@@ -3,13 +3,13 @@ module Cardano.Types.CostModel where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
-import Cardano.Serialization.Lib
+import Cardano.Data.Lite
   ( costModel_get
   , costModel_len
   , costModel_new
   , costModel_set
   )
-import Cardano.Serialization.Lib as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Int (Int) as Int
 import Data.Array as Array
 import Data.FoldableWithIndex (forWithIndex_)
@@ -35,15 +35,15 @@ derive newtype instance DecodeAeson CostModel
 instance Show CostModel where
   show = genericShow
 
-toCsl :: CostModel -> Csl.CostModel
-toCsl (CostModel mdls) = unsafePerformEffect do
+toCdl :: CostModel -> Cdl.CostModel
+toCdl (CostModel mdls) = unsafePerformEffect do
   mdl <- costModel_new
   forWithIndex_ mdls \i c ->
     costModel_set mdl (Int.toNumber i) $ unwrap c
   pure mdl
 
-fromCsl :: Csl.CostModel -> CostModel
-fromCsl mdl = CostModel $ unsafePerformEffect do
+fromCdl :: Cdl.CostModel -> CostModel
+fromCdl mdl = CostModel $ unsafePerformEffect do
   length <- unsafePartial $ fromJust <<< PInt.fromNumber <$> costModel_len mdl
   for (Array.range 0 $ length - 1) \ix -> do
     wrap <$> costModel_get mdl (Int.toNumber ix)
