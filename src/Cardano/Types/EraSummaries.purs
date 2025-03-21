@@ -14,7 +14,7 @@ import Prelude
 import Aeson
   ( class DecodeAeson
   , class EncodeAeson
-  , JsonDecodeError(..)
+  , JsonDecodeError(TypeMismatch)
   , caseAesonObject
   , encodeAeson
   , finiteNumber
@@ -22,7 +22,7 @@ import Aeson
   )
 import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.Slot (Slot)
-import Data.Either (Either(..))
+import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, wrap)

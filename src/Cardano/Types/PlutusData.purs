@@ -28,6 +28,8 @@ import Cardano.Data.Lite
   ( constrPlutusData_alternative
   , constrPlutusData_data
   , constrPlutusData_new
+  , packListContainer
+  , packMultiMapContainer
   , plutusData_asBytes
   , plutusData_asConstrPlutusData
   , plutusData_asInteger
@@ -38,14 +40,10 @@ import Cardano.Data.Lite
   , plutusData_newInteger
   , plutusData_newList
   , plutusData_newMap
-  )
-import Cardano.Data.Lite as Csl
-import Cardano.Data.Lite.Internal
-  ( packListContainer
-  , packMultiMapContainer
   , unpackListContainer
   , unpackMultiMapContainer
   )
+import Cardano.Data.Lite as Csl
 import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum

@@ -103,20 +103,17 @@ fromCsl ws =
   use :: forall a. (Csl.TransactionWitnessSet -> Nullable a) -> Maybe a
   use f = toMaybe (f ws)
 
-  setLanguage :: Language -> PlutusScript -> PlutusScript
-  setLanguage lang (PlutusScript (ba /\ _)) = PlutusScript (ba /\ lang)
-
   vkeys = map Vkeywitness.fromCsl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_vkeys
   nativeScripts = map NativeScript.fromCsl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_nativeScripts
   bootstraps = map BoostrapWitness.fromCsl $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_bootstraps
-  plutusScripts_v1 = map (setLanguage PlutusV1 <<< PlutusScript.fromCsl) $ fromMaybe []
+  plutusScripts_v1 = map (flip PlutusScript.fromCsl PlutusV1) $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_plutusScripts_v1
-  plutusScripts_v2 = map (setLanguage PlutusV2 <<< PlutusScript.fromCsl) $ fromMaybe []
+  plutusScripts_v2 = map (flip PlutusScript.fromCsl PlutusV2) $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_plutusScripts_v2
-  plutusScripts_v3 = map ((setLanguage PlutusV3) <<< PlutusScript.fromCsl) $ fromMaybe []
+  plutusScripts_v3 = map (flip PlutusScript.fromCsl PlutusV3) $ fromMaybe []
     $ unpackListContainer <$> use transactionWitnessSet_plutusScripts_v3
   plutusScripts = plutusScripts_v1 <> plutusScripts_v2 <> plutusScripts_v3
   plutusData = map PlutusData.fromCsl $ fromMaybe []

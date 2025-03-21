@@ -7,7 +7,7 @@ import Prelude
 import Aeson
   ( class DecodeAeson
   , class EncodeAeson
-  , JsonDecodeError(..)
+  , JsonDecodeError(TypeMismatch)
   , caseAesonObject
   , decodeAeson
   , encodeAeson
@@ -16,7 +16,7 @@ import Aeson
 import Cardano.FromData (class FromData)
 import Cardano.ToData (class ToData)
 import Cardano.Types.ScriptHash (ScriptHash)
-import Data.Either (Either(..))
+import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype)
 import Data.Show.Generic (genericShow)

@@ -112,20 +112,19 @@ fromCsl csl = AuxiliaryData
   , plutusScripts: if (Array.null plutusScripts) then Nothing else Just plutusScripts
   }
   where
-
-  use :: forall a. (Csl.AuxiliaryData -> Nullable a) -> Maybe a
-  use f = toMaybe (f csl)
-
   emptyToNothing (Just []) = Nothing
   emptyToNothing x = x
 
-  setLanguage :: Language -> PlutusScript -> PlutusScript
-  setLanguage lang (PlutusScript (ba /\ _)) = PlutusScript (ba /\ lang)
+  getPlutusScripts
+    :: (Csl.AuxiliaryData -> Nullable Csl.PlutusScripts)
+    -> Language
+    -> Array PlutusScript
+  getPlutusScripts f lang =
+    map (flip PlutusScript.fromCsl lang) $ fromMaybe [] $ unpackListContainer <$>
+      toMaybe (f csl)
 
-  plutusScripts_v1 = map (setLanguage PlutusV1 <<< PlutusScript.fromCsl) $ fromMaybe []
-    $ unpackListContainer <$> use auxiliaryData_plutusScripts_v1
-  plutusScripts_v2 = map (setLanguage PlutusV2 <<< PlutusScript.fromCsl) $ fromMaybe []
-    $ unpackListContainer <$> use auxiliaryData_plutusScripts_v2
-  plutusScripts_v3 = map ((setLanguage PlutusV3) <<< PlutusScript.fromCsl) $ fromMaybe []
-    $ unpackListContainer <$> use auxiliaryData_plutusScripts_v3
-  plutusScripts = plutusScripts_v1 <> plutusScripts_v2 <> plutusScripts_v3
+  plutusScripts :: Array PlutusScript
+  plutusScripts =
+    getPlutusScripts auxiliaryData_plutusScripts_v1 PlutusV1
+      <> getPlutusScripts auxiliaryData_plutusScripts_v2 PlutusV2
+      <> getPlutusScripts auxiliaryData_plutusScripts_v3 PlutusV3

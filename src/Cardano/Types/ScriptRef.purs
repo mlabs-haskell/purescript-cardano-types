@@ -99,9 +99,6 @@ toCsl = case _ of
 fromCsl :: Csl.ScriptRef -> ScriptRef
 fromCsl sr = unsafePartial $ fromJust $
   (NativeScriptRef <<< NativeScript.fromCsl <$> toMaybe (scriptRef_nativeScript sr))
-    <|> (PlutusScriptRef <<< setLanguage PlutusV1 <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript_v1 sr))
-    <|> (PlutusScriptRef <<< setLanguage PlutusV2 <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript_v2 sr))
-    <|> (PlutusScriptRef <<< setLanguage PlutusV3 <<< PlutusScript.fromCsl <$> toMaybe (scriptRef_plutusScript_v3 sr))
-  where
-  setLanguage :: Language -> PlutusScript -> PlutusScript
-  setLanguage lang (PlutusScript (ba /\ _)) = PlutusScript (ba /\ lang)
+    <|> (PlutusScriptRef <<< flip PlutusScript.fromCsl PlutusV1 <$> toMaybe (scriptRef_plutusScript_v1 sr))
+    <|> (PlutusScriptRef <<< flip PlutusScript.fromCsl PlutusV2 <$> toMaybe (scriptRef_plutusScript_v2 sr))
+    <|> (PlutusScriptRef <<< flip PlutusScript.fromCsl PlutusV3 <$> toMaybe (scriptRef_plutusScript_v3 sr))

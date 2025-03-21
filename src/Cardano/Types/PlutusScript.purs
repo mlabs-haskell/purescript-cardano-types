@@ -6,6 +6,7 @@ import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, fromString)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (fromBytes, plutusScript_bytes, plutusScript_hash, plutusScript_new, toBytes)
 import Cardano.Data.Lite as Csl
+import Cardano.Types.CborBytes (CborBytes)
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
 import Cardano.Types.RawBytes (RawBytes)
 import Cardano.Types.ScriptHash (ScriptHash)
@@ -14,7 +15,7 @@ import Data.ByteArray (ByteArray)
 import Data.Either (hush)
 import Data.Generic.Rep (class Generic)
 import Data.Int as Int
-import Data.Maybe (fromJust)
+import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 import Data.Tuple.Nested (type (/\), (/\))
@@ -58,9 +59,11 @@ plutusV3Script :: RawBytes -> PlutusScript
 plutusV3Script ba =
   PlutusScript $ unwrap ba /\ PlutusV3
 
-instance AsCbor PlutusScript where
-  encodeCbor = toCsl >>> toBytes >>> wrap
-  decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+encodeCbor :: PlutusScript -> CborBytes
+encodeCbor = wrap <<< toBytes <<< toCsl
+
+decodeCbor :: CborBytes -> Language -> Maybe PlutusScript
+decodeCbor cbor lang = flip fromCsl lang <$> fromBytes (unwrap cbor)
 
 languageToNumber :: Language -> Number
 languageToNumber PlutusV1 = Int.toNumber 1
@@ -79,9 +82,5 @@ toCsl :: PlutusScript -> Csl.PlutusScript
 toCsl (PlutusScript (script /\ _)) =
   plutusScript_new script
 
-fromCsl :: Csl.PlutusScript -> PlutusScript
-fromCsl ps =
-  PlutusScript
-    ( plutusScript_bytes ps
-        /\ PlutusV1
-    )
+fromCsl :: Csl.PlutusScript -> Language -> PlutusScript
+fromCsl ps lang = PlutusScript $ plutusScript_bytes ps /\ lang

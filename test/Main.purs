@@ -3,14 +3,19 @@ module Test.Main where
 import Prelude
 
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
+import Cardano.Types.Language (Language(PlutusV1))
 import Cardano.Types.NetworkId (NetworkId(MainnetId, TestnetId))
 import Cardano.Types.OutputDatum (OutputDatum(OutputDatum))
+import Cardano.Types.PlutusScript (PlutusScript)
+import Cardano.Types.PlutusScript (decodeCbor, encodeCbor) as PlutusScript
 import Cardano.Types.Relay (Relay(SingleHostAddr, SingleHostName, MultiHostName))
 import Cardano.Types.ScriptRef (ScriptRef(PlutusScriptRef))
 import Data.Array as Array
 import Data.ByteArray (ByteArray, byteArrayFromIntArrayUnsafe, byteArrayToHex, hexToByteArray)
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just))
-import Data.Newtype (unwrap, wrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Show.Generic (genericShow)
 import Data.Time.Duration (Milliseconds(Milliseconds))
 import Data.Traversable (for_)
 import Data.Tuple.Nested ((/\))
@@ -70,7 +75,7 @@ suite :: TestPlanM (Aff Unit) Unit
 suite = do
   group "deserialization and serialization roundtrip" $ do
     group "PlutusScript" do
-      roundtripTest "plutusScriptFixture1" plutusScriptFixture1
+      roundtripTest "plutusScriptFixture1" $ PlutusScriptV1 plutusScriptFixture1
     -- These are not supposed to work: plutus script version is not encoded
     -- in the cbor. instead, TransactionWitness using the scripts is encoded
     -- differently depending on the language version. See the CDDL spec of Cardano
@@ -162,9 +167,22 @@ suite = do
 
   suiteCSL
 
+newtype PlutusScriptV1 = PlutusScriptV1 PlutusScript
+
+derive instance Generic PlutusScriptV1 _
+derive instance Newtype PlutusScriptV1 _
+derive instance Eq PlutusScriptV1
+
+instance Show PlutusScriptV1 where
+  show = genericShow
+
+instance AsCbor PlutusScriptV1 where
+  encodeCbor = PlutusScript.encodeCbor <<< unwrap
+  decodeCbor = map wrap <<< flip PlutusScript.decodeCbor PlutusV1
+
 suiteCSL :: TestPlanM (Aff Unit) Unit
 suiteCSL = do
-  checkCSLHex "plutusScriptFixture1" CSLHex.plutusScriptFixture1_csl_hex plutusScriptFixture1
+  checkCSLHex "plutusScriptFixture1" CSLHex.plutusScriptFixture1_csl_hex $ PlutusScriptV1 plutusScriptFixture1
 
   checkCSLHex "nativeScriptFixture1" CSLHex.nativeScriptFixture1_csl_hex nativeScriptFixture1
   checkCSLHex "nativeScriptFixture2" CSLHex.nativeScriptFixture2_csl_hex nativeScriptFixture2
