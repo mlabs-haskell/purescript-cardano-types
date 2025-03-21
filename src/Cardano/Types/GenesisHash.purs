@@ -11,7 +11,7 @@ import Aeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
 import Cardano.Data.Lite (fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData)
 import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
@@ -29,7 +29,7 @@ import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
-newtype GenesisHash = GenesisHash Csl.GenesisHash
+newtype GenesisHash = GenesisHash Cdl.GenesisHash
 
 derive instance Newtype GenesisHash _
 derive instance Generic GenesisHash _

@@ -8,28 +8,28 @@ module Cardano.Types.GovernanceAction
       , NewConstitution
       , Info
       )
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson, (.:))
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.HardForkInitiationAction (HardForkInitiationAction)
-import Cardano.Types.HardForkInitiationAction (fromCsl, toCsl) as HardForkInitiationAction
+import Cardano.Types.HardForkInitiationAction (fromCdl, toCdl) as HardForkInitiationAction
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Cardano.Types.NewConstitutionAction (NewConstitutionAction)
-import Cardano.Types.NewConstitutionAction (fromCsl, toCsl) as NewConstitutionAction
+import Cardano.Types.NewConstitutionAction (fromCdl, toCdl) as NewConstitutionAction
 import Cardano.Types.NoConfidenceAction (NoConfidenceAction)
-import Cardano.Types.NoConfidenceAction (fromCsl, toCsl) as NoConfidenceAction
+import Cardano.Types.NoConfidenceAction (fromCdl, toCdl) as NoConfidenceAction
 import Cardano.Types.ParameterChangeAction (ParameterChangeAction)
-import Cardano.Types.ParameterChangeAction (fromCsl, toCsl) as ParameterChangeAction
+import Cardano.Types.ParameterChangeAction (fromCdl, toCdl) as ParameterChangeAction
 import Cardano.Types.TreasuryWithdrawalsAction (TreasuryWithdrawalsAction)
-import Cardano.Types.TreasuryWithdrawalsAction (fromCsl, toCsl) as TreasuryWithdrawalsAction
+import Cardano.Types.TreasuryWithdrawalsAction (fromCdl, toCdl) as TreasuryWithdrawalsAction
 import Cardano.Types.UpdateCommitteeAction (UpdateCommitteeAction)
-import Cardano.Types.UpdateCommitteeAction (fromCsl, toCsl) as UpdateCommitteeAction
+import Cardano.Types.UpdateCommitteeAction (fromCdl, toCdl) as UpdateCommitteeAction
 import Control.Alt ((<|>))
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
@@ -56,8 +56,8 @@ instance Show GovernanceAction where
   show = genericShow
 
 instance AsCbor GovernanceAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
 instance EncodeAeson GovernanceAction where
   encodeAeson = case _ of
@@ -85,57 +85,57 @@ instance DecodeAeson GovernanceAction where
       "Info" -> pure Info
       _ -> Left $ TypeMismatch $ "Unknown tag: " <> tag
 
-toCsl :: GovernanceAction -> Csl.GovernanceAction
-toCsl = case _ of
+toCdl :: GovernanceAction -> Cdl.GovernanceAction
+toCdl = case _ of
   ChangePParams action ->
-    Csl.governanceAction_newParameterChangeAction
-      (ParameterChangeAction.toCsl action)
+    Cdl.governanceAction_newParameterChangeAction
+      (ParameterChangeAction.toCdl action)
   TriggerHF action ->
-    Csl.governanceAction_newHardForkInitiationAction
-      (HardForkInitiationAction.toCsl action)
+    Cdl.governanceAction_newHardForkInitiationAction
+      (HardForkInitiationAction.toCdl action)
   TreasuryWdrl action ->
-    Csl.governanceAction_newTreasuryWithdrawalsAction
-      (TreasuryWithdrawalsAction.toCsl action)
+    Cdl.governanceAction_newTreasuryWithdrawalsAction
+      (TreasuryWithdrawalsAction.toCdl action)
   NoConfidence action ->
-    Csl.governanceAction_newNoConfidenceAction
-      (NoConfidenceAction.toCsl action)
+    Cdl.governanceAction_newNoConfidenceAction
+      (NoConfidenceAction.toCdl action)
   NewCommittee action ->
-    Csl.governanceAction_newNewCommitteeAction
-      (UpdateCommitteeAction.toCsl action)
+    Cdl.governanceAction_newNewCommitteeAction
+      (UpdateCommitteeAction.toCdl action)
   NewConstitution action ->
-    Csl.governanceAction_newNewConstitutionAction
-      (NewConstitutionAction.toCsl action)
+    Cdl.governanceAction_newNewConstitutionAction
+      (NewConstitutionAction.toCdl action)
   Info ->
-    Csl.governanceAction_newInfoAction
-      Csl.infoAction_new
+    Cdl.governanceAction_newInfoAction
+      Cdl.infoAction_new
 
-fromCsl :: Csl.GovernanceAction -> GovernanceAction
-fromCsl action =
+fromCdl :: Cdl.GovernanceAction -> GovernanceAction
+fromCdl action =
   unsafePartial fromJust $
-    ( ChangePParams <<< ParameterChangeAction.fromCsl <$>
-        toMaybe (Csl.governanceAction_asParameterChangeAction action)
+    ( ChangePParams <<< ParameterChangeAction.fromCdl <$>
+        toMaybe (Cdl.governanceAction_asParameterChangeAction action)
     )
       <|>
-        ( TriggerHF <<< HardForkInitiationAction.fromCsl <$>
-            toMaybe (Csl.governanceAction_asHardForkInitiationAction action)
+        ( TriggerHF <<< HardForkInitiationAction.fromCdl <$>
+            toMaybe (Cdl.governanceAction_asHardForkInitiationAction action)
         )
       <|>
-        ( TreasuryWdrl <<< TreasuryWithdrawalsAction.fromCsl <$>
-            toMaybe (Csl.governanceAction_asTreasuryWithdrawalsAction action)
+        ( TreasuryWdrl <<< TreasuryWithdrawalsAction.fromCdl <$>
+            toMaybe (Cdl.governanceAction_asTreasuryWithdrawalsAction action)
         )
       <|>
-        ( NoConfidence <<< NoConfidenceAction.fromCsl <$>
-            toMaybe (Csl.governanceAction_asNoConfidenceAction action)
+        ( NoConfidence <<< NoConfidenceAction.fromCdl <$>
+            toMaybe (Cdl.governanceAction_asNoConfidenceAction action)
         )
       <|>
-        ( NewCommittee <<< UpdateCommitteeAction.fromCsl <$>
-            toMaybe (Csl.governanceAction_asNewCommitteeAction action)
+        ( NewCommittee <<< UpdateCommitteeAction.fromCdl <$>
+            toMaybe (Cdl.governanceAction_asNewCommitteeAction action)
         )
       <|>
-        ( NewConstitution <<< NewConstitutionAction.fromCsl <$>
-            toMaybe (Csl.governanceAction_asNewConstitutionAction action)
+        ( NewConstitution <<< NewConstitutionAction.fromCdl <$>
+            toMaybe (Cdl.governanceAction_asNewConstitutionAction action)
         )
       <|>
         ( Info <$
-            toMaybe (Csl.governanceAction_asInfoAction action)
+            toMaybe (Cdl.governanceAction_asInfoAction action)
         )

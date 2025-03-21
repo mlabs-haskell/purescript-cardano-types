@@ -45,7 +45,7 @@ import Cardano.Data.Lite
   , fromBytes
   , toBytes
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Internal.Helpers (clone, eqOrd)
 import Data.Array.NonEmpty as NA
 import Data.Either (note)
@@ -66,7 +66,7 @@ import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, oneOf)
 
 -- | Unisigned 64-bit integer, 0..18446744073709551615
-newtype BigNum = BigNum Csl.BigNum
+newtype BigNum = BigNum Cdl.BigNum
 
 derive instance Generic BigNum _
 derive instance Newtype BigNum _

@@ -16,7 +16,7 @@ import Cardano.Data.Lite
   , fromBytes
   , toBytes
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData)
 import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
@@ -44,7 +44,7 @@ import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck.Arbitrary (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
-newtype Ed25519KeyHash = Ed25519KeyHash Csl.Ed25519KeyHash
+newtype Ed25519KeyHash = Ed25519KeyHash Cdl.Ed25519KeyHash
 
 derive instance Generic Ed25519KeyHash _
 derive instance Newtype Ed25519KeyHash _

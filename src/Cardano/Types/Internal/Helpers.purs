@@ -2,7 +2,7 @@ module Cardano.Types.Internal.Helpers
   ( eqOrd
   , showFromBytes
   , showFromCbor
-  , compareViaCslBytes
+  , compareViaCdlBytes
   , decodeMap
   , encodeTagged
   , encodeTagged'
@@ -44,7 +44,7 @@ import Foreign.Object as Obj
 eqOrd :: forall a. Ord a => a -> a -> Boolean
 eqOrd a b = compare a b == EQ
 
-compareViaCslBytes
+compareViaCdlBytes
   :: forall a b
    . IsCsl a
   => IsBytes a
@@ -53,7 +53,7 @@ compareViaCslBytes
   => a
   -> b
   -> Ordering
-compareViaCslBytes a b =
+compareViaCdlBytes a b =
   compare (byteArrayToHex $ toBytes a) (byteArrayToHex $ toBytes b)
 
 showFromBytes :: forall a. IsCsl a => IsBytes a => String -> a -> String

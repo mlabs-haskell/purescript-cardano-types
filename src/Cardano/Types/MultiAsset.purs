@@ -5,7 +5,7 @@ import Prelude hiding (add)
 import Aeson (class DecodeAeson, class EncodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Data.Lite (packMapContainer, unpackMapContainer)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.AssetName (AssetName, fromAssetName)
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
@@ -75,8 +75,8 @@ instance DecodeAeson MultiAsset where
     MultiAsset <$> for mapAesons decodeMap
 
 instance AsCbor MultiAsset where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance Partial => Semigroup MultiAsset where
   append a b = unsafePerformEffect $ maybe (throw "MultiAsset.append: numeric overflow") pure $ add a b
@@ -198,14 +198,14 @@ union l r =
   in
     Map.fromFoldable (ls' <> rs'')
 
-toCsl :: MultiAsset -> Csl.MultiAsset
-toCsl ma | MultiAsset mp <- normalizeMultiAsset ma =
-  packMapContainer $ map (unwrap *** assetsToCsl) $ Map.toUnfoldable mp
+toCdl :: MultiAsset -> Cdl.MultiAsset
+toCdl ma | MultiAsset mp <- normalizeMultiAsset ma =
+  packMapContainer $ map (unwrap *** assetsToCdl) $ Map.toUnfoldable mp
   where
-  assetsToCsl :: Map AssetName BigNum -> Csl.Assets
-  assetsToCsl assets = packMapContainer $ map (unwrap *** unwrap) $ Map.toUnfoldable assets
+  assetsToCdl :: Map AssetName BigNum -> Cdl.Assets
+  assetsToCdl assets = packMapContainer $ map (unwrap *** unwrap) $ Map.toUnfoldable assets
 
-fromCsl :: Csl.MultiAsset -> MultiAsset
-fromCsl multiAsset = MultiAsset $ Map.fromFoldable $
+fromCdl :: Cdl.MultiAsset -> MultiAsset
+fromCdl multiAsset = MultiAsset $ Map.fromFoldable $
   unpackMapContainer multiAsset <#> wrap *** \asset ->
     Map.fromFoldable (unpackMapContainer asset <#> wrap *** wrap)

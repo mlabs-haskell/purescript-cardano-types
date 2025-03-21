@@ -1,7 +1,7 @@
 module Cardano.Types.Vote
   ( Vote(VoteNo, VoteYes, VoteAbstain)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -15,7 +15,7 @@ import Aeson
   , fromString
   , toStringifiedNumbersJson
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
@@ -52,16 +52,16 @@ instance DecodeAeson Vote where
 instance Arbitrary Vote where
   arbitrary = genericArbitrary
 
-toCsl :: Vote -> Csl.VoteKind
-toCsl =
-  Csl.toCslEnum <<< case _ of
-    VoteNo -> Csl.VoteKind_No
-    VoteYes -> Csl.VoteKind_Yes
-    VoteAbstain -> Csl.VoteKind_Abstain
+toCdl :: Vote -> Cdl.VoteKind
+toCdl =
+  Cdl.toCslEnum <<< case _ of
+    VoteNo -> Cdl.VoteKind_No
+    VoteYes -> Cdl.VoteKind_Yes
+    VoteAbstain -> Cdl.VoteKind_Abstain
 
-fromCsl :: Csl.VoteKind -> Vote
-fromCsl =
-  Csl.fromCslEnum >>> case _ of
-    Csl.VoteKind_No -> VoteNo
-    Csl.VoteKind_Yes -> VoteYes
-    Csl.VoteKind_Abstain -> VoteAbstain
+fromCdl :: Cdl.VoteKind -> Vote
+fromCdl =
+  Cdl.fromCslEnum >>> case _ of
+    Cdl.VoteKind_No -> VoteNo
+    Cdl.VoteKind_Yes -> VoteYes
+    Cdl.VoteKind_Abstain -> VoteAbstain

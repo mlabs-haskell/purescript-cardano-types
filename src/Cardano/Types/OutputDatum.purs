@@ -3,8 +3,8 @@ module Cardano.Types.OutputDatum
   , outputDatumDataHash
   , outputDatumDatum
   , pprintOutputDatum
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -19,7 +19,7 @@ import Aeson
   , (.:)
   )
 import Cardano.AsCbor (class AsCbor, encodeCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, genericFromData)
 import Cardano.Plutus.DataSchema (class HasPlutusSchema, type (:+), type (:=), type (@@), PNil, S, Z)
 import Cardano.ToData (class ToData, genericToData)
@@ -91,23 +91,23 @@ instance DecodeAeson OutputDatum where
             $ fromString tagValue
 
 instance AsCbor OutputDatum where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance Arbitrary OutputDatum where
   arbitrary = genericArbitrary
 
-fromCsl :: Csl.OutputDatum -> OutputDatum
-fromCsl cslOd = case toMaybe (Csl.outputDatum_dataHash cslOd) of
+fromCdl :: Cdl.OutputDatum -> OutputDatum
+fromCdl cslOd = case toMaybe (Cdl.outputDatum_dataHash cslOd) of
   Just hash -> OutputDatumHash (wrap hash)
-  Nothing -> case toMaybe (Csl.outputDatum_data cslOd) of
-    Just dat -> OutputDatum (PlutusData.fromCsl dat)
-    Nothing -> unsafePerformEffect $ throw "Cardano.Types.OutputDatum.fromCsl: unknown kind"
+  Nothing -> case toMaybe (Cdl.outputDatum_data cslOd) of
+    Just dat -> OutputDatum (PlutusData.fromCdl dat)
+    Nothing -> unsafePerformEffect $ throw "Cardano.Types.OutputDatum.fromCdl: unknown kind"
 
-toCsl :: OutputDatum -> Csl.OutputDatum
-toCsl = case _ of
-  OutputDatumHash hash -> Csl.outputDatum_newDataHash (unwrap hash)
-  OutputDatum datum -> Csl.outputDatum_newData (PlutusData.toCsl datum)
+toCdl :: OutputDatum -> Cdl.OutputDatum
+toCdl = case _ of
+  OutputDatumHash hash -> Cdl.outputDatum_newDataHash (unwrap hash)
+  OutputDatum datum -> Cdl.outputDatum_newData (PlutusData.toCdl datum)
 
 pprintOutputDatum :: OutputDatum -> TagSet
 pprintOutputDatum = TagSet.fromArray <<< case _ of

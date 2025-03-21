@@ -1,7 +1,7 @@
 module Cardano.Types.TransactionInput
   ( TransactionInput(TransactionInput)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   , _transactionId
   , _index
   , pprintTransactionInput
@@ -16,7 +16,7 @@ import Cardano.Data.Lite
   , transactionInput_new
   , transactionInput_transactionId
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, fromData)
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum (zero) as BigNum
@@ -89,11 +89,11 @@ instance Coarbitrary TransactionInput where
     coarbitrary (toInt input.index) $ coarbitrary input.transactionId generator
 
 instance AsCbor TransactionInput where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-fromCsl :: Csl.TransactionInput -> TransactionInput
-fromCsl input =
+fromCdl :: Cdl.TransactionInput -> TransactionInput
+fromCdl input =
   let
     index = UInt.fromNumber $ transactionInput_index input
     transactionId = TransactionHash $ transactionInput_transactionId input
@@ -103,8 +103,8 @@ fromCsl input =
       , index
       }
 
-toCsl :: TransactionInput -> Csl.TransactionInput
-toCsl (TransactionInput { transactionId, index }) = do
+toCdl :: TransactionInput -> Cdl.TransactionInput
+toCdl (TransactionInput { transactionId, index }) = do
   transactionInput_new (unwrap transactionId) (UInt.toNumber index)
 
 _transactionId :: Lens' TransactionInput TransactionHash

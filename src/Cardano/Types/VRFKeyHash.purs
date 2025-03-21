@@ -10,11 +10,11 @@ import Aeson
   )
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, fromData)
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum as BigNum
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd)
+import Cardano.Types.Internal.Helpers (compareViaCdlBytes, eqOrd)
 import Cardano.Types.PlutusData (PlutusData(Constr))
 import Data.ByteArray (byteArrayToHex)
 import Data.Function (on)
@@ -22,7 +22,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
 
-newtype VRFKeyHash = VRFKeyHash Csl.VRFKeyHash
+newtype VRFKeyHash = VRFKeyHash Cdl.VRFKeyHash
 
 derive instance Newtype VRFKeyHash _
 derive instance Generic VRFKeyHash _
@@ -34,7 +34,7 @@ instance Eq VRFKeyHash where
   eq = eqOrd
 
 instance Ord VRFKeyHash where
-  compare = compareViaCslBytes `on` unwrap
+  compare = compareViaCdlBytes `on` unwrap
 
 instance FromData VRFKeyHash where
   fromData (Constr n [ bytes ])

@@ -28,7 +28,7 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite (Int) as Csl
+import Cardano.Data.Lite (Int) as Cdl
 import Cardano.Data.Lite
   ( fromBytes
   , int_asNegative
@@ -55,7 +55,7 @@ import Prim (String)
 import Prim as Prim
 
 -- | Signed 128-bit integer, -170141183460469231731687303715884105728..170141183460469231731687303715884105727
-newtype Int = Int Csl.Int
+newtype Int = Int Cdl.Int
 
 derive instance Generic Int _
 derive instance Newtype Int _

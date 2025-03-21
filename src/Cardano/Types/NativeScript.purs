@@ -41,7 +41,7 @@ import Cardano.Data.Lite
   , timelockStart_slotBignum
   , unpackListContainer
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BigNum (fromString)
 import Cardano.Types.BigNum as BigNum
 import Cardano.Types.Ed25519KeyHash (Ed25519KeyHash)
@@ -132,11 +132,11 @@ instance EncodeAeson NativeScript where
     TimelockExpiry r -> encodeTagged' "TimelockExpiry" r
 
 instance AsCbor NativeScript where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 hash :: NativeScript -> ScriptHash
-hash = toCsl >>> nativeScript_hash >>> wrap
+hash = toCdl >>> nativeScript_hash >>> wrap
 
 pprintNativeScript :: NativeScript -> TagSet
 pprintNativeScript = case _ of
@@ -151,11 +151,11 @@ pprintNativeScript = case _ of
   TimelockStart slot -> "Timelock start" `tag` BigNum.toString (unwrap slot)
   TimelockExpiry slot -> "Timelock expiry" `tag` BigNum.toString (unwrap slot)
 
-toCslMany :: Array NativeScript -> Csl.NativeScripts
-toCslMany = packListContainer <<< map toCsl
+toCdlMany :: Array NativeScript -> Cdl.NativeScripts
+toCdlMany = packListContainer <<< map toCdl
 
-fromCsl :: Csl.NativeScript -> NativeScript
-fromCsl ns = unsafePartial $ fromJust $
+fromCdl :: Cdl.NativeScript -> NativeScript
+fromCdl ns = unsafePartial $ fromJust $
   convertScriptPubkey <$> toMaybe (nativeScript_asScriptPubkey ns)
     <|> convertScriptAll <$> toMaybe (nativeScript_asScriptAll ns)
     <|> convertScriptAny <$> toMaybe (nativeScript_asScriptAny ns)
@@ -166,22 +166,22 @@ fromCsl ns = unsafePartial $ fromJust $
   where
   convertScriptPubkey = scriptPubkey_addrKeyhash >>> wrap >>> ScriptPubkey
   convertScriptAll =
-    scriptAll_nativeScripts >>> unpackListContainer >>> map fromCsl >>>
+    scriptAll_nativeScripts >>> unpackListContainer >>> map fromCdl >>>
       ScriptAll
   convertScriptAny =
-    scriptAny_nativeScripts >>> unpackListContainer >>> map fromCsl >>>
+    scriptAny_nativeScripts >>> unpackListContainer >>> map fromCdl >>>
       ScriptAny
   convertScriptNOfK nOfK = ScriptNOfK
     (unsafePartial $ fromJust $ Int.fromNumber $ scriptNOfK_n nOfK)
-    (map fromCsl $ unpackListContainer $ scriptNOfK_nativeScripts nOfK)
+    (map fromCdl $ unpackListContainer $ scriptNOfK_nativeScripts nOfK)
   convertScriptTimelockStart =
     timelockStart_slotBignum >>> wrap >>> Slot >>> TimelockStart
   convertScriptTimelockExpiry =
     timelockExpiry_slotBignum >>> wrap >>> Slot >>> TimelockExpiry
 
 -- | Note: unbounded recursion here.
-toCsl :: NativeScript -> Csl.NativeScript
-toCsl = case _ of
+toCdl :: NativeScript -> Cdl.NativeScript
+toCdl = case _ of
   ScriptPubkey keyHash -> convertScriptPubkey keyHash
   ScriptAll nss -> convertScriptAll nss
   ScriptAny nss -> convertScriptAny nss
@@ -189,30 +189,30 @@ toCsl = case _ of
   TimelockStart slot -> convertTimelockStart slot
   TimelockExpiry slot -> convertTimelockExpiry slot
   where
-  convertScriptPubkey :: Ed25519KeyHash -> Csl.NativeScript
+  convertScriptPubkey :: Ed25519KeyHash -> Cdl.NativeScript
   convertScriptPubkey kh = do
     nativeScript_newScriptPubkey $ scriptPubkey_new (unwrap kh)
 
-  convertScriptAll :: Array NativeScript -> Csl.NativeScript
+  convertScriptAll :: Array NativeScript -> Cdl.NativeScript
   convertScriptAll nss =
     nativeScript_newScriptAll <<< scriptAll_new <<<
-      packListContainer $ map toCsl nss
+      packListContainer $ map toCdl nss
 
-  convertScriptAny :: Array NativeScript -> Csl.NativeScript
+  convertScriptAny :: Array NativeScript -> Cdl.NativeScript
   convertScriptAny nss =
     nativeScript_newScriptAny <<< scriptAny_new <<<
-      packListContainer $ map toCsl nss
+      packListContainer $ map toCdl nss
 
-  convertScriptNOfK :: Int -> Array NativeScript -> Csl.NativeScript
+  convertScriptNOfK :: Int -> Array NativeScript -> Cdl.NativeScript
   convertScriptNOfK n nss =
     nativeScript_newScriptNOfK <<< scriptNOfK_new (Int.toNumber n) <<<
-      packListContainer $ map toCsl nss
+      packListContainer $ map toCdl nss
 
-  convertTimelockStart :: Slot -> Csl.NativeScript
+  convertTimelockStart :: Slot -> Cdl.NativeScript
   convertTimelockStart (Slot slot) =
     nativeScript_newTimelockStart (timelockStart_newTimelockstart $ unwrap slot)
 
-  convertTimelockExpiry :: Slot -> Csl.NativeScript
+  convertTimelockExpiry :: Slot -> Cdl.NativeScript
   convertTimelockExpiry (Slot slot) =
     nativeScript_newTimelockExpiry
       (timelockExpiry_newTimelockexpiry $ unwrap slot)

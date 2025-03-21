@@ -4,7 +4,7 @@ import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.ExUnits (ExUnits)
 import Cardano.Types.ExUnits as ExUnits
@@ -29,34 +29,34 @@ derive instance Eq Redeemer
 derive instance Ord Redeemer
 
 instance EncodeAeson Redeemer where
-  encodeAeson = toCsl >>> encodeAeson
+  encodeAeson = toCdl >>> encodeAeson
 
 instance DecodeAeson Redeemer where
-  decodeAeson = map fromCsl <<< decodeAeson
+  decodeAeson = map fromCdl <<< decodeAeson
 
 instance Show Redeemer where
   show = genericShow
 
 instance AsCbor Redeemer where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-fromCsl :: Csl.Redeemer -> Redeemer
-fromCsl input =
+fromCdl :: Cdl.Redeemer -> Redeemer
+fromCdl input =
   let
-    tag = RedeemerTag.fromCsl $ Csl.redeemer_tag input
-    index = wrap $ Csl.redeemer_index input
-    d = PlutusData.fromCsl $ Csl.redeemer_data input
-    exUnits = ExUnits.fromCsl $ Csl.redeemer_exUnits input
+    tag = RedeemerTag.fromCdl $ Cdl.redeemer_tag input
+    index = wrap $ Cdl.redeemer_index input
+    d = PlutusData.fromCdl $ Cdl.redeemer_data input
+    exUnits = ExUnits.fromCdl $ Cdl.redeemer_exUnits input
   in
     Redeemer { tag, index, data: wrap d, exUnits }
 
-toCsl :: Redeemer -> Csl.Redeemer
-toCsl (Redeemer input) =
+toCdl :: Redeemer -> Cdl.Redeemer
+toCdl (Redeemer input) =
   let
-    tag = RedeemerTag.toCsl $ input.tag
+    tag = RedeemerTag.toCdl $ input.tag
     index = unwrap input.index
-    d = PlutusData.toCsl $ unwrap $ input.data
-    exUnits = ExUnits.toCsl $ input.exUnits
+    d = PlutusData.toCdl $ unwrap $ input.data
+    exUnits = ExUnits.toCdl $ input.exUnits
   in
-    Csl.redeemer_new tag index d exUnits
+    Cdl.redeemer_new tag index d exUnits

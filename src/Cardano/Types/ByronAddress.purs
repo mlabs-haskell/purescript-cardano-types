@@ -9,9 +9,9 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (byronAddress_fromBase58, byronAddress_toBase58, fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Base58String (Base58String)
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromBytes)
+import Cardano.Types.Internal.Helpers (compareViaCdlBytes, eqOrd, showFromBytes)
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe, fromJust)
@@ -20,7 +20,7 @@ import Data.Nullable (toMaybe)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary)
 
-newtype ByronAddress = ByronAddress Csl.ByronAddress
+newtype ByronAddress = ByronAddress Cdl.ByronAddress
 
 derive instance Generic ByronAddress _
 derive instance Newtype ByronAddress _
@@ -31,7 +31,7 @@ instance Eq ByronAddress where
 -- This is not newtyped derived because it will be used for ordering a
 -- `TransactionInput`, we want lexicographical ordering on the hexstring.
 instance Ord ByronAddress where
-  compare = compareViaCslBytes `on` unwrap
+  compare = compareViaCdlBytes `on` unwrap
 
 instance Show ByronAddress where
   show = unwrap >>> showFromBytes "ByronAddress"

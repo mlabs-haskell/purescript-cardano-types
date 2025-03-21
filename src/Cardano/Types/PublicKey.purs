@@ -17,7 +17,7 @@ import Cardano.Data.Lite
   , publicKey_toBech32
   , publicKey_verify
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, fromData)
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.Bech32String (Bech32String)
@@ -32,7 +32,7 @@ import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 
-newtype PublicKey = PublicKey Csl.PublicKey
+newtype PublicKey = PublicKey Cdl.PublicKey
 
 derive instance Generic PublicKey _
 derive instance Newtype PublicKey _

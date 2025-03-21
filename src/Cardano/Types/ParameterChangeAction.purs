@@ -1,18 +1,18 @@
 module Cardano.Types.ParameterChangeAction
   ( ParameterChangeAction(ParameterChangeAction)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
-import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
+import Cardano.Types.GovernanceActionId (fromCdl, toCdl) as GovernanceActionId
 import Cardano.Types.ProtocolParamUpdate (ProtocolParamUpdate)
-import Cardano.Types.ProtocolParamUpdate (fromCsl, toCsl) as ProtocolParamUpdate
+import Cardano.Types.ProtocolParamUpdate (fromCdl, toCdl) as ProtocolParamUpdate
 import Cardano.Types.ScriptHash (ScriptHash)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing))
@@ -42,35 +42,35 @@ instance Show ParameterChangeAction where
   show = genericShow
 
 instance AsCbor ParameterChangeAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: ParameterChangeAction -> Csl.ParameterChangeAction
-toCsl (ParameterChangeAction rec) =
+toCdl :: ParameterChangeAction -> Cdl.ParameterChangeAction
+toCdl (ParameterChangeAction rec) =
   case rec.actionId, rec.policyHash of
     Nothing, Nothing ->
-      Csl.parameterChangeAction_new pparamsUpdate
+      Cdl.parameterChangeAction_new pparamsUpdate
     Just actionId, Nothing ->
-      Csl.parameterChangeAction_newWithActionId (GovernanceActionId.toCsl actionId) pparamsUpdate
+      Cdl.parameterChangeAction_newWithActionId (GovernanceActionId.toCdl actionId) pparamsUpdate
     Nothing, Just policyHash ->
-      Csl.parameterChangeAction_newWithPolicyHash pparamsUpdate (unwrap policyHash)
+      Cdl.parameterChangeAction_newWithPolicyHash pparamsUpdate (unwrap policyHash)
     Just actionId, Just policyHash ->
-      Csl.parameterChangeAction_newWithPolicyHashAndActionId
-        (GovernanceActionId.toCsl actionId)
+      Cdl.parameterChangeAction_newWithPolicyHashAndActionId
+        (GovernanceActionId.toCdl actionId)
         pparamsUpdate
         (unwrap policyHash)
   where
-  pparamsUpdate = ProtocolParamUpdate.toCsl rec.pparamsUpdate
+  pparamsUpdate = ProtocolParamUpdate.toCdl rec.pparamsUpdate
 
-fromCsl :: Csl.ParameterChangeAction -> ParameterChangeAction
-fromCsl action =
+fromCdl :: Cdl.ParameterChangeAction -> ParameterChangeAction
+fromCdl action =
   ParameterChangeAction
     { pparamsUpdate:
-        ProtocolParamUpdate.fromCsl $
-          Csl.parameterChangeAction_protocolParamUpdates action
+        ProtocolParamUpdate.fromCdl $
+          Cdl.parameterChangeAction_protocolParamUpdates action
     , actionId:
-        GovernanceActionId.fromCsl <$>
-          toMaybe (Csl.parameterChangeAction_govActionId action)
+        GovernanceActionId.fromCdl <$>
+          toMaybe (Cdl.parameterChangeAction_govActionId action)
     , policyHash:
-        wrap <$> toMaybe (Csl.parameterChangeAction_policyHash action)
+        wrap <$> toMaybe (Cdl.parameterChangeAction_policyHash action)
     }

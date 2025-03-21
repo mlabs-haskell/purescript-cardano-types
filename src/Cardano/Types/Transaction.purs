@@ -1,8 +1,8 @@
 module Cardano.Types.Transaction
   ( Transaction(Transaction)
   , empty
-  , toCsl
-  , fromCsl
+  , toCdl
+  , fromCdl
   , hash
   , _body
   , _isValid
@@ -16,7 +16,7 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (transaction_setIsValid)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.AuxiliaryData (AuxiliaryData)
 import Cardano.Types.AuxiliaryData as AuxiliaryData
 import Cardano.Types.TransactionBody (TransactionBody, _outputs)
@@ -60,8 +60,8 @@ instance Show Transaction where
   show = genericShow
 
 instance AsCbor Transaction where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 derive newtype instance EncodeAeson Transaction
 derive newtype instance DecodeAeson Transaction
@@ -77,8 +77,8 @@ empty = Transaction
 hash :: Transaction -> TransactionHash
 hash = unwrap
   >>> _.body
-  >>> TransactionBody.toCsl
-  >>> Csl.hashTransaction
+  >>> TransactionBody.toCdl
+  >>> Cdl.hashTransaction
   >>> wrap
 
 findUtxos
@@ -94,24 +94,24 @@ findUtxos pred tx = toUtxoMap $
   where
   transactionId = hash tx
 
-fromCsl :: Csl.Transaction -> Transaction
-fromCsl tx =
+fromCdl :: Cdl.Transaction -> Transaction
+fromCdl tx =
   let
-    body = TransactionBody.fromCsl $ Csl.transaction_body tx
-    witnessSet = TransactionWitnessSet.fromCsl $ Csl.transaction_witnessSet tx
-    auxiliaryData = map AuxiliaryData.fromCsl $ toMaybe $ Csl.transaction_auxiliaryData tx
-    isValid = Csl.transaction_isValid tx
+    body = TransactionBody.fromCdl $ Cdl.transaction_body tx
+    witnessSet = TransactionWitnessSet.fromCdl $ Cdl.transaction_witnessSet tx
+    auxiliaryData = map AuxiliaryData.fromCdl $ toMaybe $ Cdl.transaction_auxiliaryData tx
+    isValid = Cdl.transaction_isValid tx
   in
     Transaction { body, witnessSet, auxiliaryData, isValid }
 
-toCsl :: Transaction -> Csl.Transaction
-toCsl (Transaction { body, witnessSet, auxiliaryData, isValid }) = do
+toCdl :: Transaction -> Cdl.Transaction
+toCdl (Transaction { body, witnessSet, auxiliaryData, isValid }) = do
   unsafePerformEffect do
     let
-      tx = Csl.transaction_new (TransactionBody.toCsl body)
-        (TransactionWitnessSet.toCsl witnessSet)
+      tx = Cdl.transaction_new (TransactionBody.toCdl body)
+        (TransactionWitnessSet.toCdl witnessSet)
         -- TODO: fix partiality here
-        (fromMaybe (unsafeCoerce undefined) (AuxiliaryData.toCsl <$> auxiliaryData))
+        (fromMaybe (unsafeCoerce undefined) (AuxiliaryData.toCdl <$> auxiliaryData))
     transaction_setIsValid tx isValid
     pure tx
 

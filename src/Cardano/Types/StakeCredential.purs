@@ -1,7 +1,7 @@
 module Cardano.Types.StakeCredential
   ( StakeCredential(StakeCredential)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -14,7 +14,7 @@ import Aeson
   , encodeAeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Credential
   ( Credential(PubKeyHashCredential, ScriptHashCredential)
   )
@@ -61,18 +61,18 @@ instance EncodeAeson StakeCredential where
 instance Arbitrary StakeCredential where
   arbitrary = genericArbitrary
 
-fromCsl :: Csl.Credential -> StakeCredential
-fromCsl cslCred =
-  case toMaybe (Csl.credential_toKeyhash cslCred) of
+fromCdl :: Cdl.Credential -> StakeCredential
+fromCdl cslCred =
+  case toMaybe (Cdl.credential_toKeyhash cslCred) of
     Just hash -> StakeCredential $ PubKeyHashCredential (wrap hash)
-    Nothing -> case toMaybe (Csl.credential_toScripthash cslCred) of
+    Nothing -> case toMaybe (Cdl.credential_toScripthash cslCred) of
       Just hash -> StakeCredential $ ScriptHashCredential (wrap hash)
-      Nothing -> unsafePerformEffect $ throw "Cardano.Types.StakeCredential.fromCsl: unknown kind"
+      Nothing -> unsafePerformEffect $ throw "Cardano.Types.StakeCredential.fromCdl: unknown kind"
 
-toCsl :: StakeCredential -> Csl.Credential
-toCsl (StakeCredential cred) =
+toCdl :: StakeCredential -> Cdl.Credential
+toCdl (StakeCredential cred) =
   case cred of
     PubKeyHashCredential hash ->
-      Csl.credential_fromKeyhash (unwrap hash)
+      Cdl.credential_fromKeyhash (unwrap hash)
     ScriptHashCredential hash ->
-      Csl.credential_fromScripthash (unwrap hash)
+      Cdl.credential_fromScripthash (unwrap hash)

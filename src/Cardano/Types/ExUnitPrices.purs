@@ -1,14 +1,14 @@
 module Cardano.Types.ExUnitPrices
   ( ExUnitPrices(ExUnitPrices)
-  , toCsl
-  , fromCsl
+  , toCdl
+  , fromCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.UnitInterval (UnitInterval)
 import Cardano.Types.UnitInterval as UnitInterval
 import Data.Generic.Rep (class Generic)
@@ -31,17 +31,17 @@ instance Show ExUnitPrices where
   show = genericShow
 
 instance AsCbor ExUnitPrices where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
-fromCsl :: Csl.ExUnitPrices -> ExUnitPrices
-fromCsl bw =
+fromCdl :: Cdl.ExUnitPrices -> ExUnitPrices
+fromCdl bw =
   let
-    memPrice = UnitInterval.fromCsl (Csl.exUnitPrices_memPrice bw)
-    stepPrice = UnitInterval.fromCsl (Csl.exUnitPrices_stepPrice bw)
+    memPrice = UnitInterval.fromCdl (Cdl.exUnitPrices_memPrice bw)
+    stepPrice = UnitInterval.fromCdl (Cdl.exUnitPrices_stepPrice bw)
   in
     (wrap { memPrice, stepPrice })
 
-toCsl :: ExUnitPrices -> Csl.ExUnitPrices
-toCsl (ExUnitPrices { memPrice, stepPrice }) =
-  Csl.exUnitPrices_new (UnitInterval.toCsl memPrice) (UnitInterval.toCsl stepPrice)
+toCdl :: ExUnitPrices -> Cdl.ExUnitPrices
+toCdl (ExUnitPrices { memPrice, stepPrice }) =
+  Cdl.exUnitPrices_new (UnitInterval.toCdl memPrice) (UnitInterval.toCdl stepPrice)

@@ -13,7 +13,7 @@ import Cardano.Data.Lite
   , privateKey_toBech32
   , privateKey_toPublic
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Ed25519Signature (Ed25519Signature)
 import Cardano.Types.Internal.Helpers (eqOrd)
@@ -30,7 +30,7 @@ import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (toMaybe)
 import Effect (Effect)
 
-newtype PrivateKey = PrivateKey Csl.PrivateKey
+newtype PrivateKey = PrivateKey Cdl.PrivateKey
 
 derive instance Generic PrivateKey _
 derive instance Newtype PrivateKey _
@@ -71,7 +71,7 @@ sign pk bytes = wrap $ privateKey_sign (unwrap pk) bytes
 -- | Sign a transaction body hash
 makeVkeyWitness :: TransactionHash -> PrivateKey -> Vkeywitness
 makeVkeyWitness th pk =
-  Vkeywitness.fromCsl $ Csl.makeVkeyWitness (unwrap th) (unwrap pk)
+  Vkeywitness.fromCdl $ Cdl.makeVkeyWitness (unwrap th) (unwrap pk)
 
 generateExtended :: Effect PrivateKey
 generateExtended = wrap <$> privateKey_generateEd25519extended

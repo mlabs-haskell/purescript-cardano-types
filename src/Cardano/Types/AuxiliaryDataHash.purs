@@ -5,13 +5,13 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor, encodeCbor)
 import Cardano.Data.Lite (fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Data.Function (on)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
-newtype AuxiliaryDataHash = AuxiliaryDataHash Csl.AuxiliaryDataHash
+newtype AuxiliaryDataHash = AuxiliaryDataHash Cdl.AuxiliaryDataHash
 
 derive instance Newtype AuxiliaryDataHash _
 derive instance Generic AuxiliaryDataHash _

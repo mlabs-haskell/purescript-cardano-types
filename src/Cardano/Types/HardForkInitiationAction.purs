@@ -1,18 +1,18 @@
 module Cardano.Types.HardForkInitiationAction
   ( HardForkInitiationAction(HardForkInitiationAction)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.GovernanceActionId (GovernanceActionId)
-import Cardano.Types.GovernanceActionId (fromCsl, toCsl) as GovernanceActionId
+import Cardano.Types.GovernanceActionId (fromCdl, toCdl) as GovernanceActionId
 import Cardano.Types.ProtocolVersion (ProtocolVersion)
-import Cardano.Types.ProtocolVersion (fromCsl, toCsl) as ProtocolVersion
+import Cardano.Types.ProtocolVersion (fromCdl, toCdl) as ProtocolVersion
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -39,27 +39,27 @@ instance Show HardForkInitiationAction where
   show = genericShow
 
 instance AsCbor HardForkInitiationAction where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: HardForkInitiationAction -> Csl.HardForkInitiationAction
-toCsl (HardForkInitiationAction rec) =
+toCdl :: HardForkInitiationAction -> Cdl.HardForkInitiationAction
+toCdl (HardForkInitiationAction rec) =
   case rec.actionId of
     Nothing ->
-      Csl.hardForkInitiationAction_new protocolVersion
+      Cdl.hardForkInitiationAction_new protocolVersion
     Just actionId ->
-      Csl.hardForkInitiationAction_newWithActionId (GovernanceActionId.toCsl actionId)
+      Cdl.hardForkInitiationAction_newWithActionId (GovernanceActionId.toCdl actionId)
         protocolVersion
   where
-  protocolVersion = ProtocolVersion.toCsl rec.protocolVersion
+  protocolVersion = ProtocolVersion.toCdl rec.protocolVersion
 
-fromCsl :: Csl.HardForkInitiationAction -> HardForkInitiationAction
-fromCsl action =
+fromCdl :: Cdl.HardForkInitiationAction -> HardForkInitiationAction
+fromCdl action =
   HardForkInitiationAction
     { protocolVersion:
-        ProtocolVersion.fromCsl $
-          Csl.hardForkInitiationAction_protocolVersion action
+        ProtocolVersion.fromCdl $
+          Cdl.hardForkInitiationAction_protocolVersion action
     , actionId:
-        GovernanceActionId.fromCsl <$>
-          toMaybe (Csl.hardForkInitiationAction_govActionId action)
+        GovernanceActionId.fromCdl <$>
+          toMaybe (Cdl.hardForkInitiationAction_govActionId action)
     }

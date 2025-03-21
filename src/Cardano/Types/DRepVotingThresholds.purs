@@ -1,16 +1,16 @@
 module Cardano.Types.DRepVotingThresholds
   ( DRepVotingThresholds(DRepVotingThresholds)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.UnitInterval (UnitInterval)
-import Cardano.Types.UnitInterval (fromCsl, toCsl) as UnitInterval
+import Cardano.Types.UnitInterval (fromCdl, toCdl) as UnitInterval
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
@@ -39,54 +39,54 @@ instance Show DRepVotingThresholds where
   show = genericShow
 
 instance AsCbor DRepVotingThresholds where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: DRepVotingThresholds -> Csl.DRepVotingThresholds
-toCsl (DRepVotingThresholds rec) =
-  Csl.dRepVotingThresholds_new
-    (UnitInterval.toCsl rec.motionNoConfidence)
-    (UnitInterval.toCsl rec.committeeNormal)
-    (UnitInterval.toCsl rec.committeeNoConfidence)
-    (UnitInterval.toCsl rec.updateConstitution)
-    (UnitInterval.toCsl rec.hardForkInitiation)
-    (UnitInterval.toCsl rec.ppNetworkGroup)
-    (UnitInterval.toCsl rec.ppEconomicGroup)
-    (UnitInterval.toCsl rec.ppTechnicalGroup)
-    (UnitInterval.toCsl rec.ppGovernanceGroup)
-    (UnitInterval.toCsl rec.treasuryWithdrawal)
+toCdl :: DRepVotingThresholds -> Cdl.DRepVotingThresholds
+toCdl (DRepVotingThresholds rec) =
+  Cdl.dRepVotingThresholds_new
+    (UnitInterval.toCdl rec.motionNoConfidence)
+    (UnitInterval.toCdl rec.committeeNormal)
+    (UnitInterval.toCdl rec.committeeNoConfidence)
+    (UnitInterval.toCdl rec.updateConstitution)
+    (UnitInterval.toCdl rec.hardForkInitiation)
+    (UnitInterval.toCdl rec.ppNetworkGroup)
+    (UnitInterval.toCdl rec.ppEconomicGroup)
+    (UnitInterval.toCdl rec.ppTechnicalGroup)
+    (UnitInterval.toCdl rec.ppGovernanceGroup)
+    (UnitInterval.toCdl rec.treasuryWithdrawal)
 
-fromCsl :: Csl.DRepVotingThresholds -> DRepVotingThresholds
-fromCsl dvt =
+fromCdl :: Cdl.DRepVotingThresholds -> DRepVotingThresholds
+fromCdl dvt =
   DRepVotingThresholds
     { motionNoConfidence:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_motionNoConfidence dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_motionNoConfidence dvt
     , committeeNormal:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_committeeNormal dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_committeeNormal dvt
     , committeeNoConfidence:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_committeeNoConfidence dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_committeeNoConfidence dvt
     , updateConstitution:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_updateConstitution dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_updateConstitution dvt
     , hardForkInitiation:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_hardForkInitiation dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_hardForkInitiation dvt
     , ppNetworkGroup:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_ppNetworkGroup dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_ppNetworkGroup dvt
     , ppEconomicGroup:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_ppEconomicGroup dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_ppEconomicGroup dvt
     , ppTechnicalGroup:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_ppTechnicalGroup dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_ppTechnicalGroup dvt
     , ppGovernanceGroup:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_ppGovernanceGroup dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_ppGovernanceGroup dvt
     , treasuryWithdrawal:
-        UnitInterval.fromCsl $
-          Csl.dRepVotingThresholds_treasuryWithdrawal dvt
+        UnitInterval.fromCdl $
+          Cdl.dRepVotingThresholds_treasuryWithdrawal dvt
     }

@@ -2,8 +2,8 @@ module Cardano.Types.TransactionUnspentOutput
   ( TransactionUnspentOutput(TransactionUnspentOutput)
   , toUtxoMap
   , fromUtxoMap
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   , _input
   , _output
   , filterUtxos
@@ -20,7 +20,7 @@ import Cardano.Data.Lite
   , transactionUnspentOutput_new
   , transactionUnspentOutput_output
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.TransactionHash (TransactionHash)
 import Cardano.Types.TransactionInput
   ( TransactionInput(TransactionInput)
@@ -62,8 +62,8 @@ instance Show TransactionUnspentOutput where
   show = genericShow
 
 instance AsCbor TransactionUnspentOutput where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 toUtxoMap :: Array TransactionUnspentOutput -> UtxoMap
 toUtxoMap = Map.fromFoldable <<< map
@@ -85,17 +85,17 @@ hasTransactionHash
   (TransactionUnspentOutput { input: TransactionInput { transactionId } }) =
   hash == transactionId
 
-fromCsl
-  :: Csl.TransactionUnspentOutput -> TransactionUnspentOutput
-fromCsl tuo = do
+fromCdl
+  :: Cdl.TransactionUnspentOutput -> TransactionUnspentOutput
+fromCdl tuo = do
   let
-    input = TransactionInput.fromCsl $ transactionUnspentOutput_input tuo
-    output = TransactionOutput.fromCsl $ transactionUnspentOutput_output tuo
+    input = TransactionInput.fromCdl $ transactionUnspentOutput_input tuo
+    output = TransactionOutput.fromCdl $ transactionUnspentOutput_output tuo
   TransactionUnspentOutput { input, output }
 
-toCsl :: TransactionUnspentOutput -> Csl.TransactionUnspentOutput
-toCsl (TransactionUnspentOutput { input, output }) =
-  transactionUnspentOutput_new (TransactionInput.toCsl input) (TransactionOutput.toCsl output)
+toCdl :: TransactionUnspentOutput -> Cdl.TransactionUnspentOutput
+toCdl (TransactionUnspentOutput { input, output }) =
+  transactionUnspentOutput_new (TransactionInput.toCdl input) (TransactionOutput.toCdl output)
 
 _output :: Lens' TransactionUnspentOutput TransactionOutput
 _output = _Newtype <<< prop (Proxy :: Proxy "output")

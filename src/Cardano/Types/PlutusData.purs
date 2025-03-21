@@ -7,8 +7,8 @@ module Cardano.Types.PlutusData
       , Bytes
       )
   , pprintPlutusData
-  , toCsl
-  , fromCsl
+  , toCdl
+  , fromCdl
   , unit
   ) where
 
@@ -43,8 +43,8 @@ import Cardano.Data.Lite
   , unpackListContainer
   , unpackMultiMapContainer
   )
-import Cardano.Data.Lite as Csl
-import Cardano.Types.BigInt (fromCsl, toCsl) as BigInt
+import Cardano.Data.Lite as Cdl
+import Cardano.Types.BigInt (fromCdl, toCdl) as BigInt
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.BigNum as BigNum
 import Control.Alt ((<|>))
@@ -148,8 +148,8 @@ instance EncodeAeson PlutusData where
   encodeAeson (Bytes ba) = encodeAeson ba
 
 instance AsCbor PlutusData where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance Arbitrary PlutusData where
   arbitrary = oneOf $ unsafePartial $ fromJust $ NA.fromFoldable
@@ -187,27 +187,27 @@ pprintPlutusData (Bytes bytes) = TagSet.fromArray
 
 -- serialization
 
-toCsl :: PlutusData -> Csl.PlutusData
-toCsl = case _ of
+toCdl :: PlutusData -> Cdl.PlutusData
+toCdl = case _ of
   Constr alt list -> convertConstr alt list
   Map mp -> convertPlutusMap mp
   List lst -> convertPlutusList lst
   Integer n -> convertPlutusInteger n
   Bytes b -> plutusData_newBytes b
   where
-  convertConstr :: BigNum -> Array PlutusData -> Csl.PlutusData
+  convertConstr :: BigNum -> Array PlutusData -> Cdl.PlutusData
   convertConstr alt list =
     plutusData_newConstrPlutusData $ constrPlutusData_new (unwrap alt)
-      (packListContainer $ map toCsl list)
+      (packListContainer $ map toCdl list)
 
-  convertPlutusList :: Array PlutusData -> Csl.PlutusData
+  convertPlutusList :: Array PlutusData -> Cdl.PlutusData
   convertPlutusList pd =
-    plutusData_newList <<< packListContainer $ map toCsl pd
+    plutusData_newList <<< packListContainer $ map toCdl pd
 
-  convertPlutusMap :: Array (PlutusData /\ PlutusData) -> Csl.PlutusData
+  convertPlutusMap :: Array (PlutusData /\ PlutusData) -> Cdl.PlutusData
   convertPlutusMap mp =
     plutusData_newMap $ packMultiMapContainer
-      $ map (toCsl *** (packListContainer <<< map toCsl))
+      $ map (toCdl *** (packListContainer <<< map toCdl))
       $ flip (groupValues Map.empty zero) mempty
       $ List.fromFoldable mp
     where
@@ -232,36 +232,36 @@ toCsl = case _ of
                 Array.snoc acc (key /\ Array.singleton value)
         Nothing -> acc
 
-  convertPlutusInteger :: BigInt -> Csl.PlutusData
+  convertPlutusInteger :: BigInt -> Cdl.PlutusData
   convertPlutusInteger =
-    plutusData_newInteger <<< BigInt.toCsl
+    plutusData_newInteger <<< BigInt.toCdl
 
 -- deserialization
-fromCsl :: Csl.PlutusData -> PlutusData
-fromCsl pd = unsafePartial $ fromJust $
+fromCdl :: Cdl.PlutusData -> PlutusData
+fromCdl pd = unsafePartial $ fromJust $
   (convertPlutusConstr <$> toMaybe (plutusData_asConstrPlutusData pd))
     <|> (convertPlutusMap <$> toMaybe (plutusData_asMap pd))
     <|> (convertPlutusList <$> toMaybe (plutusData_asList pd))
     <|> (convertPlutusInteger <$> toMaybe (plutusData_asInteger pd))
     <|> (Bytes <$> toMaybe (plutusData_asBytes pd))
   where
-  convertPlutusConstr :: Csl.ConstrPlutusData -> PlutusData
+  convertPlutusConstr :: Cdl.ConstrPlutusData -> PlutusData
   convertPlutusConstr constr = do
     let
       datas = unpackListContainer $ constrPlutusData_data constr
       alt = constrPlutusData_alternative constr
-    Constr (wrap alt) $ map fromCsl datas
+    Constr (wrap alt) $ map fromCdl datas
 
-  convertPlutusMap :: Csl.PlutusMap -> PlutusData
+  convertPlutusMap :: Cdl.PlutusMap -> PlutusData
   convertPlutusMap pm =
     Map $ unpackMultiMapContainer pm >>= \(k /\ vs) ->
       let
-        cslK = fromCsl k
+        cslK = fromCdl k
       in
-        unpackListContainer vs >>= fromCsl >>> Tuple cslK >>> pure
+        unpackListContainer vs >>= fromCdl >>> Tuple cslK >>> pure
 
-  convertPlutusList :: Csl.PlutusList -> PlutusData
-  convertPlutusList = unpackListContainer >>> map fromCsl >>> List
+  convertPlutusList :: Cdl.PlutusList -> PlutusData
+  convertPlutusList = unpackListContainer >>> map fromCdl >>> List
 
-  convertPlutusInteger :: Csl.BigInt -> PlutusData
-  convertPlutusInteger = Integer <<< BigInt.fromCsl
+  convertPlutusInteger :: Cdl.BigInt -> PlutusData
+  convertPlutusInteger = Integer <<< BigInt.fromCdl

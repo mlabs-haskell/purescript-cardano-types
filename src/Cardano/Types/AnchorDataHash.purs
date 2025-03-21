@@ -7,7 +7,7 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson, JsonDecodeError(TypeMismatch), decodeAeson, encodeAeson)
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
 import Cardano.Data.Lite (fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Data.ByteArray (hexToByteArray)
 import Data.Either (note)
 import Data.Function (on)
@@ -15,7 +15,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
-newtype AnchorDataHash = AnchorDataHash Csl.AnchorDataHash
+newtype AnchorDataHash = AnchorDataHash Cdl.AnchorDataHash
 
 derive instance Generic AnchorDataHash _
 derive instance Newtype AnchorDataHash _

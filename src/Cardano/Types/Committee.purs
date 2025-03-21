@@ -1,7 +1,7 @@
 module Cardano.Types.Committee
   ( Committee(Committee)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -9,12 +9,12 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (unpackListContainer)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Credential (Credential)
-import Cardano.Types.Credential (fromCsl, toCsl) as Credential
+import Cardano.Types.Credential (fromCdl, toCdl) as Credential
 import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.UnitInterval (UnitInterval)
-import Cardano.Types.UnitInterval (fromCsl, toCsl) as UnitInterval
+import Cardano.Types.UnitInterval (fromCdl, toCdl) as UnitInterval
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (fromJust)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -44,32 +44,32 @@ instance Show Committee where
   show = genericShow
 
 instance AsCbor Committee where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: Committee -> Csl.Committee
-toCsl (Committee rec) =
+toCdl :: Committee -> Cdl.Committee
+toCdl (Committee rec) =
   unsafePerformEffect do
-    committee <- Csl.committee_new $ UnitInterval.toCsl rec.quorumThreshold
+    committee <- Cdl.committee_new $ UnitInterval.toCdl rec.quorumThreshold
     for_ rec.members \(cred /\ memberEpoch) ->
-      Csl.committee_addMember committee (Credential.toCsl cred)
+      Cdl.committee_addMember committee (Credential.toCdl cred)
         (UInt.toNumber $ unwrap memberEpoch)
     pure committee
 
-fromCsl :: Csl.Committee -> Committee
-fromCsl committee =
+fromCdl :: Cdl.Committee -> Committee
+fromCdl committee =
   Committee
     { quorumThreshold:
-        UnitInterval.fromCsl $
-          Csl.committee_quorumThreshold committee
+        UnitInterval.fromCdl $
+          Cdl.committee_quorumThreshold committee
     , members:
-        (Credential.fromCsl *** (wrap <<< UInt.fromNumber)) <$>
+        (Credential.fromCdl *** (wrap <<< UInt.fromNumber)) <$>
           map
             ( \cred ->
                 Tuple cred $ unsafePartial fromJust $
-                  toMaybe (Csl.committee_getMemberEpoch committee cred)
+                  toMaybe (Cdl.committee_getMemberEpoch committee cred)
             )
             ( unpackListContainer $
-                Csl.committee_membersKeys committee
+                Cdl.committee_membersKeys committee
             )
     }

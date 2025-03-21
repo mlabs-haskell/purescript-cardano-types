@@ -3,9 +3,8 @@ module Cardano.Types.PlutusScript where
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson, decodeAeson, fromString)
-import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (fromBytes, plutusScript_bytes, plutusScript_hash, plutusScript_new, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.CborBytes (CborBytes)
 import Cardano.Types.Language (Language(PlutusV1, PlutusV2, PlutusV3))
 import Cardano.Types.RawBytes (RawBytes)
@@ -60,10 +59,10 @@ plutusV3Script ba =
   PlutusScript $ unwrap ba /\ PlutusV3
 
 encodeCbor :: PlutusScript -> CborBytes
-encodeCbor = wrap <<< toBytes <<< toCsl
+encodeCbor = wrap <<< toBytes <<< toCdl
 
 decodeCbor :: CborBytes -> Language -> Maybe PlutusScript
-decodeCbor cbor lang = flip fromCsl lang <$> fromBytes (unwrap cbor)
+decodeCbor cbor lang = flip fromCdl lang <$> fromBytes (unwrap cbor)
 
 languageToNumber :: Language -> Number
 languageToNumber PlutusV1 = Int.toNumber 1
@@ -71,16 +70,16 @@ languageToNumber PlutusV2 = Int.toNumber 2
 languageToNumber PlutusV3 = Int.toNumber 3
 
 hash :: PlutusScript -> ScriptHash
-hash script@(PlutusScript (_ /\ language)) = wrap $ plutusScript_hash (toCsl script)
+hash script@(PlutusScript (_ /\ language)) = wrap $ plutusScript_hash (toCdl script)
   (languageToNumber language)
 
 -- | Get raw Plutus script bytes
 getBytes :: PlutusScript -> RawBytes
 getBytes (PlutusScript (script /\ _)) = wrap script
 
-toCsl :: PlutusScript -> Csl.PlutusScript
-toCsl (PlutusScript (script /\ _)) =
+toCdl :: PlutusScript -> Cdl.PlutusScript
+toCdl (PlutusScript (script /\ _)) =
   plutusScript_new script
 
-fromCsl :: Csl.PlutusScript -> Language -> PlutusScript
-fromCsl ps lang = PlutusScript $ plutusScript_bytes ps /\ lang
+fromCdl :: Cdl.PlutusScript -> Language -> PlutusScript
+fromCdl ps lang = PlutusScript $ plutusScript_bytes ps /\ lang

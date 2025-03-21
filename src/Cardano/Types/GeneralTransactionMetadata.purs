@@ -5,7 +5,7 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (packMapContainer, unpackMapContainer)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.BigNum (BigNum)
 import Cardano.Types.Internal.Helpers (decodeMap, encodeMap)
 import Cardano.Types.TransactionMetadatum (TransactionMetadatum)
@@ -52,8 +52,8 @@ instance Monoid GeneralTransactionMetadata where
   mempty = GeneralTransactionMetadata Map.empty
 
 instance AsCbor GeneralTransactionMetadata where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 empty :: GeneralTransactionMetadata
 empty = wrap Map.empty
@@ -71,8 +71,8 @@ fold metas =
     , Nothing <- Map.lookup k oldMap = pure $ Map.insert k v oldMap
     | otherwise = Nothing
 
-toCsl :: GeneralTransactionMetadata -> Csl.GeneralTransactionMetadata
-toCsl = unwrap >>> Map.toUnfoldable >>> map (unwrap *** TransactionMetadatum.toCsl) >>> packMapContainer
+toCdl :: GeneralTransactionMetadata -> Cdl.GeneralTransactionMetadata
+toCdl = unwrap >>> Map.toUnfoldable >>> map (unwrap *** TransactionMetadatum.toCdl) >>> packMapContainer
 
-fromCsl :: Csl.GeneralTransactionMetadata -> GeneralTransactionMetadata
-fromCsl = unpackMapContainer >>> map (wrap *** TransactionMetadatum.fromCsl) >>> Map.fromFoldable >>> wrap
+fromCdl :: Cdl.GeneralTransactionMetadata -> GeneralTransactionMetadata
+fromCdl = unpackMapContainer >>> map (wrap *** TransactionMetadatum.fromCdl) >>> Map.fromFoldable >>> wrap

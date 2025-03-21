@@ -1,14 +1,14 @@
 module Cardano.Types.GovernanceActionId
   ( GovernanceActionId(GovernanceActionId)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
 
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.TransactionHash (TransactionHash)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
@@ -37,18 +37,18 @@ instance Show GovernanceActionId where
       <> " })"
 
 instance AsCbor GovernanceActionId where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: GovernanceActionId -> Csl.GovernanceActionId
-toCsl (GovernanceActionId rec) =
-  Csl.governanceActionId_new (unwrap rec.transactionId) (UInt.toNumber rec.index)
+toCdl :: GovernanceActionId -> Cdl.GovernanceActionId
+toCdl (GovernanceActionId rec) =
+  Cdl.governanceActionId_new (unwrap rec.transactionId) (UInt.toNumber rec.index)
 
-fromCsl :: Csl.GovernanceActionId -> GovernanceActionId
-fromCsl actionId =
+fromCdl :: Cdl.GovernanceActionId -> GovernanceActionId
+fromCdl actionId =
   let
-    transactionId = wrap $ Csl.governanceActionId_transactionId actionId
-    index = UInt.fromNumber $ Csl.governanceActionId_index actionId
+    transactionId = wrap $ Cdl.governanceActionId_transactionId actionId
+    index = UInt.fromNumber $ Cdl.governanceActionId_index actionId
   in
     GovernanceActionId
       { transactionId

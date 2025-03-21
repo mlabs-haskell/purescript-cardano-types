@@ -3,7 +3,7 @@ module Cardano.AsCbor where
 import Prelude
 
 import Cardano.Data.Lite (bigInt_fromStr, bigInt_toStr, fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.CborBytes (CborBytes)
 import Data.Maybe (Maybe, fromJust)
 import Data.Newtype (unwrap, wrap)
@@ -19,12 +19,12 @@ class AsCbor a where
 
 -- we have to put it here due to absence of orphan instances in PS
 instance AsCbor BigInt where
-  encodeCbor = toCsl >>> toBytes >>> wrap
-  decodeCbor = unwrap >>> fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> toBytes >>> wrap
+  decodeCbor = unwrap >>> fromBytes >>> map fromCdl
 
-toCsl :: BigInt -> Csl.BigInt
-toCsl bi = unsafePartial $ fromJust $ toMaybe $ bigInt_fromStr $
+toCdl :: BigInt -> Cdl.BigInt
+toCdl bi = unsafePartial $ fromJust $ toMaybe $ bigInt_fromStr $
   BigInt.toString bi
 
-fromCsl :: Csl.BigInt -> BigInt
-fromCsl bi = unsafePartial $ fromJust $ BigInt.fromString $ bigInt_toStr bi
+fromCdl :: Cdl.BigInt -> BigInt
+fromCdl bi = unsafePartial $ fromJust $ BigInt.fromString $ bigInt_toStr bi

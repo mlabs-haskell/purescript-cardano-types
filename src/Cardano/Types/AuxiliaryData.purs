@@ -1,7 +1,7 @@
 module Cardano.Types.AuxiliaryData
   ( AuxiliaryData(AuxiliaryData)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   , hashAuxiliaryData
   ) where
 
@@ -25,7 +25,7 @@ import Cardano.Data.Lite
   , packListContainer
   , unpackListContainer
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.AuxiliaryDataHash (AuxiliaryDataHash)
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata)
 import Cardano.Types.GeneralTransactionMetadata as GeneralTransactionMetadatum
@@ -79,23 +79,23 @@ instance Monoid AuxiliaryData where
     }
 
 instance AsCbor AuxiliaryData where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 hashAuxiliaryData :: AuxiliaryData -> AuxiliaryDataHash
-hashAuxiliaryData = toCsl >>> Csl.hashAuxiliaryData >>> wrap
+hashAuxiliaryData = toCdl >>> Cdl.hashAuxiliaryData >>> wrap
 
-toCsl :: AuxiliaryData -> Csl.AuxiliaryData
-toCsl
+toCdl :: AuxiliaryData -> Cdl.AuxiliaryData
+toCdl
   (AuxiliaryData { metadata, nativeScripts, plutusScripts }) = unsafePerformEffect do
   ad <- auxiliaryData_newShelleyMetadata <$> generalTransactionMetadata_new
   for_ metadata $
-    GeneralTransactionMetadatum.toCsl >>> auxiliaryData_setMetadata ad
+    GeneralTransactionMetadatum.toCdl >>> auxiliaryData_setMetadata ad
   for_ nativeScripts $
-    map NativeScript.toCsl >>> packListContainer >>> auxiliaryData_setNativeScripts ad
-  withNonEmptyArray (PlutusScript.toCsl <$> nub ps_v1) $ auxiliaryData_setPlutusScripts_v1 ad
-  withNonEmptyArray (PlutusScript.toCsl <$> nub ps_v2) $ auxiliaryData_setPlutusScripts_v2 ad
-  withNonEmptyArray (PlutusScript.toCsl <$> nub ps_v3) $ auxiliaryData_setPlutusScripts_v3 ad
+    map NativeScript.toCdl >>> packListContainer >>> auxiliaryData_setNativeScripts ad
+  withNonEmptyArray (PlutusScript.toCdl <$> nub ps_v1) $ auxiliaryData_setPlutusScripts_v1 ad
+  withNonEmptyArray (PlutusScript.toCdl <$> nub ps_v2) $ auxiliaryData_setPlutusScripts_v2 ad
+  withNonEmptyArray (PlutusScript.toCdl <$> nub ps_v3) $ auxiliaryData_setPlutusScripts_v3 ad
   pure ad
 
   where
@@ -104,11 +104,11 @@ toCsl
   ps_v2 = filterByLang PlutusV2 $ fromMaybe [] plutusScripts
   ps_v3 = filterByLang PlutusV3 $ fromMaybe [] plutusScripts
 
-fromCsl :: Csl.AuxiliaryData -> AuxiliaryData
-fromCsl csl = AuxiliaryData
-  { metadata: toMaybe (auxiliaryData_metadata csl) <#> GeneralTransactionMetadatum.fromCsl
+fromCdl :: Cdl.AuxiliaryData -> AuxiliaryData
+fromCdl csl = AuxiliaryData
+  { metadata: toMaybe (auxiliaryData_metadata csl) <#> GeneralTransactionMetadatum.fromCdl
   , nativeScripts: emptyToNothing $ toMaybe (auxiliaryData_nativeScripts csl) <#> unpackListContainer >>> map
-      NativeScript.fromCsl
+      NativeScript.fromCdl
   , plutusScripts: if (Array.null plutusScripts) then Nothing else Just plutusScripts
   }
   where
@@ -116,11 +116,11 @@ fromCsl csl = AuxiliaryData
   emptyToNothing x = x
 
   getPlutusScripts
-    :: (Csl.AuxiliaryData -> Nullable Csl.PlutusScripts)
+    :: (Cdl.AuxiliaryData -> Nullable Cdl.PlutusScripts)
     -> Language
     -> Array PlutusScript
   getPlutusScripts f lang =
-    map (flip PlutusScript.fromCsl lang) $ fromMaybe [] $ unpackListContainer <$>
+    map (flip PlutusScript.fromCdl lang) $ fromMaybe [] $ unpackListContainer <$>
       toMaybe (f csl)
 
   plutusScripts :: Array PlutusScript

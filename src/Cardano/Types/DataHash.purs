@@ -8,11 +8,11 @@ import Prelude
 import Aeson (class DecodeAeson, class EncodeAeson)
 import Cardano.AsCbor (class AsCbor)
 import Cardano.Data.Lite (fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData, fromData)
 import Cardano.ToData (class ToData, toData)
 import Cardano.Types.BigNum as BigNum
-import Cardano.Types.Internal.Helpers (compareViaCslBytes, eqOrd, showFromCbor)
+import Cardano.Types.Internal.Helpers (compareViaCdlBytes, eqOrd, showFromCbor)
 import Cardano.Types.PlutusData (PlutusData(Constr))
 import Cardano.Types.PlutusData as PlutusData
 import Data.ByteArray (byteArrayFromIntArrayUnsafe)
@@ -24,7 +24,7 @@ import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck (class Arbitrary, class Coarbitrary, coarbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
-newtype DataHash = DataHash Csl.DataHash
+newtype DataHash = DataHash Cdl.DataHash
 
 derive instance Generic DataHash _
 derive instance Newtype DataHash _
@@ -42,7 +42,7 @@ derive newtype instance DecodeAeson DataHash
 -- This is not newtyped derived because it will be used for ordering a
 -- `TransactionInput`, we want lexicographical ordering on the hexstring.
 instance Ord DataHash where
-  compare = compareViaCslBytes `on` unwrap
+  compare = compareViaCdlBytes `on` unwrap
 
 instance Show DataHash where
   show = unwrap >>> showFromCbor "DataHash"
@@ -68,4 +68,4 @@ instance Coarbitrary DataHash where
     generator
 
 hashPlutusData :: PlutusData -> DataHash
-hashPlutusData = PlutusData.toCsl >>> Csl.hashPlutusData >>> wrap
+hashPlutusData = PlutusData.toCdl >>> Cdl.hashPlutusData >>> wrap

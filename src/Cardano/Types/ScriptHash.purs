@@ -16,7 +16,7 @@ import Cardano.Data.Lite
   , scriptHash_toBech32
   , toBytes
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData)
 import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
@@ -37,7 +37,7 @@ import Test.QuickCheck (class Arbitrary)
 import Test.QuickCheck.Gen (chooseInt, vectorOf)
 
 -- | blake2b-224 hash digests of serialized monetary scripts
-newtype ScriptHash = ScriptHash Csl.ScriptHash
+newtype ScriptHash = ScriptHash Cdl.ScriptHash
 
 derive instance Newtype ScriptHash _
 derive instance Generic ScriptHash _

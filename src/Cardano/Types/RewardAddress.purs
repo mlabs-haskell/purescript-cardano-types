@@ -11,7 +11,7 @@ import Cardano.Data.Lite
   , rewardAddress_paymentCred
   , rewardAddress_toAddress
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Bech32String (Bech32String)
 import Cardano.Types.Credential as Credential
 import Cardano.Types.NetworkId (NetworkId)
@@ -32,23 +32,23 @@ type RewardAddress =
 
 toBech32 :: RewardAddress -> Bech32String
 toBech32 =
-  toCsl >>> rewardAddress_toAddress >>> flip address_toBech32 (unsafeCoerce undefined)
+  toCdl >>> rewardAddress_toAddress >>> flip address_toBech32 (unsafeCoerce undefined)
 
 fromBech32 :: Bech32String -> Maybe RewardAddress
 fromBech32 =
-  map fromCsl <<< toMaybe <<< rewardAddress_fromAddress <=<
+  map fromCdl <<< toMaybe <<< rewardAddress_fromAddress <=<
     toMaybe <<< address_fromBech32
 
-toCsl :: RewardAddress -> Csl.RewardAddress
-toCsl { networkId, stakeCredential } =
+toCdl :: RewardAddress -> Cdl.RewardAddress
+toCdl { networkId, stakeCredential } =
   rewardAddress_new
     (Int.toNumber $ NetworkId.toInt networkId)
-    (Credential.toCsl $ unwrap stakeCredential)
+    (Credential.toCdl $ unwrap stakeCredential)
 
-fromCsl :: Csl.RewardAddress -> RewardAddress
-fromCsl addr =
+fromCdl :: Cdl.RewardAddress -> RewardAddress
+fromCdl addr =
   { networkId
-  , stakeCredential: wrap $ Credential.fromCsl $ rewardAddress_paymentCred addr
+  , stakeCredential: wrap $ Credential.fromCdl $ rewardAddress_paymentCred addr
   }
   where
   networkId :: NetworkId

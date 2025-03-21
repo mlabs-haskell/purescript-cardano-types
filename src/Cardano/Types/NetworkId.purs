@@ -1,8 +1,8 @@
 module Cardano.Types.NetworkId
   ( NetworkId(TestnetId, MainnetId)
-  , fromCsl
+  , fromCdl
   , fromInt
-  , toCsl
+  , toCdl
   , toInt
   ) where
 
@@ -17,7 +17,7 @@ import Aeson
   , toStringifiedNumbersJson
   )
 import Cardano.AsCbor (class AsCbor)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Internal.Helpers (encodeTagged')
 import Data.Either (Either(Left))
 import Data.Generic.Rep (class Generic)
@@ -56,8 +56,8 @@ instance DecodeAeson NetworkId where
         $ fromString tagValue
 
 instance AsCbor NetworkId where
-  encodeCbor = toCsl >>> Csl.toBytes >>> wrap
-  decodeCbor = unwrap >>> Csl.fromBytes >>> map fromCsl
+  encodeCbor = toCdl >>> Cdl.toBytes >>> wrap
+  decodeCbor = unwrap >>> Cdl.fromBytes >>> map fromCdl
 
 instance Arbitrary NetworkId where
   arbitrary = genericArbitrary
@@ -73,13 +73,13 @@ fromInt = case _ of
   1 -> Just MainnetId
   _ -> Nothing
 
-toCsl :: NetworkId -> Csl.NetworkId
-toCsl = case _ of
-  TestnetId -> Csl.networkId_testnet
-  MainnetId -> Csl.networkId_mainnet
+toCdl :: NetworkId -> Cdl.NetworkId
+toCdl = case _ of
+  TestnetId -> Cdl.networkId_testnet
+  MainnetId -> Cdl.networkId_mainnet
 
-fromCsl :: Csl.NetworkId -> NetworkId
-fromCsl cslNetworkId =
-  case Csl.fromCslEnum (Csl.networkId_kind cslNetworkId) of
-    Csl.NetworkIdKind_Testnet -> TestnetId
-    Csl.NetworkIdKind_Mainnet -> MainnetId
+fromCdl :: Cdl.NetworkId -> NetworkId
+fromCdl cslNetworkId =
+  case Cdl.fromCslEnum (Cdl.networkId_kind cslNetworkId) of
+    Cdl.NetworkIdKind_Testnet -> TestnetId
+    Cdl.NetworkIdKind_Mainnet -> MainnetId

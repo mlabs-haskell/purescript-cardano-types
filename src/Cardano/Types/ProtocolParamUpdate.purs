@@ -1,7 +1,7 @@
 module Cardano.Types.ProtocolParamUpdate
   ( ProtocolParamUpdate(ProtocolParamUpdate)
-  , fromCsl
-  , toCsl
+  , fromCdl
+  , toCdl
   ) where
 
 import Prelude
@@ -73,13 +73,13 @@ import Cardano.Data.Lite
   , protocolParamUpdate_treasuryGrowthRate
   , unpackMapContainerToMapWith
   )
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.Types.Coin (Coin)
 import Cardano.Types.CostModel (CostModel)
 import Cardano.Types.CostModel as CostModel
 import Cardano.Types.CostModel as CostModels
 import Cardano.Types.DRepVotingThresholds (DRepVotingThresholds)
-import Cardano.Types.DRepVotingThresholds (fromCsl, toCsl) as DRepVotingThresholds
+import Cardano.Types.DRepVotingThresholds (fromCdl, toCdl) as DRepVotingThresholds
 import Cardano.Types.Epoch (Epoch)
 import Cardano.Types.ExUnitPrices (ExUnitPrices)
 import Cardano.Types.ExUnitPrices as ExUnitPrices
@@ -88,7 +88,7 @@ import Cardano.Types.ExUnits as ExUnits
 import Cardano.Types.Language (Language)
 import Cardano.Types.Language as Language
 import Cardano.Types.PoolVotingThresholds (PoolVotingThresholds)
-import Cardano.Types.PoolVotingThresholds (fromCsl, toCsl) as PoolVotingThresholds
+import Cardano.Types.PoolVotingThresholds (fromCdl, toCdl) as PoolVotingThresholds
 import Cardano.Types.UnitInterval (UnitInterval)
 import Cardano.Types.UnitInterval as UnitInterval
 import Data.Generic.Rep (class Generic)
@@ -151,11 +151,11 @@ instance Show ProtocolParamUpdate where
   show = genericShow
 
 instance AsCbor ProtocolParamUpdate where
-  encodeCbor = wrap <<< Csl.toBytes <<< toCsl
-  decodeCbor = map fromCsl <<< Csl.fromBytes <<< unwrap
+  encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
+  decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
 
-toCsl :: ProtocolParamUpdate -> Csl.ProtocolParamUpdate
-toCsl
+toCdl :: ProtocolParamUpdate -> Cdl.ProtocolParamUpdate
+toCdl
   ( ProtocolParamUpdate
       { minfeeA
       , minfeeB
@@ -199,34 +199,34 @@ toCsl
   for_ poolDeposit $ protocolParamUpdate_setPoolDeposit pp <<< unwrap <<< unwrap
   for_ maxEpoch $ protocolParamUpdate_setMaxEpoch pp <<< UInt.toNumber <<< unwrap
   for_ nOpt $ protocolParamUpdate_setNOpt pp <<< UInt.toNumber
-  for_ poolPledgeInfluence $ protocolParamUpdate_setPoolPledgeInfluence pp <<< UnitInterval.toCsl
-  for_ expansionRate $ protocolParamUpdate_setExpansionRate pp <<< UnitInterval.toCsl
-  for_ treasuryGrowthRate $ protocolParamUpdate_setTreasuryGrowthRate pp <<< UnitInterval.toCsl
+  for_ poolPledgeInfluence $ protocolParamUpdate_setPoolPledgeInfluence pp <<< UnitInterval.toCdl
+  for_ expansionRate $ protocolParamUpdate_setExpansionRate pp <<< UnitInterval.toCdl
+  for_ treasuryGrowthRate $ protocolParamUpdate_setTreasuryGrowthRate pp <<< UnitInterval.toCdl
   for_ minPoolCost $ protocolParamUpdate_setMinPoolCost pp <<< unwrap <<< unwrap
   for_ adaPerUtxoByte $ protocolParamUpdate_setAdaPerUtxoByte pp <<< unwrap <<< unwrap
   for_ costModels $ protocolParamUpdate_setCostModels pp
     <<< packMapContainer
-    <<< map (Language.toCsl *** CostModels.toCsl)
+    <<< map (Language.toCdl *** CostModels.toCdl)
     <<< Map.toUnfoldable
-  for_ executionCosts $ protocolParamUpdate_setExecutionCosts pp <<< ExUnitPrices.toCsl
-  for_ maxTxExUnits $ protocolParamUpdate_setMaxTxExUnits pp <<< ExUnits.toCsl
-  for_ maxBlockExUnits $ protocolParamUpdate_setMaxBlockExUnits pp <<< ExUnits.toCsl
+  for_ executionCosts $ protocolParamUpdate_setExecutionCosts pp <<< ExUnitPrices.toCdl
+  for_ maxTxExUnits $ protocolParamUpdate_setMaxTxExUnits pp <<< ExUnits.toCdl
+  for_ maxBlockExUnits $ protocolParamUpdate_setMaxBlockExUnits pp <<< ExUnits.toCdl
   for_ maxValueSize $ protocolParamUpdate_setMaxValueSize pp <<< UInt.toNumber
   for_ collateralPercentage $ protocolParamUpdate_setCollateralPercentage pp <<< UInt.toNumber
   for_ maxCollateralInputs $ protocolParamUpdate_setMaxCollateralInputs pp <<< UInt.toNumber
-  for_ poolVotingThresholds $ protocolParamUpdate_setPoolVotingThresholds pp <<< PoolVotingThresholds.toCsl
-  for_ drepVotingThresholds $ protocolParamUpdate_setDrepVotingThresholds pp <<< DRepVotingThresholds.toCsl
+  for_ poolVotingThresholds $ protocolParamUpdate_setPoolVotingThresholds pp <<< PoolVotingThresholds.toCdl
+  for_ drepVotingThresholds $ protocolParamUpdate_setDrepVotingThresholds pp <<< DRepVotingThresholds.toCdl
   for_ minCommitteeSize $ protocolParamUpdate_setMinCommitteeSize pp <<< UInt.toNumber
   for_ committeeTermLimit $ protocolParamUpdate_setCommitteeTermLimit pp <<< UInt.toNumber <<< unwrap
   for_ govActionValidityPeriod $ protocolParamUpdate_setGovernanceActionValidityPeriod pp <<< UInt.toNumber <<< unwrap
   for_ govActionDeposit $ protocolParamUpdate_setGovernanceActionDeposit pp <<< unwrap <<< unwrap
   for_ drepDeposit $ protocolParamUpdate_setDrepDeposit pp <<< unwrap <<< unwrap
   for_ drepInactivityPeriod $ protocolParamUpdate_setDrepInactivityPeriod pp <<< UInt.toNumber <<< unwrap
-  for_ refScriptCoinsPerByte $ protocolParamUpdate_setRefScriptCoinsPerByte pp <<< UnitInterval.toCsl
+  for_ refScriptCoinsPerByte $ protocolParamUpdate_setRefScriptCoinsPerByte pp <<< UnitInterval.toCdl
   pure pp
 
-fromCsl :: Csl.ProtocolParamUpdate -> ProtocolParamUpdate
-fromCsl pp =
+fromCdl :: Cdl.ProtocolParamUpdate -> ProtocolParamUpdate
+fromCdl pp =
   ProtocolParamUpdate
     { minfeeA
     , minfeeB
@@ -260,7 +260,7 @@ fromCsl pp =
     , refScriptCoinsPerByte
     }
   where
-  use :: forall b. (Csl.ProtocolParamUpdate -> Nullable b) -> Maybe b
+  use :: forall b. (Cdl.ProtocolParamUpdate -> Nullable b) -> Maybe b
   use f = toMaybe (f pp)
   minfeeA = wrap <<< wrap <$> use protocolParamUpdate_minfeeA
   minfeeB = wrap <<< wrap <$> use protocolParamUpdate_minfeeB
@@ -274,25 +274,25 @@ fromCsl pp =
   poolDeposit = wrap <<< wrap <$> use protocolParamUpdate_poolDeposit
   maxEpoch = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_maxEpoch
   nOpt = UInt.fromNumber <$> use protocolParamUpdate_nOpt
-  poolPledgeInfluence = UnitInterval.fromCsl <$> use protocolParamUpdate_poolPledgeInfluence
-  expansionRate = UnitInterval.fromCsl <$> use protocolParamUpdate_expansionRate
-  treasuryGrowthRate = UnitInterval.fromCsl <$> use protocolParamUpdate_treasuryGrowthRate
+  poolPledgeInfluence = UnitInterval.fromCdl <$> use protocolParamUpdate_poolPledgeInfluence
+  expansionRate = UnitInterval.fromCdl <$> use protocolParamUpdate_expansionRate
+  treasuryGrowthRate = UnitInterval.fromCdl <$> use protocolParamUpdate_treasuryGrowthRate
   minPoolCost = wrap <<< wrap <$> use protocolParamUpdate_minPoolCost
   adaPerUtxoByte = wrap <<< wrap <$> use protocolParamUpdate_adaPerUtxoByte
-  costModels = costModelsFromCsl <$> use protocolParamUpdate_costModels
-  costModelsFromCsl = unpackMapContainerToMapWith Language.fromCsl CostModel.fromCsl
-  executionCosts = ExUnitPrices.fromCsl <$> use protocolParamUpdate_executionCosts
-  maxTxExUnits = ExUnits.fromCsl <$> use protocolParamUpdate_maxTxExUnits
-  maxBlockExUnits = ExUnits.fromCsl <$> use protocolParamUpdate_maxBlockExUnits
+  costModels = costModelsFromCdl <$> use protocolParamUpdate_costModels
+  costModelsFromCdl = unpackMapContainerToMapWith Language.fromCdl CostModel.fromCdl
+  executionCosts = ExUnitPrices.fromCdl <$> use protocolParamUpdate_executionCosts
+  maxTxExUnits = ExUnits.fromCdl <$> use protocolParamUpdate_maxTxExUnits
+  maxBlockExUnits = ExUnits.fromCdl <$> use protocolParamUpdate_maxBlockExUnits
   maxValueSize = UInt.fromNumber <$> use protocolParamUpdate_maxValueSize
   collateralPercentage = UInt.fromNumber <$> use protocolParamUpdate_collateralPercentage
   maxCollateralInputs = UInt.fromNumber <$> use protocolParamUpdate_maxCollateralInputs
-  poolVotingThresholds = PoolVotingThresholds.fromCsl <$> use protocolParamUpdate_poolVotingThresholds
-  drepVotingThresholds = DRepVotingThresholds.fromCsl <$> use protocolParamUpdate_drepVotingThresholds
+  poolVotingThresholds = PoolVotingThresholds.fromCdl <$> use protocolParamUpdate_poolVotingThresholds
+  drepVotingThresholds = DRepVotingThresholds.fromCdl <$> use protocolParamUpdate_drepVotingThresholds
   minCommitteeSize = UInt.fromNumber <$> use protocolParamUpdate_minCommitteeSize
   committeeTermLimit = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_committeeTermLimit
   govActionValidityPeriod = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_governanceActionValidityPeriod
   govActionDeposit = wrap <<< wrap <$> use protocolParamUpdate_governanceActionDeposit
   drepDeposit = wrap <<< wrap <$> use protocolParamUpdate_drepDeposit
   drepInactivityPeriod = wrap <<< UInt.fromNumber <$> use protocolParamUpdate_drepInactivityPeriod
-  refScriptCoinsPerByte = UnitInterval.fromCsl <$> use protocolParamUpdate_refScriptCoinsPerByte
+  refScriptCoinsPerByte = UnitInterval.fromCdl <$> use protocolParamUpdate_refScriptCoinsPerByte

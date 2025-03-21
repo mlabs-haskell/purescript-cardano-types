@@ -11,7 +11,7 @@ import Aeson
   )
 import Cardano.AsCbor (class AsCbor, decodeCbor, encodeCbor)
 import Cardano.Data.Lite (fromBytes, toBytes)
-import Cardano.Data.Lite as Csl
+import Cardano.Data.Lite as Cdl
 import Cardano.FromData (class FromData)
 import Cardano.FromMetadata (class FromMetadata)
 import Cardano.ToData (class ToData, toData)
@@ -26,7 +26,7 @@ import Data.Maybe (Maybe(Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
 
-newtype PoolMetadataHash = PoolMetadataHash Csl.PoolMetadataHash
+newtype PoolMetadataHash = PoolMetadataHash Cdl.PoolMetadataHash
 
 derive instance Newtype PoolMetadataHash _
 derive instance Generic PoolMetadataHash _
