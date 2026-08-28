@@ -76,6 +76,12 @@ import Cardano.Types.ExUnitPrices (ExUnitPrices(ExUnitPrices)) as X
 import Cardano.Types.ExUnits (ExUnits(ExUnits)) as X
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata(GeneralTransactionMetadata)) as X
 import Cardano.Types.GenesisHash (GenesisHash(GenesisHash)) as X
+import Cardano.Types.GovId
+  ( GovId(GovCredential, GovAction)
+  , GovIdType(CCHot, CCCold, DRep)
+  , fromBech32
+  , toBech32
+  ) as X
 import Cardano.Types.GovernanceAction
   ( GovernanceAction
       ( ChangePParams
