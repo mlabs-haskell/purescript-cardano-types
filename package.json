@@ -6,7 +6,8 @@
     },
     "dependencies": {
         "@mlabs-haskell/cardano-data-lite": "0.1.0-prerelease8",
-        "@mlabs-haskell/json-bigint": "^2.0.0"
+        "@mlabs-haskell/json-bigint": "^2.0.0",
+        "bech32": "2.0.0"
     },
     "prettier": {
         "arrowParens": "avoid",

@@ -1,12 +1,15 @@
 module Cardano.Types.Internal.Helpers
-  ( eqOrd
+  ( DecodedBech32
+  , eqOrd
   , showFromBytes
   , showFromCbor
   , compareViaCdlBytes
   , decodeMap
+  , encodeBech32
   , encodeTagged
   , encodeTagged'
   , encodeMap
+  , decodeBech32
   , decodeUtf8
   , withNonEmptyArray
   , clone
@@ -26,6 +29,7 @@ import Aeson
 import Aeson as Aeson
 import Cardano.Data.Lite (class IsBytes, packListContainer, toBytes)
 import Cardano.Data.Lite.Internal (class IsCsl, class IsListContainer)
+import Cardano.Types.Bech32String (Bech32String)
 import Control.Alt ((<|>))
 import Data.Bifunctor (bimap)
 import Data.Bitraversable (ltraverse)
@@ -40,6 +44,29 @@ import Effect (Effect)
 import Effect.Exception (Error)
 import Foreign.Object (Object)
 import Foreign.Object as Obj
+
+type EitherFfiHelper =
+  { right :: forall (a :: Type) (b :: Type). b -> Either a b
+  , left :: forall (a :: Type) (b :: Type). a -> Either a b
+  }
+
+eitherFfiHelper :: EitherFfiHelper
+eitherFfiHelper =
+  { right: Right
+  , left: Left
+  }
+
+type DecodedBech32 =
+  { prefix :: String
+  , bytes :: ByteArray
+  }
+
+foreign import encodeBech32 :: String -> ByteArray -> Bech32String
+
+foreign import _decodeBech32 :: EitherFfiHelper -> Bech32String -> Either String DecodedBech32
+
+decodeBech32 :: Bech32String -> Either String DecodedBech32
+decodeBech32 = _decodeBech32 eitherFfiHelper
 
 eqOrd :: forall a. Ord a => a -> a -> Boolean
 eqOrd a b = compare a b == EQ
