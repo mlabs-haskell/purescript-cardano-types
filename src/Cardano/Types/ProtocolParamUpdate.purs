@@ -1,5 +1,6 @@
 module Cardano.Types.ProtocolParamUpdate
   ( ProtocolParamUpdate(ProtocolParamUpdate)
+  , emptyProtocolParamUpdate
   , fromCdl
   , toCdl
   ) where
@@ -94,7 +95,7 @@ import Cardano.Types.UnitInterval as UnitInterval
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(Nothing))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Nullable (Nullable, toMaybe)
 import Data.Profunctor.Strong ((***))
@@ -153,6 +154,40 @@ instance Show ProtocolParamUpdate where
 instance AsCbor ProtocolParamUpdate where
   encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
   decodeCbor = map fromCdl <<< Cdl.fromBytes <<< unwrap
+
+emptyProtocolParamUpdate :: ProtocolParamUpdate
+emptyProtocolParamUpdate = wrap
+  { minfeeA: Nothing
+  , minfeeB: Nothing
+  , maxBlockBodySize: Nothing
+  , maxTxSize: Nothing
+  , maxBlockHeaderSize: Nothing
+  , keyDeposit: Nothing
+  , poolDeposit: Nothing
+  , maxEpoch: Nothing
+  , nOpt: Nothing
+  , poolPledgeInfluence: Nothing
+  , expansionRate: Nothing
+  , treasuryGrowthRate: Nothing
+  , minPoolCost: Nothing
+  , adaPerUtxoByte: Nothing
+  , costModels: Nothing
+  , executionCosts: Nothing
+  , maxTxExUnits: Nothing
+  , maxBlockExUnits: Nothing
+  , maxValueSize: Nothing
+  , collateralPercentage: Nothing
+  , maxCollateralInputs: Nothing
+  , poolVotingThresholds: Nothing
+  , drepVotingThresholds: Nothing
+  , minCommitteeSize: Nothing
+  , committeeTermLimit: Nothing
+  , govActionValidityPeriod: Nothing
+  , govActionDeposit: Nothing
+  , drepDeposit: Nothing
+  , drepInactivityPeriod: Nothing
+  , refScriptCoinsPerByte: Nothing
+  }
 
 toCdl :: ProtocolParamUpdate -> Cdl.ProtocolParamUpdate
 toCdl
