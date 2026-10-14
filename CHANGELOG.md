@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and we follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v5.1.0
+
+## Added
+
+- `Cardano.Types.GovId` module with the `GovId` type and Bech32 converters ([#22](https://github.com/mlabs-haskell/purescript-cardano-types/pull/22))
+- `ProtocolParamUpdate.emptyProtocolParamUpdate` helper ([#22](https://github.com/mlabs-haskell/purescript-cardano-types/pull/22))
+
 # v5.0.0
 
 ## Changed
