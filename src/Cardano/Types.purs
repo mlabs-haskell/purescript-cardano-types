@@ -76,6 +76,12 @@ import Cardano.Types.ExUnitPrices (ExUnitPrices(ExUnitPrices)) as X
 import Cardano.Types.ExUnits (ExUnits(ExUnits)) as X
 import Cardano.Types.GeneralTransactionMetadata (GeneralTransactionMetadata(GeneralTransactionMetadata)) as X
 import Cardano.Types.GenesisHash (GenesisHash(GenesisHash)) as X
+import Cardano.Types.GovId
+  ( GovId(GovCredential, GovAction)
+  , GovIdType(CCHot, CCCold, DRep)
+  , fromBech32
+  , toBech32
+  ) as X
 import Cardano.Types.GovernanceAction
   ( GovernanceAction
       ( ChangePParams
@@ -129,7 +135,7 @@ import Cardano.Types.PoolParams (PoolParams(PoolParams)) as X
 import Cardano.Types.PoolPubKeyHash (PoolPubKeyHash(PoolPubKeyHash)) as X
 import Cardano.Types.PoolVotingThresholds (PoolVotingThresholds(PoolVotingThresholds)) as X
 import Cardano.Types.PrivateKey (PrivateKey(PrivateKey)) as X
-import Cardano.Types.ProtocolParamUpdate (ProtocolParamUpdate(ProtocolParamUpdate)) as X
+import Cardano.Types.ProtocolParamUpdate (ProtocolParamUpdate(ProtocolParamUpdate), emptyProtocolParamUpdate) as X
 import Cardano.Types.ProtocolParameters (ProtocolParameters(ProtocolParameters)) as X
 import Cardano.Types.ProtocolVersion (ProtocolVersion(ProtocolVersion)) as X
 import Cardano.Types.PublicKey (PublicKey(PublicKey)) as X

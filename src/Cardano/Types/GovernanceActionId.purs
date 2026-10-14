@@ -13,7 +13,9 @@ import Cardano.Types.TransactionHash (TransactionHash)
 import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.UInt (UInt)
-import Data.UInt (fromNumber, toInt, toNumber) as UInt
+import Data.UInt (fromInt, fromNumber, toInt, toNumber) as UInt
+import Test.QuickCheck (class Arbitrary, class Coarbitrary, arbitrary, coarbitrary)
+import Test.QuickCheck.Gen (chooseInt)
 
 newtype GovernanceActionId = GovernanceActionId
   { transactionId :: TransactionHash
@@ -35,6 +37,17 @@ instance Show GovernanceActionId where
       <> ", index: UInt.fromInt "
       <> show (UInt.toInt rec.index)
       <> " })"
+
+instance Arbitrary GovernanceActionId where
+  arbitrary = GovernanceActionId <$>
+    ( { transactionId: _
+      , index: _
+      } <$> arbitrary <*> (UInt.fromInt <$> chooseInt 0 1000)
+    )
+
+instance Coarbitrary GovernanceActionId where
+  coarbitrary (GovernanceActionId input) generator =
+    coarbitrary (UInt.toInt input.index) $ coarbitrary input.transactionId generator
 
 instance AsCbor GovernanceActionId where
   encodeCbor = wrap <<< Cdl.toBytes <<< toCdl
