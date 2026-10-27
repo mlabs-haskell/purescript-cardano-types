@@ -1,5 +1,6 @@
 {
     "name": "purescript-cardano-types",
+    "license": "MIT",
     "type": "module",
     "scripts": {
         "test": "spago test"
